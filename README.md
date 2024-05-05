@@ -113,3 +113,15 @@ npm run test
 ```
 
 - Runs tests using Vitest, a test runner for Vite projects.
+
+```
+npm run type-check
+```
+
+- Performs TypeScript type checking without emitting any files.
+
+```
+npm run coverage
+```
+
+- Runs tests with code coverage analysis using Vitest. Identifies which parts of your codebase are covered by tests and which are not.
