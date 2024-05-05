@@ -11,7 +11,8 @@
     "lint": "eslint src/**/*.ts",
     "format": "prettier --check src/**/*.ts",
     "test": "vitest",
-    "type-check": "tsc --noEmit"
+    "type-check": "tsc --noEmit",
+    "coverage": "vitest run --coverage"
   },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^7.8.0",
