@@ -1,0 +1,1 @@
+npx vitest --watch=false
