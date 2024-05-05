@@ -37,3 +37,33 @@ Our application is a Single Page Application (SPA) with an empty index.html 🗂
 - Vite.js
 - TypeScript
 - CSS
+
+## Getting Started
+
+To get started with the project, follow these steps:
+
+1. Clone the project repository to your computer using Git:
+
+```
+$ git clone https://github.com/amrkov5/RSS_eCommerce_App.git
+```
+
+2. Navigate to the project directory:
+
+```
+$ cd RSS_eCommerce_App
+```
+
+3. Install project dependencies (Node.js must be installed):
+
+```
+$ npm install
+```
+
+4. Start the project in development mode:
+
+```
+$ npm run dev
+```
+
+This way you will have the repository cloned to your local machine 💻, all necessary dependencies installed and project up and running 🏃‍♂️🏃‍♂️🏃.
