@@ -67,3 +67,49 @@ $ npm run dev
 ```
 
 This way you will have the repository cloned to your local machine 💻, all necessary dependencies installed and project up and running 🏃‍♂️🏃‍♂️🏃.
+
+## Scripts
+
+While working with the project you might want to use these scripts. Note that Node.js must be installed on your system.
+
+```
+npm run dev
+```
+
+- Starts the development server using Vite, enabling you to work with your project with hot module replacement and other development features. You can customize the development server settings by modifying the Vite configuration file (`vite.config.js`).
+
+```
+npm run build
+```
+
+- Builds the project for production by compiling TypeScript files (tsc) and then building with Vite.
+
+```
+npm run preview
+```
+
+- Previews the built project locally using Vite's preview command.
+
+```
+npm run prepare
+```
+
+- Runs Husky's prepare script, which sets up Git hooks for the project.
+
+```
+npm run lint
+```
+
+- Lints the TypeScript source files using ESLint, ensuring code quality and adherence to coding standards.
+
+```
+npm run format
+```
+
+- Formats the TypeScript source files using Prettier, ensuring consistent code style and formatting.
+
+```
+npm run test
+```
+
+- Runs tests using Vitest, a test runner for Vite projects.
