@@ -106,7 +106,7 @@ npm run lint
 npm run format
 ```
 
-- Formats the TypeScript source files using Prettier, ensuring consistent code style and formatting.
+- Checks if TypeScript source files are formatted according to the specified rules using Prettier and reports any formatting errors or inconsistencies without modifying the files.
 
 ```
 npm run test
