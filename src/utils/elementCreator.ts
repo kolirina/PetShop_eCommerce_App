@@ -94,3 +94,17 @@ export function createSpan(
   appendToParent(element, parentElement);
   return element;
 }
+
+export function createLink(
+  className: string,
+  text: string,
+  href: string,
+  parentElement?: HTMLElement
+): HTMLAnchorElement {
+  const element: HTMLAnchorElement = document.createElement('a');
+  element.classList.add(className);
+  element.href = href;
+  element.textContent = text;
+  appendToParent(element, parentElement);
+  return element;
+}
