@@ -1,3 +1,12 @@
+type InputArguments = {
+  className?: string;
+  type: string;
+  isActive?: boolean;
+  placeholder?: string;
+  isRequired?: boolean;
+  parentElement?: HTMLElement;
+};
+
 function appendToParent(
   element: HTMLElement,
   parentElement?: HTMLElement
@@ -27,14 +36,14 @@ export function createForm(
   return element;
 }
 
-export function createInput(
-  className: string,
-  type: string,
+export function createInput({
+  className = '',
+  type,
   isActive = true,
-  placeholder?: string,
+  placeholder,
   isRequired = false,
-  parentElement?: HTMLElement
-): HTMLInputElement {
+  parentElement,
+}: InputArguments): HTMLInputElement {
   const element: HTMLInputElement = document.createElement('input');
   element.type = type;
   element.classList.add(className);
