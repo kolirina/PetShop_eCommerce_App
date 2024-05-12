@@ -131,6 +131,7 @@ class LoginPage {
 
   private validateEmail(email: string): EmailValidationErrors[] | null {
     this.isEmailValid = false;
+    this.signInBtn.disabled = true;
     this.emailErrorsDiv.innerHTML = '';
     const emailRegex: RegExp = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
@@ -166,6 +167,7 @@ class LoginPage {
     password: string
   ): PasswordValidationErrors[] | null {
     this.isPasswordValid = false;
+    this.signInBtn.disabled = true;
     this.passwordErrorsDiv.innerHTML = '';
     if (password.length < 8) {
       this.passwordErrors.push(PasswordValidationErrors.LENGTH_ERROR);
