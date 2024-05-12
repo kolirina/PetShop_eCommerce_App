@@ -1,6 +1,15 @@
+:root {
+  --main-bg-color: rgb(251, 252, 251);
+  --text-color: rgb(35, 49, 37);
+  --accent-color: rgb(151, 59, 17);
+  --light-border-color: rgb(136, 139, 138);
+  --disabled-bg-color: rgb(240, 235, 230);
+  --disabled-border-color: rgb(150, 109, 91);
+}
+
 body {
   font-family: proxima-nova, Helvetica, Arial, sans-serif;
-  background-color: rgb(251, 252, 251);
+  background-color: var(--main-bg-color);
   height: 100vh;
   margin: 0;
 }
@@ -24,14 +33,14 @@ body {
 .preWelcomeDiv {
   margin-bottom: 15px;
   text-align: center;
-  color: rgb(35, 49, 37);
+  color: var(--text-color);
   font-size: x-large;
   font-weight: bold;
 }
 
 .emailInput {
   height: 28px;
-  color: rgb(35, 49, 37);
+  color: var(--text-color);
 }
 
 .passwordPlusEyeDiv {
@@ -41,7 +50,7 @@ body {
   flex-direction: row;
   flex-wrap: nowrap;
   justify-content: space-between;
-  border: 1px solid rgb(136, 139, 138);
+  border: 1px solid var(--light-border-color);
   border-radius: 2px;
 }
 
@@ -49,7 +58,7 @@ body {
   width: 270px;
   height: 28px;
   border: none;
-  color: rgb(35, 49, 37);
+  color: var(--text-color);
 }
 
 .passwordInput:focus,
@@ -66,39 +75,37 @@ body {
 .passwordErrors {
   width: 300px;
   font-size: smaller;
-  color: rgb(151, 59, 17);
+  color: var(--accent-color);
 }
 
 .button {
   height: 30px;
-
-  color: rgb(151, 59, 17);
+  color: var(--accent-color);
   font-weight: 600;
-
-  background-color: rgb(251, 252, 251);
-  border: 1px solid rgb(151, 59, 17);
+  background-color: var(--main-bg-color);
+  border: 1px solid var(--accent-color);
   border-radius: 2px;
 }
 
 .button:hover {
-  color: rgb(251, 252, 251);
+  color: var(--main-bg-color);
   font-weight: 400;
-
-  background-color: rgb(151, 59, 17);
-  border: 1px solid rgb(151, 59, 17);
+  background-color: var(--accent-color);
+  border: 1px solid var(--accent-color);
 }
 
 .button:disabled {
   color: rgb(204, 154, 125);
   font-weight: 400;
-  background-color: rgb(240, 235, 230);
-  border: 1px solid rgb(150, 109, 91);
+  background-color: var(--disabled-bg-color);
+  border: 1px solid var(--disabled-border-color);
 }
+
 .registerLink {
   color: rgb(33, 85, 26);
   font-size: small;
 }
 
 .registerLink:hover {
-  color: rgb(151, 59, 17);
+  color: var(--accent-color);
 }
