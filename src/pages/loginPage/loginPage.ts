@@ -129,8 +129,6 @@ class LoginPage {
     this.validatePassword(passwordValue);
   }
 
-  // private handleSubmit(): void {}
-
   private validateEmail(email: string): EmailValidationErrors[] | null {
     this.isEmailValid = false;
     this.emailErrorsDiv.innerHTML = '';
@@ -163,6 +161,7 @@ class LoginPage {
     return this.emailErrors.length > 0 ? this.emailErrors : null;
   }
 
+  // private handleSubmit(): void {}
   private validatePassword(
     password: string
   ): PasswordValidationErrors[] | null {
