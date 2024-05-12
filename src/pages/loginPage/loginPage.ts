@@ -136,13 +136,13 @@ class LoginPage {
     if (email.split('@').length !== 2) {
       this.emailErrors.push(EmailValidationErrors.AT_SYMBOL_ERROR);
     }
-    if (this.isEmailValid && this.isPasswordValid) {
-      this.signInBtn.disabled = false;
-    }
+
     if (this.emailErrors.length === 0) {
       this.isEmailValid = true;
     }
-
+    if (this.isEmailValid && this.isPasswordValid) {
+      this.signInBtn.disabled = false;
+    }
     this.showEmailErrors(this.emailErrors);
     return this.emailErrors.length > 0 ? this.emailErrors : null;
   }
