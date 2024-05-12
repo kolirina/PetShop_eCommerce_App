@@ -90,6 +90,13 @@ body {
   background-color: rgb(151, 59, 17);
   border: 1px solid rgb(151, 59, 17);
 }
+
+.button:disabled {
+  color: rgb(204, 154, 125);
+  font-weight: 400;
+  background-color: rgb(240, 235, 230);
+  border: 1px solid rgb(150, 109, 91);
+}
 .registerLink {
   color: rgb(33, 85, 26);
   font-size: small;
