@@ -206,13 +206,13 @@ class LoginPage {
 
   public showEmailErrors(emailErrors: EmailValidationErrors[]): void {
     if (emailErrors.length > 0) {
-      this.emailErrorsDiv.innerHTML = `Email must ${this.emailErrors.join(', ')}.`;
+      this.emailErrorsDiv.innerHTML = `x Email must ${this.emailErrors.join(', ')}.`;
     }
   }
 
   public showPasswordErrors(passwordErrors: PasswordValidationErrors[]): void {
     if (passwordErrors.length > 0) {
-      this.passwordErrorsDiv.innerHTML = `Password must ${this.passwordErrors.join(', ')}.`;
+      this.passwordErrorsDiv.innerHTML = `x Password must ${this.passwordErrors.join(', ')}.`;
     }
   }
 

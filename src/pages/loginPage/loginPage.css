@@ -30,7 +30,7 @@ body {
 }
 
 .emailInput {
-  height: 30px;
+  height: 28px;
   color: rgb(35, 49, 37);
 }
 
@@ -62,14 +62,11 @@ body {
   border: none;
 }
 
-.emailErrors {
-  width: 300px;
-  font-size: small;
-}
-
+.emailErrors,
 .passwordErrors {
   width: 300px;
-  font-size: small;
+  font-size: smaller;
+  color: rgb(151, 59, 17);
 }
 
 .button {
