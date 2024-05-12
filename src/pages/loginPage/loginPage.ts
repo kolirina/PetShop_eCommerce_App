@@ -23,7 +23,11 @@ enum PasswordValidationErrors {
 }
 
 class LoginPage {
+  private container: HTMLDivElement;
+
   private loginForm: HTMLElement;
+
+  private preWelcomeDiv: HTMLDivElement;
 
   private welcomeDiv: HTMLDivElement;
 
@@ -52,11 +56,14 @@ class LoginPage {
   private passwordErrorsDiv: HTMLDivElement;
 
   constructor() {
-    this.loginForm = createForm('loginForm', document.body);
+    this.container = createDiv('container', document.body);
+    this.loginForm = createForm('loginForm', this.container);
+    this.preWelcomeDiv = createDiv('preWelcomeDiv', this.loginForm);
+    this.preWelcomeDiv.innerHTML = '🐾';
     this.welcomeDiv = createDiv('welcomeDiv', this.loginForm);
     this.welcomeDiv.innerHTML = 'Login to Your Account';
     this.emailInput = createInput({
-      className: 'input',
+      className: 'emailInput',
       type: 'text',
       isActive: true,
       placeholder: 'Email',
@@ -65,7 +72,7 @@ class LoginPage {
     });
     this.passwordPlusEyeDiv = createDiv('passwordPlusEyeDiv', this.loginForm);
     this.passwordInput = createInput({
-      className: 'input',
+      className: 'passwordInput',
       type: 'password',
       isActive: true,
       placeholder: 'Password',
@@ -210,7 +217,7 @@ class LoginPage {
 
   public render() {
     document.body.innerHTML = '';
-    document.body.appendChild(this.loginForm);
+    document.body.appendChild(this.container);
   }
 }
 
