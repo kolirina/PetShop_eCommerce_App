@@ -8,10 +8,10 @@
 }
 
 body {
-  font-family: proxima-nova, Helvetica, Arial, sans-serif;
-  background-color: var(--main-bg-color);
   height: 100vh;
   margin: 0;
+  font-family: proxima-nova, Helvetica, Arial, sans-serif;
+  background-color: var(--main-bg-color);
 }
 
 .container {
@@ -32,10 +32,10 @@ body {
 .welcomeDiv,
 .preWelcomeDiv {
   margin-bottom: 15px;
-  text-align: center;
-  color: var(--text-color);
   font-size: x-large;
   font-weight: bold;
+  text-align: center;
+  color: var(--text-color);
 }
 
 .emailInput {
@@ -57,8 +57,8 @@ body {
 .passwordInput {
   width: 270px;
   height: 28px;
-  border: none;
   color: var(--text-color);
+  border: none;
 }
 
 .passwordInput:focus,
@@ -80,23 +80,23 @@ body {
 
 .button {
   height: 30px;
-  color: var(--accent-color);
   font-weight: 600;
+  color: var(--accent-color);
   background-color: var(--main-bg-color);
   border: 1px solid var(--accent-color);
   border-radius: 2px;
 }
 
 .button:hover {
-  color: var(--main-bg-color);
   font-weight: 400;
+  color: var(--main-bg-color);
   background-color: var(--accent-color);
   border: 1px solid var(--accent-color);
 }
 
 .button:disabled {
-  color: rgb(204, 154, 125);
   font-weight: 400;
+  color: rgb(204, 154, 125);
   background-color: var(--disabled-bg-color);
   border: 1px solid var(--disabled-border-color);
 }
