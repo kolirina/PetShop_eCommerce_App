@@ -1,3 +1,6 @@
+import Router from '../../router';
+import Page from '../Page';
+import './loginPageStyles.css';
 import {
   createForm,
   createBtn,
@@ -7,9 +10,7 @@ import {
 } from '../../utils/elementCreator';
 import { EmailValidationErrors, PasswordValidationErrors } from './constants';
 
-class LoginPage {
-  private container: HTMLDivElement;
-
+class LoginPage extends Page {
   private loginForm: HTMLElement;
 
   private preWelcomeDiv: HTMLDivElement;
@@ -40,7 +41,8 @@ class LoginPage {
 
   private passwordErrorsDiv: HTMLDivElement;
 
-  constructor() {
+  constructor(router: Router) {
+    super(router);
     this.container = createDiv('container', document.body);
     this.loginForm = createForm('loginForm', this.container);
     this.preWelcomeDiv = createDiv('preWelcomeDiv', this.loginForm);
