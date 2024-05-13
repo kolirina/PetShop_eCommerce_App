@@ -82,7 +82,7 @@ class LoginPage {
     this.registerLink = createLink(
       'registerLink',
       'Create Account',
-      'https://example.com',
+      '/registration',
       this.loginForm
     );
     this.loginForm.appendChild(this.registerLink);
