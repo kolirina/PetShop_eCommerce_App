@@ -7,6 +7,7 @@
 
 import LoginPage from './pages/loginPage/loginPage';
 import './pages/loginPage/loginPage.css';
+import './pages/main.css';
 
 const loginPage = new LoginPage();
 loginPage.render();

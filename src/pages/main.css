@@ -1,0 +1,15 @@
+:root {
+  --main-bg-color: rgb(251, 252, 251);
+  --text-color: rgb(35, 49, 37);
+  --accent-color: rgb(151, 59, 17);
+  --light-border-color: rgb(136, 139, 138);
+  --disabled-bg-color: rgb(240, 235, 230);
+  --disabled-border-color: rgb(150, 109, 91);
+}
+
+body {
+  height: 100vh;
+  margin: 0;
+  font-family: proxima-nova, Helvetica, Arial, sans-serif;
+  background-color: var(--main-bg-color);
+}
