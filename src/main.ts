@@ -1,3 +1,4 @@
+import './pages/main.css';
 import Router from './router';
 import LoginPage from './pages/loginPage';
 import MainPage from './pages/mainPage';
