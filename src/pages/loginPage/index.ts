@@ -9,6 +9,7 @@ import {
   createLink,
 } from '../../utils/elementCreator';
 import { EmailValidationErrors, PasswordValidationErrors } from './constants';
+import Pages from '../../router/pageNames';
 
 class LoginPage extends Page {
   private loginForm: HTMLElement;
@@ -41,8 +42,8 @@ class LoginPage extends Page {
 
   private passwordErrorsDiv: HTMLDivElement;
 
-  constructor(router: Router) {
-    super(router);
+  constructor(router: Router, parentElement: HTMLElement) {
+    super(router, parentElement);
     this.container = createDiv('container', document.body);
     this.loginForm = createForm('loginForm', this.container);
     this.preWelcomeDiv = createDiv('preWelcomeDiv', this.loginForm);
@@ -87,6 +88,10 @@ class LoginPage extends Page {
       '/registration',
       this.loginForm
     );
+    this.registerLink.addEventListener('click', (e) => {
+      e.preventDefault();
+      router.navigateTo(Pages.REGISTRATION);
+    });
     this.loginForm.appendChild(this.registerLink);
     this.emailErrorsDiv = createDiv('emailErrors');
     this.emailInput.after(this.emailErrorsDiv);
@@ -201,11 +206,6 @@ class LoginPage extends Page {
     if (passwordErrors.length > 0) {
       this.passwordErrorsDiv.innerHTML = `x Password must ${this.passwordErrors.join(', ')}.`;
     }
-  }
-
-  public render() {
-    document.body.innerHTML = '';
-    document.body.appendChild(this.container);
   }
 }
 

@@ -8,8 +8,11 @@ export default class Router {
   }
 
   navigateTo(path: Pages) {
-    window.history.pushState({}, '', path);
-    this.handleRoute();
+    const currentPath = window.location.pathname;
+    if (path !== currentPath) {
+      window.history.pushState({}, '', path);
+      this.handleRoute();
+    }
   }
 
   handleRoute() {
