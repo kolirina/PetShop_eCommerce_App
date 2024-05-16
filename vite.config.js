@@ -1,5 +1,6 @@
 /// <reference types="vitest" />
 import { defineConfig } from 'vite';
+import { nodePolyfills } from 'vite-plugin-node-polyfills';
 export default defineConfig({
   base: '/',
   css: {
@@ -7,5 +8,6 @@ export default defineConfig({
       localsConvention: 'camelCaseOnly',
     },
   },
+  plugins: [nodePolyfills()],
   test: {},
 });

@@ -1,3 +1,4 @@
+import { apiRoot } from '../../api/ApiRoot';
 import Router from '../../router';
 import Page from '../Page';
 import './loginPageStyles.css';
@@ -9,8 +10,13 @@ import {
   createLink,
 } from '../../utils/elementCreator';
 import { EmailValidationErrors, PasswordValidationErrors } from './constants';
+import getUser from '../../api/SDK';
+import MyTokenCache from '../../api/tokenCache';
+import Pages from '../../router/pageNames';
 
-class LoginPage extends Page {
+const tokenCache = new MyTokenCache();
+
+export default class LoginPage extends Page {
   private loginForm: HTMLElement;
 
   private preWelcomeDiv: HTMLDivElement;
@@ -28,6 +34,8 @@ class LoginPage extends Page {
   private signInBtn: HTMLButtonElement;
 
   private registerLink: HTMLAnchorElement;
+
+  private loginErrorPopup?: HTMLDivElement;
 
   private emailErrors: EmailValidationErrors[] = [];
 
@@ -101,7 +109,10 @@ class LoginPage extends Page {
       'input',
       this.handlePasswordInput.bind(this)
     );
-    // this.loginForm.addEventListener('submit', this.handleSubmit.bind(this));
+    this.signInBtn.addEventListener('click', (event) => {
+      event.preventDefault();
+      this.signIn();
+    });
   }
 
   private handleEmailInput(event: Event): void {
@@ -149,7 +160,6 @@ class LoginPage extends Page {
     return this.emailErrors.length > 0 ? this.emailErrors : null;
   }
 
-  // private handleSubmit(): void {}
   private validatePassword(
     password: string
   ): PasswordValidationErrors[] | null {
@@ -160,20 +170,12 @@ class LoginPage extends Page {
       this.passwordErrors.push(PasswordValidationErrors.LENGTH_ERROR);
     }
 
-    if (!/[A-Z]/.test(password)) {
-      this.passwordErrors.push(PasswordValidationErrors.UPPERCASE_ERROR);
-    }
-
     if (!/[a-z]/.test(password)) {
       this.passwordErrors.push(PasswordValidationErrors.LOWERCASE_ERROR);
     }
 
     if (!/\d/.test(password)) {
       this.passwordErrors.push(PasswordValidationErrors.DIGIT_ERROR);
-    }
-
-    if (!/[^a-zA-Z0-9]/.test(password)) {
-      this.passwordErrors.push(PasswordValidationErrors.SPECIAL_CHAR_ERROR);
     }
 
     if (password.trim() !== password) {
@@ -207,6 +209,54 @@ class LoginPage extends Page {
     document.body.innerHTML = '';
     document.body.appendChild(this.container);
   }
-}
 
-export default LoginPage;
+  public async signIn(): Promise<void> {
+    const email = this.emailInput.value;
+    const password = this.passwordInput.value;
+    try {
+      const resp = await getUser(email, password, apiRoot);
+
+      if (resp.statusCode !== 400) {
+        const { id } = resp.body.customer;
+        const { token } = tokenCache.get();
+        localStorage.setItem('token', token);
+        localStorage.setItem('id', id);
+        this.router.navigateTo(Pages.MAIN);
+      }
+    } catch (error) {
+      this.handleLoginError();
+    }
+  }
+
+  public handleLoginError(): void {
+    this.loginErrorPopup = createDiv('loginErrorPopup', document.body);
+    const loginErrorPopupContent = createDiv(
+      'loginErrorPopupContent',
+      this.loginErrorPopup
+    );
+    const loginErrorPopupTop = createDiv(
+      'loginErrorPopupTop',
+      loginErrorPopupContent
+    );
+
+    loginErrorPopupTop.innerHTML = '🐶🐶🐶';
+
+    const loginErrorPopupBottom = createDiv(
+      'loginErrorPopupBottom',
+      loginErrorPopupContent
+    );
+    loginErrorPopupBottom.innerHTML = `${'We searched, but could find a customer <br> with given email and password.'}`;
+    this.loginErrorPopup.addEventListener(
+      'click',
+      this.closeLoginErrorPopup.bind(this)
+    );
+  }
+
+  private closeLoginErrorPopup() {
+    if (this.loginErrorPopup) {
+      this.loginErrorPopup.classList.add('hidden');
+    }
+    this.emailInput.value = '';
+    this.passwordInput.value = '';
+  }
+}
