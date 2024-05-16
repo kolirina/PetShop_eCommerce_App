@@ -11,10 +11,7 @@ import {
 } from '../../utils/elementCreator';
 import { EmailValidationErrors, PasswordValidationErrors } from './constants';
 import getUser from '../../api/SDK';
-import MyTokenCache from '../../api/tokenCache';
 import Pages from '../../router/pageNames';
-
-const tokenCache = new MyTokenCache();
 
 export default class LoginPage extends Page {
   private loginForm: HTMLElement;
@@ -182,6 +179,16 @@ export default class LoginPage extends Page {
       this.passwordErrors.push(PasswordValidationErrors.WHITESPACE_ERROR);
     }
 
+    // Comment out the following two to check successful login for user with email 'johndoe@example.com' and password 'secret123'.
+
+    if (!/[A-Z]/.test(password)) {
+      this.passwordErrors.push(PasswordValidationErrors.UPPERCASE_ERROR);
+    }
+
+    if (!/[^a-zA-Z0-9]/.test(password)) {
+      this.passwordErrors.push(PasswordValidationErrors.SPECIAL_CHAR_ERROR);
+    }
+
     if (this.passwordErrors.length === 0) {
       this.isPasswordValid = true;
     }
@@ -213,14 +220,38 @@ export default class LoginPage extends Page {
   public async signIn(): Promise<void> {
     const email = this.emailInput.value;
     const password = this.passwordInput.value;
+    const CTP_AUTH_URL = import.meta.env.VITE_CTP_AUTH_URL;
+    const CTP_CLIENT_ID = import.meta.env.VITE_CTP_CLIENT_ID;
+    const CTP_CLIENT_SECRET = import.meta.env.VITE_CTP_CLIENT_SECRET;
+
+    try {
+      const response = await fetch(
+        `${CTP_AUTH_URL}/oauth/token?grant_type=client_credentials`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            Authorization: `Basic ${btoa(`${CTP_CLIENT_ID}:${CTP_CLIENT_SECRET}`)}`,
+          },
+        }
+      );
+
+      if (response.ok) {
+        const data = await response.json();
+        sessionStorage.setItem('token', data.access_token);
+      } else {
+        throw new Error(`An error occured: ${response.statusText}`);
+      }
+    } catch (error) {
+      throw new Error(`An error occured: ${error}`);
+    }
+
     try {
       const resp = await getUser(email, password, apiRoot);
 
       if (resp.statusCode !== 400) {
         const { id } = resp.body.customer;
-        const { token } = tokenCache.get();
-        localStorage.setItem('token', token);
-        localStorage.setItem('id', id);
+        sessionStorage.setItem('id', id);
         this.router.navigateTo(Pages.MAIN);
       }
     } catch (error) {
@@ -245,7 +276,7 @@ export default class LoginPage extends Page {
       'loginErrorPopupBottom',
       loginErrorPopupContent
     );
-    loginErrorPopupBottom.innerHTML = `${'We searched, but could find a customer <br> with given email and password.'}`;
+    loginErrorPopupBottom.innerHTML = `${'We searched, but could find a customer <br> with given email and password. <br> Try again or register.'}`;
     this.loginErrorPopup.addEventListener(
       'click',
       this.closeLoginErrorPopup.bind(this)

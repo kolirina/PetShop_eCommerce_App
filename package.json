@@ -9,7 +9,7 @@
     "preview": "vite preview",
     "prepare": "husky",
     "lint": "eslint src/**/*.ts",
-    "format": "prettier --write src/**/*.ts",
+    "format": "prettier --check src/**/*.ts",
     "test": "vitest",
     "type-check": "tsc --noEmit",
     "coverage": "vitest run --coverage"
