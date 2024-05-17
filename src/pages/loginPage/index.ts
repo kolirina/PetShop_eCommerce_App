@@ -1,5 +1,4 @@
-import { apiRoot } from '../../api/ApiRoot';
-import getUser from '../../api/SDK';
+import { loginUser } from '../../api/services';
 
 import {
   createForm,
@@ -224,40 +223,9 @@ export default class LoginPage extends Page {
   public async signIn(): Promise<void> {
     const email = this.emailInput.value;
     const password = this.passwordInput.value;
-    const CTP_AUTH_URL = import.meta.env.VITE_CTP_AUTH_URL;
-    const CTP_CLIENT_ID = import.meta.env.VITE_CTP_CLIENT_ID;
-    const CTP_CLIENT_SECRET = import.meta.env.VITE_CTP_CLIENT_SECRET;
-
     try {
-      const response = await fetch(
-        `${CTP_AUTH_URL}/oauth/token?grant_type=client_credentials`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-            Authorization: `Basic ${btoa(`${CTP_CLIENT_ID}:${CTP_CLIENT_SECRET}`)}`,
-          },
-        }
-      );
-
-      if (response.ok) {
-        const data = await response.json();
-        sessionStorage.setItem('token', data.access_token);
-      } else {
-        throw new Error(`An error occured: ${response.statusText}`);
-      }
-    } catch (error) {
-      throw new Error(`An error occured: ${error}`);
-    }
-
-    try {
-      const resp = await getUser(email, password, apiRoot);
-
-      if (resp.statusCode !== 400) {
-        const { id } = resp.body.customer;
-        sessionStorage.setItem('id', id);
-        this.router.navigateTo(Pages.MAIN);
-      }
+      await loginUser(email, password);
+      this.router.navigateTo(Pages.MAIN);
     } catch (error) {
       this.handleLoginError();
     }
