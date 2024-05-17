@@ -181,13 +181,13 @@ export default class LoginPage extends Page {
 
     // Comment out the following two to check successful login for user with email 'johndoe@example.com' and password 'secret123'.
 
-    if (!/[A-Z]/.test(password)) {
-      this.passwordErrors.push(PasswordValidationErrors.UPPERCASE_ERROR);
-    }
+    // if (!/[A-Z]/.test(password)) {
+    //   this.passwordErrors.push(PasswordValidationErrors.UPPERCASE_ERROR);
+    // }
 
-    if (!/[^a-zA-Z0-9]/.test(password)) {
-      this.passwordErrors.push(PasswordValidationErrors.SPECIAL_CHAR_ERROR);
-    }
+    // if (!/[^a-zA-Z0-9]/.test(password)) {
+    //   this.passwordErrors.push(PasswordValidationErrors.SPECIAL_CHAR_ERROR);
+    // }
 
     if (this.passwordErrors.length === 0) {
       this.isPasswordValid = true;

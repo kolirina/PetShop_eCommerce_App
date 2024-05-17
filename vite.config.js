@@ -10,4 +10,13 @@ export default defineConfig({
   },
   plugins: [nodePolyfills()],
   test: {},
+  server: {
+    proxy: {
+      '/api': {
+        target: 'https://api.eu-central-1.aws.commercetools.com',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api/, ''),
+      },
+    },
+  },
 });
