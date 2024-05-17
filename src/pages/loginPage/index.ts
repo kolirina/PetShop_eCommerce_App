@@ -215,11 +215,6 @@ export default class LoginPage extends Page {
     }
   }
 
-  public render() {
-    document.body.innerHTML = '';
-    document.body.appendChild(this.container);
-  }
-
   public async signIn(): Promise<void> {
     const email = this.emailInput.value;
     const password = this.passwordInput.value;
