@@ -1,7 +1,6 @@
 import { apiRoot } from '../../api/ApiRoot';
-import Router from '../../router';
-import Page from '../Page';
-import './loginPageStyles.css';
+import getUser from '../../api/SDK';
+
 import {
   createForm,
   createBtn,
@@ -9,9 +8,14 @@ import {
   createDiv,
   createLink,
 } from '../../utils/elementCreator';
+
 import { EmailValidationErrors, PasswordValidationErrors } from './constants';
-import getUser from '../../api/SDK';
+
+import Router from '../../router';
 import Pages from '../../router/pageNames';
+import Page from '../Page';
+
+import './loginPageStyles.css';
 
 export default class LoginPage extends Page {
   private loginForm: HTMLElement;
