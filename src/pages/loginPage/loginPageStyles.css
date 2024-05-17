@@ -93,3 +93,39 @@
 .registerLink:hover {
   color: var(--accent-color);
 }
+
+.loginErrorPopup {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(218, 223, 219, 0.5);
+}
+
+.loginErrorPopupContent {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  background-color: rgba(166, 190, 170, 0.8);
+  padding: 20px;
+  border-radius: 5px;
+}
+
+.loginErrorPopupBottom {
+  font-size: smaller;
+  text-align: center;
+  color: rgb(97, 35, 6);
+}
+
+.hidden {
+  display: none;
+}

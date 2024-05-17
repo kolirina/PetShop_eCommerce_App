@@ -1,6 +1,5 @@
-import Router from '../../router';
-import Page from '../Page';
-import './loginPageStyles.css';
+import { loginUser } from '../../api/services';
+
 import {
   createForm,
   createBtn,
@@ -8,10 +7,16 @@ import {
   createDiv,
   createLink,
 } from '../../utils/elementCreator';
+
 import { EmailValidationErrors, PasswordValidationErrors } from './constants';
 import Pages from '../../router/pageNames';
 
-class LoginPage extends Page {
+import Router from '../../router';
+import Page from '../Page';
+
+import './loginPageStyles.css';
+
+export default class LoginPage extends Page {
   private loginForm: HTMLElement;
 
   private preWelcomeDiv: HTMLDivElement;
@@ -29,6 +34,8 @@ class LoginPage extends Page {
   private signInBtn: HTMLButtonElement;
 
   private registerLink: HTMLAnchorElement;
+
+  private loginErrorPopup?: HTMLDivElement;
 
   private emailErrors: EmailValidationErrors[] = [];
 
@@ -106,7 +113,10 @@ class LoginPage extends Page {
       'input',
       this.handlePasswordInput.bind(this)
     );
-    // this.loginForm.addEventListener('submit', this.handleSubmit.bind(this));
+    this.signInBtn.addEventListener('click', (event) => {
+      event.preventDefault();
+      this.signIn();
+    });
   }
 
   private handleEmailInput(event: Event): void {
@@ -154,7 +164,6 @@ class LoginPage extends Page {
     return this.emailErrors.length > 0 ? this.emailErrors : null;
   }
 
-  // private handleSubmit(): void {}
   private validatePassword(
     password: string
   ): PasswordValidationErrors[] | null {
@@ -165,10 +174,6 @@ class LoginPage extends Page {
       this.passwordErrors.push(PasswordValidationErrors.LENGTH_ERROR);
     }
 
-    if (!/[A-Z]/.test(password)) {
-      this.passwordErrors.push(PasswordValidationErrors.UPPERCASE_ERROR);
-    }
-
     if (!/[a-z]/.test(password)) {
       this.passwordErrors.push(PasswordValidationErrors.LOWERCASE_ERROR);
     }
@@ -177,12 +182,18 @@ class LoginPage extends Page {
       this.passwordErrors.push(PasswordValidationErrors.DIGIT_ERROR);
     }
 
-    if (!/[^a-zA-Z0-9]/.test(password)) {
-      this.passwordErrors.push(PasswordValidationErrors.SPECIAL_CHAR_ERROR);
-    }
-
     if (password.trim() !== password) {
       this.passwordErrors.push(PasswordValidationErrors.WHITESPACE_ERROR);
+    }
+
+    // Comment out the following two to check successful login for user with email 'johndoe@example.com' and password 'secret123'.
+
+    if (!/[A-Z]/.test(password)) {
+      this.passwordErrors.push(PasswordValidationErrors.UPPERCASE_ERROR);
+    }
+
+    if (!/[^a-zA-Z0-9]/.test(password)) {
+      this.passwordErrors.push(PasswordValidationErrors.SPECIAL_CHAR_ERROR);
     }
 
     if (this.passwordErrors.length === 0) {
@@ -207,6 +218,47 @@ class LoginPage extends Page {
       this.passwordErrorsDiv.innerHTML = `x Password must ${this.passwordErrors.join(', ')}.`;
     }
   }
-}
 
-export default LoginPage;
+  public async signIn(): Promise<void> {
+    const email = this.emailInput.value;
+    const password = this.passwordInput.value;
+    try {
+      await loginUser(email, password);
+      this.router.navigateTo(Pages.MAIN);
+    } catch (error) {
+      this.handleLoginError();
+    }
+  }
+
+  public handleLoginError(): void {
+    this.loginErrorPopup = createDiv('loginErrorPopup', document.body);
+    const loginErrorPopupContent = createDiv(
+      'loginErrorPopupContent',
+      this.loginErrorPopup
+    );
+    const loginErrorPopupTop = createDiv(
+      'loginErrorPopupTop',
+      loginErrorPopupContent
+    );
+
+    loginErrorPopupTop.innerHTML = '🐶🐶🐶';
+
+    const loginErrorPopupBottom = createDiv(
+      'loginErrorPopupBottom',
+      loginErrorPopupContent
+    );
+    loginErrorPopupBottom.innerHTML = `${'We searched, but could find a customer <br> with given email and password. <br> Try again or register.'}`;
+    this.loginErrorPopup.addEventListener(
+      'click',
+      this.closeLoginErrorPopup.bind(this)
+    );
+  }
+
+  private closeLoginErrorPopup() {
+    if (this.loginErrorPopup) {
+      this.loginErrorPopup.classList.add('hidden');
+    }
+    this.emailInput.value = '';
+    this.passwordInput.value = '';
+  }
+}
