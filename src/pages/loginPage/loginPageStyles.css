@@ -106,7 +106,7 @@
   align-items: center;
   width: 100%;
   height: 100%;
-  background-color: rgba(170, 209, 174, 0.5);
+  background-color: rgba(218, 223, 219, 0.5);
 }
 
 .loginErrorPopupContent {
@@ -115,7 +115,7 @@
   justify-content: center;
   align-items: center;
   gap: 10px;
-  background-color: rgba(118, 177, 126, 0.8);
+  background-color: rgba(166, 190, 170, 0.8);
   padding: 20px;
   border-radius: 5px;
 }
@@ -123,7 +123,7 @@
 .loginErrorPopupBottom {
   font-size: smaller;
   text-align: center;
-  color: rgb(122, 45, 9);
+  color: rgb(97, 35, 6);
 }
 
 .hidden {
