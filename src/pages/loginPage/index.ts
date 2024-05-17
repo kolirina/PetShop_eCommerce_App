@@ -9,9 +9,9 @@ import {
 } from '../../utils/elementCreator';
 
 import { EmailValidationErrors, PasswordValidationErrors } from './constants';
+import Pages from '../../router/pageNames';
 
 import Router from '../../router';
-import Pages from '../../router/pageNames';
 import Page from '../Page';
 
 import './loginPageStyles.css';
@@ -49,8 +49,8 @@ export default class LoginPage extends Page {
 
   private passwordErrorsDiv: HTMLDivElement;
 
-  constructor(router: Router) {
-    super(router);
+  constructor(router: Router, parentElement: HTMLElement) {
+    super(router, parentElement);
     this.container = createDiv('container', document.body);
     this.loginForm = createForm('loginForm', this.container);
     this.preWelcomeDiv = createDiv('preWelcomeDiv', this.loginForm);
@@ -95,6 +95,10 @@ export default class LoginPage extends Page {
       '/registration',
       this.loginForm
     );
+    this.registerLink.addEventListener('click', (e) => {
+      e.preventDefault();
+      router.navigateTo(Pages.REGISTRATION);
+    });
     this.loginForm.appendChild(this.registerLink);
     this.emailErrorsDiv = createDiv('emailErrors');
     this.emailInput.after(this.emailErrorsDiv);
