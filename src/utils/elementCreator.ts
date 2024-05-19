@@ -80,6 +80,18 @@ export function createH1(
   return element;
 }
 
+export function createH3(
+  className: string,
+  text: string,
+  parentElement?: HTMLElement
+): HTMLHeadingElement {
+  const element: HTMLHeadingElement = document.createElement('h3');
+  element.classList.add(className);
+  element.textContent = text;
+  appendToParent(element, parentElement);
+  return element;
+}
+
 export function createBtn(
   className: string,
   text: string,

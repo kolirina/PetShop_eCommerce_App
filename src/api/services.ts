@@ -27,7 +27,7 @@ const getToken = async (): Promise<string> => {
 
 const loginUser = async (email: string, password: string): Promise<string> => {
   const token = await getToken();
-  sessionStorage.setItem('token', token);
+  localStorage.setItem('token', token);
 
   const response = await getUser(email, password, apiRoot);
 
@@ -36,7 +36,7 @@ const loginUser = async (email: string, password: string): Promise<string> => {
   }
 
   const { id } = response.body.customer;
-  sessionStorage.setItem('id', id);
+  localStorage.setItem('id', id);
   return id;
 };
 
