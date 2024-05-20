@@ -18,39 +18,39 @@ import TemplatePage from '../templatePage';
 import './loginPageStyles.css';
 
 export default class LoginPage extends Page {
-  private templatePage: TemplatePage;
+  public templatePage: TemplatePage;
 
-  private loginForm: HTMLElement;
+  public loginForm: HTMLElement;
 
-  private preWelcomeDiv: HTMLDivElement;
+  public preWelcomeDiv: HTMLDivElement;
 
-  private welcomeDiv: HTMLDivElement;
+  public welcomeDiv: HTMLDivElement;
 
-  private emailInput: HTMLInputElement;
+  public emailInput: HTMLInputElement;
 
-  private passwordInput: HTMLInputElement;
+  public passwordInput: HTMLInputElement;
 
-  private passwordPlusEyeDiv: HTMLDivElement;
+  public passwordPlusEyeDiv: HTMLDivElement;
 
-  private eyeBtn: HTMLButtonElement;
+  public eyeBtn: HTMLButtonElement;
 
-  private signInBtn: HTMLButtonElement;
+  public signInBtn: HTMLButtonElement;
 
-  private registerLink: HTMLAnchorElement;
+  public registerLink: HTMLAnchorElement;
 
-  private loginErrorPopup?: HTMLDivElement;
+  public loginErrorPopup?: HTMLDivElement;
 
-  private emailErrors: EmailValidationErrors[] = [];
+  public emailErrors: EmailValidationErrors[] = [];
 
-  private passwordErrors: PasswordValidationErrors[] = [];
+  public passwordErrors: PasswordValidationErrors[] = [];
 
-  private isEmailValid: boolean = false;
+  public isEmailValid: boolean = false;
 
-  private isPasswordValid: boolean = false;
+  public isPasswordValid: boolean = false;
 
-  private emailErrorsDiv: HTMLDivElement;
+  public emailErrorsDiv: HTMLDivElement;
 
-  private passwordErrorsDiv: HTMLDivElement;
+  public passwordErrorsDiv: HTMLDivElement;
 
   constructor(router: Router, templatePage: TemplatePage) {
     super(router, templatePage.getMainElement());
@@ -107,7 +107,7 @@ export default class LoginPage extends Page {
     this.setupListeners();
   }
 
-  private setupListeners(): void {
+  public setupListeners(): void {
     this.emailInput.addEventListener('input', this.handleEmailInput.bind(this));
     this.passwordInput.addEventListener(
       'input',
@@ -119,19 +119,19 @@ export default class LoginPage extends Page {
     });
   }
 
-  private handleEmailInput(event: Event): void {
+  public handleEmailInput(event: Event): void {
     const emailValue: string = (event.target as HTMLInputElement).value;
     this.emailErrors = [];
     this.validateEmail(emailValue);
   }
 
-  private handlePasswordInput(event: Event): void {
+  public handlePasswordInput(event: Event): void {
     const passwordValue: string = (event.target as HTMLInputElement).value;
     this.passwordErrors = [];
     this.validatePassword(passwordValue);
   }
 
-  private validateEmail(email: string): EmailValidationErrors[] | null {
+  public validateEmail(email: string): EmailValidationErrors[] | null {
     this.isEmailValid = false;
     this.signInBtn.disabled = true;
     this.emailErrorsDiv.innerHTML = '';
@@ -164,9 +164,7 @@ export default class LoginPage extends Page {
     return this.emailErrors.length > 0 ? this.emailErrors : null;
   }
 
-  private validatePassword(
-    password: string
-  ): PasswordValidationErrors[] | null {
+  public validatePassword(password: string): PasswordValidationErrors[] | null {
     this.isPasswordValid = false;
     this.signInBtn.disabled = true;
     this.passwordErrorsDiv.innerHTML = '';
@@ -255,7 +253,7 @@ export default class LoginPage extends Page {
     );
   }
 
-  private closeLoginErrorPopup() {
+  public closeLoginErrorPopup() {
     if (this.loginErrorPopup) {
       this.loginErrorPopup.classList.add('hidden');
     }
