@@ -591,20 +591,6 @@ const postCodes: PostalCodeObj[] = [
     Regex: '^\\d{4}$',
   },
   {
-    Note: 'Postleitzahl (PLZ)',
-    Country: 'Germany',
-    ISO: 'DE',
-    Format: 'NN',
-    Regex: '^\\d{2}$',
-  },
-  {
-    Note: 'Postleitzahl (PLZ)',
-    Country: 'Germany',
-    ISO: 'DE',
-    Format: 'NNNN',
-    Regex: '^\\d{4}$',
-  },
-  {
     Note: 'Postleitzahl (PLZ), introduced after the German reunification. Between 1989 and 1993 the old separate 4-digit postal codes of former West- and East-Germany were distinguished by preceding "W-" or "O-" (\'Ost\' for East).',
     Country: 'Germany',
     ISO: 'DE',

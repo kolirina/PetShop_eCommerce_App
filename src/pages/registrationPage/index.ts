@@ -17,8 +17,16 @@ import { PostalCodeObj, UserInfo, ValidationObj } from '../../types';
 import { INPUT_FORM_COUNT, ValidationErrors } from './constants';
 import AddressBlock from './addressesBlocks';
 import Pages from '../../router/pageNames';
-import { signUpUser } from '../../api/services';
 import TemplatePage from '../templatePage';
+import { addAddresses, signUpUser } from '../../api/services';
+
+function getCountryISOCode(country: string): string {
+  const countryObj = postCodes.find(
+    (el: PostalCodeObj) => el.Country.toLowerCase() === country.toLowerCase()
+  );
+  const ISO = countryObj?.ISO ? countryObj.ISO : '';
+  return ISO;
+}
 
 class RegistrationPage extends Page {
   protected templatePage: TemplatePage;
@@ -586,6 +594,14 @@ class RegistrationPage extends Page {
       this.billingAddressBlock.postInput.disabled = true;
       this.billingAddressBlock.cityInput.disabled = true;
       this.billingAddressBlock.streetInput.disabled = true;
+      this.billingAddressBlock.countryInput.value =
+        this.shippingAddressBlock.countryInput.value;
+      this.billingAddressBlock.postInput.value =
+        this.shippingAddressBlock.postInput.value;
+      this.billingAddressBlock.cityInput.value =
+        this.shippingAddressBlock.cityInput.value;
+      this.billingAddressBlock.streetInput.value =
+        this.shippingAddressBlock.streetInput.value;
       this.checkAllInputs();
     } else {
       this.billingAddressBlock.addressWrapper.classList.remove(
@@ -599,6 +615,10 @@ class RegistrationPage extends Page {
       this.billingAddressBlock.postInput.disabled = false;
       this.billingAddressBlock.cityInput.disabled = false;
       this.billingAddressBlock.streetInput.disabled = false;
+      this.billingAddressBlock.countryInput.value = '';
+      this.billingAddressBlock.postInput.value = '';
+      this.billingAddressBlock.cityInput.value = '';
+      this.billingAddressBlock.streetInput.value = '';
       this.checkAllInputs();
     }
   }
@@ -615,9 +635,8 @@ class RegistrationPage extends Page {
     }
   }
 
-  private async submitRegistration(event: Event): Promise<void> {
-    event.preventDefault();
-    const userInfo: UserInfo = {
+  private createUserObj(): UserInfo {
+    const userObj: UserInfo = {
       email: this.emailInput.value,
       firstName: this.firstNameInput.value,
       lastName: this.lastNameInput.value,
@@ -627,19 +646,34 @@ class RegistrationPage extends Page {
         postCode: this.shippingAddressBlock.postInput.value,
         city: this.shippingAddressBlock.cityInput.value,
         street: this.shippingAddressBlock.streetInput.value,
+        isDefault: this.shippingAddressBlock.defaultAddressCheckbox.checked,
+        countryISO: getCountryISOCode(
+          this.shippingAddressBlock.countryInput.value
+        ),
+      },
+      billingAddress: {
+        country: this.billingAddressBlock.countryInput.value,
+        postCode: this.billingAddressBlock.postInput.value,
+        city: this.billingAddressBlock.cityInput.value,
+        street: this.billingAddressBlock.streetInput.value,
+        isDefault: this.shippingAddressBlock.sameAsShippingCheckbox.checked
+          ? true
+          : this.billingAddressBlock.defaultAddressCheckbox.checked,
+        countryISO: getCountryISOCode(
+          this.billingAddressBlock.countryInput.value
+        ),
       },
     };
-    if (!this.shippingAddressBlock.sameAsShippingCheckbox.checked) {
-      userInfo.shippingAddress.country =
-        this.billingAddressBlock.countryInput.value;
-      userInfo.shippingAddress.postCode =
-        this.billingAddressBlock.postInput.value;
-      userInfo.shippingAddress.city = this.billingAddressBlock.cityInput.value;
-      userInfo.shippingAddress.street =
-        this.billingAddressBlock.streetInput.value;
-    }
+    return userObj;
+  }
+
+  private async submitRegistration(event: Event): Promise<void> {
+    event.preventDefault();
+    const userInfo: UserInfo = this.createUserObj();
+
     try {
-      await signUpUser(userInfo);
+      const userId = await signUpUser(userInfo);
+      await addAddresses(userInfo, userId);
       this.router.navigateTo(Pages.MAIN);
       this.templatePage.getHeader().updateHeader();
     } catch (error) {

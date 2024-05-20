@@ -1,6 +1,14 @@
-import { UserInfo } from '../types';
+import { AddressTypes, UserInfo } from '../types';
 import { apiRoot } from './ApiRoot';
-import { getUser, registerUser } from './SDK';
+import {
+  addAddress,
+  getUser,
+  registerUser,
+  setBillingAddress,
+  setDefaultBillingAddress,
+  setDefaultShippingAddress,
+  setShippingAddress,
+} from './SDK';
 
 const getToken = async (): Promise<string> => {
   const CTP_AUTH_URL = import.meta.env.VITE_CTP_AUTH_URL;
@@ -58,4 +66,42 @@ const signUpUser = async (userInfo: UserInfo) => {
   }
 };
 
-export { getToken, loginUser, signUpUser };
+const addAddresses = async (userInfo: UserInfo, userId: string) => {
+  const token = await getToken();
+  localStorage.setItem('token', token);
+
+  try {
+    const addedShippingAddress = await addAddress(
+      userInfo,
+      userInfo.shippingAddress,
+      AddressTypes.SHIPPING,
+      userId
+    );
+    const shippingAddressId = addedShippingAddress?.body.addresses.find(
+      (e) => e.key === AddressTypes.SHIPPING
+    )?.id;
+    if (shippingAddressId) {
+      await setShippingAddress(shippingAddressId, userId);
+      if (userInfo.shippingAddress.isDefault) {
+        await setDefaultShippingAddress(userId, shippingAddressId);
+      }
+    }
+    const addedBillingAddress = await addAddress(
+      userInfo,
+      userInfo.billingAddress,
+      AddressTypes.BILLING,
+      userId
+    );
+    const billingAddressId = addedBillingAddress?.body.addresses.find(
+      (e) => e.key === AddressTypes.BILLING
+    )?.id;
+    if (billingAddressId) {
+      await setBillingAddress(billingAddressId, userId);
+      await setDefaultBillingAddress(userId, billingAddressId);
+    }
+  } catch (err) {
+    throw new Error('Unable to add the addresses.');
+  }
+};
+
+export { getToken, loginUser, signUpUser, addAddresses };

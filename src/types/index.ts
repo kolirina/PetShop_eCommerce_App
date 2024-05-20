@@ -28,9 +28,11 @@ export type PostalCodeObj = {
 
 export type UserAddress = {
   country: string;
+  countryISO: string;
   postCode: string;
   city: string;
   street: string;
+  isDefault: boolean;
 };
 
 export type UserInfo = {
@@ -39,5 +41,10 @@ export type UserInfo = {
   lastName: string;
   password: string;
   shippingAddress: UserAddress;
-  billingAddress?: UserAddress;
+  billingAddress: UserAddress;
 };
+
+export enum AddressTypes {
+  SHIPPING = 'Shipping',
+  BILLING = 'Billing',
+}
