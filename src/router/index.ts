@@ -17,6 +17,14 @@ export default class Router {
 
   handleRoute() {
     const path = window.location.pathname;
+    if (
+      (path === Pages.LOGIN || path === Pages.REGISTRATION) &&
+      localStorage.getItem('token') &&
+      localStorage.getItem('id')
+    ) {
+      this.navigateTo(Pages.MAIN);
+      return;
+    }
     if (path in this.routes) {
       this.routes[path]();
     } else {

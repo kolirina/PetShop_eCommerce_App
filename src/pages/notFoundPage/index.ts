@@ -26,6 +26,7 @@ class NotFoundPage extends Page {
     createLocalLink(
       styles.home,
       'Go Home',
+      Pages.MAIN,
       () => router.navigateTo(Pages.MAIN),
       info
     );

@@ -11,18 +11,21 @@ class MainPage extends Page {
     createLocalLink(
       styles.link,
       'Login',
+      Pages.LOGIN,
       () => router.navigateTo(Pages.LOGIN),
       this.container
     );
     createLocalLink(
       styles.link,
       'Register',
+      Pages.REGISTRATION,
       () => router.navigateTo(Pages.REGISTRATION),
       this.container
     );
     createLocalLink(
       styles.link,
       'Home',
+      Pages.MAIN,
       () => router.navigateTo(Pages.MAIN),
       this.container
     );

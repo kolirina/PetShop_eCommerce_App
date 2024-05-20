@@ -7,7 +7,7 @@ import {
   createH3,
   createInput,
   createLabel,
-  createLink,
+  createLocalLink,
 } from '../../utils/elementCreator';
 import Page from '../Page';
 import countryList from '../../assets/data/countryList';
@@ -18,8 +18,11 @@ import { INPUT_FORM_COUNT, ValidationErrors } from './constants';
 import AddressBlock from './addressesBlocks';
 import Pages from '../../router/pageNames';
 import { signUpUser } from '../../api/services';
+import TemplatePage from '../templatePage';
 
 class RegistrationPage extends Page {
+  protected templatePage: TemplatePage;
+
   protected registerForm: HTMLFormElement;
 
   protected passwordInput: HTMLInputElement;
@@ -96,8 +99,9 @@ class RegistrationPage extends Page {
 
   protected registrationErrorPopup?: HTMLDivElement;
 
-  constructor(router: Router, parentElement: HTMLElement) {
-    super(router, parentElement);
+  constructor(router: Router, templatePage: TemplatePage) {
+    super(router, templatePage.getMainElement());
+    this.templatePage = templatePage;
     this.areAllInputsValid = {
       firstName: false,
       lastName: false,
@@ -236,10 +240,11 @@ class RegistrationPage extends Page {
 
     this.loginWrapper = createDiv('login-wrapper', this.registerForm);
     this.loginWrapper.textContent = 'Already have an account? ';
-    this.loginLink = createLink(
+    this.loginLink = createLocalLink(
       'login-link',
       'Sign In',
-      '/registration',
+      Pages.LOGIN,
+      () => router.navigateTo(Pages.LOGIN),
       this.loginWrapper
     );
 
@@ -253,10 +258,6 @@ class RegistrationPage extends Page {
     this.submitBtn.disabled = true;
     this.registerForm.addEventListener('input', this.handleInput.bind(this));
 
-    this.loginLink.addEventListener('click', (e) => {
-      e.preventDefault();
-      router.navigateTo(Pages.LOGIN);
-    });
     this.shippingAddressBlock.countryInput.addEventListener(
       'change',
       (event) => {
@@ -640,6 +641,7 @@ class RegistrationPage extends Page {
     try {
       await signUpUser(userInfo);
       this.router.navigateTo(Pages.MAIN);
+      this.templatePage.getHeader().updateHeader();
     } catch (error) {
       this.handleRegistrationError();
     }

@@ -34,20 +34,20 @@ export default class Header {
     createLocalLink(
       styles.link,
       'Home',
+      Pages.MAIN,
       () => router.navigateTo(Pages.MAIN),
       links
     );
 
     this.userControls = createDiv(styles.userControls, this.container);
-
     this.burgerMenu = createDiv(styles.burgerMenu, this.container);
-    this.addMenuItem('Home', () => router.navigateTo(Pages.MAIN));
     this.updateHeader();
 
     const burgerButton = createBtn(styles.burgerButton, '', this.container);
     createSpan(styles.burgerIcon, '', burgerButton);
     burgerButton.addEventListener('click', () => {
       this.burgerMenu.classList.toggle(styles.burgerMenuOpen);
+      document.body.classList.toggle(styles.noscroll);
     });
   }
 
@@ -106,6 +106,7 @@ export default class Header {
     item.addEventListener('click', onClick);
     item.addEventListener('click', () => {
       this.burgerMenu.classList.toggle(styles.burgerMenuOpen);
+      document.body.classList.toggle(styles.noscroll);
     });
     return item;
   }

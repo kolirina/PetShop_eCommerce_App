@@ -133,12 +133,14 @@ export function createLink(
 export function createLocalLink(
   className: string,
   text: string,
+  href: string,
   navCallback: () => void,
   parentElement?: HTMLElement
 ): HTMLAnchorElement {
   const element: HTMLAnchorElement = document.createElement('a');
   element.classList.add(className);
   element.textContent = text;
+  element.href = href;
   element.addEventListener('click', (e) => {
     e.preventDefault();
     navCallback();

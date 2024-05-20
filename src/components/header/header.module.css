@@ -1,7 +1,10 @@
 .header {
   display: flex;
   justify-content: space-between;
+  align-items: center;
   padding: 20px;
+  border-bottom: var(--accent-color) 2px solid;
+  margin-bottom: 30px;
 }
 
 .logo-container {
@@ -48,10 +51,7 @@
 }
 
 .burger-button {
-  position: fixed;
-  top: 30px;
-  right: 30px;
-  z-index: 1;
+  z-index: 3;
   display: none;
   width: 36px;
   height: 36px;
@@ -68,7 +68,7 @@
 .burger-icon::after {
   position: absolute;
   display: block;
-  width: 100%;
+  width: 36px;
   height: 2px;
   background-color: #616161;
   transition-duration: 0.25s;
@@ -102,6 +102,7 @@
   position: fixed;
   top: 0;
   right: -100%;
+  z-index: 2;
   display: none;
   width: 100%;
   height: 100%;
@@ -119,6 +120,10 @@
 .burger-menu-open {
   right: 0;
   visibility: visible;
+}
+
+.noscroll {
+  overflow: hidden;
 }
 
 .menu-item {
