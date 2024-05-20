@@ -49,6 +49,7 @@
 .address-wrapper {
   display: flex;
   justify-content: space-between;
+  column-gap: 15px;
 }
 .address-type {
   display: block;
@@ -59,18 +60,19 @@
 .address-wrapper {
   margin-top: 10px;
   flex-direction: column;
+  flex-basis: 150px;
 }
 .address-inputs-wrapper {
-  display: flex;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
   justify-content: space-between;
-  flex-wrap: wrap;
   margin: 15px 0;
   row-gap: 17px;
+  column-gap: 15px;
 }
 .address-inputs-wrapper-hidden {
   overflow-y: hidden;
-  height: 0;
-  transition: 0.2s ease-out;
+  flex-basis: 0;
 }
 .address-wrapper:first-child {
   margin-top: 0;
@@ -78,6 +80,7 @@
 .wrapper {
   position: relative;
   box-sizing: border-box;
+  width: 100%;
   padding-right: 20px;
   background-color: #ffffff;
   border-radius: 4px;
@@ -133,6 +136,7 @@
 .street,
 .birth-date {
   height: 28px;
+  width: 100%;
   color: var(--text-color);
   border: none;
   border-radius: 4px;
@@ -156,7 +160,7 @@
   width: 100%;
 }
 .birth-label {
-  width: 47%;
+  max-width: calc(100% / 2 - 9px);
 }
 .birth-date {
   width: 100%;

@@ -1,5 +1,6 @@
+import { UserInfo } from '../types';
 import { apiRoot } from './ApiRoot';
-import getUser from './SDK';
+import { getUser, registerUser } from './SDK';
 
 const getToken = async (): Promise<string> => {
   const CTP_AUTH_URL = import.meta.env.VITE_CTP_AUTH_URL;
@@ -40,4 +41,21 @@ const loginUser = async (email: string, password: string): Promise<string> => {
   return id;
 };
 
-export { getToken, loginUser };
+const signUpUser = async (userInfo: UserInfo) => {
+  const token = await getToken();
+  localStorage.setItem('token', token);
+
+  try {
+    const response = await registerUser(userInfo);
+    const { id } = response.body.customer;
+    localStorage.setItem('id', id);
+
+    return id;
+  } catch (err) {
+    throw new Error(
+      'There is already an existing customer with the provided email.'
+    );
+  }
+};
+
+export { getToken, loginUser, signUpUser };

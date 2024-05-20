@@ -25,3 +25,19 @@ export type PostalCodeObj = {
   Format: string;
   Regex: string;
 };
+
+export type UserAddress = {
+  country: string;
+  postCode: string;
+  city: string;
+  street: string;
+};
+
+export type UserInfo = {
+  email: string;
+  firstName: string;
+  lastName: string;
+  password: string;
+  shippingAddress: UserAddress;
+  billingAddress?: UserAddress;
+};

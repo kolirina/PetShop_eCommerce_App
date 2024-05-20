@@ -1,7 +1,8 @@
 import { ApiRoot } from '@commercetools/platform-sdk';
-import { projectKey } from './ApiRoot';
+import { apiRoot, projectKey } from './ApiRoot';
+import { UserInfo } from '../types';
 
-export default async function getUser(
+async function getUser(
   email: string,
   password: string,
   passwordApiRoot: ApiRoot
@@ -20,3 +21,21 @@ export default async function getUser(
     .execute();
   return resp;
 }
+
+async function registerUser(userInfo: UserInfo) {
+  const resp = await apiRoot
+    .withProjectKey({ projectKey })
+    .customers()
+    .post({
+      body: {
+        email: userInfo.email,
+        firstName: userInfo.firstName,
+        lastName: userInfo.lastName,
+        password: userInfo.password,
+      },
+    })
+    .execute();
+  return resp;
+}
+
+export { getUser, registerUser };

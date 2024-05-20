@@ -143,7 +143,7 @@ class AddressBlock {
     }
   }
 
-  public getAddressess() {
+  public getAddresses() {
     return this.addressWrapper;
   }
 }

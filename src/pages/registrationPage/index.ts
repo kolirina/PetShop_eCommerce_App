@@ -13,10 +13,11 @@ import Page from '../Page';
 import countryList from '../../assets/data/countryList';
 import './registrationPage.css';
 import postCodes from '../../assets/data/postal-codes';
-import { PostalCodeObj, ValidationObj } from '../../types';
+import { PostalCodeObj, UserInfo, ValidationObj } from '../../types';
 import { INPUT_FORM_COUNT, ValidationErrors } from './constants';
 import AddressBlock from './addressesBlocks';
 import Pages from '../../router/pageNames';
+import { signUpUser } from '../../api/services';
 
 class RegistrationPage extends Page {
   protected registerForm: HTMLFormElement;
@@ -40,8 +41,6 @@ class RegistrationPage extends Page {
   protected nameWrapper: HTMLDivElement;
 
   protected emailWrapper: HTMLDivElement;
-
-  // protected passwordWrapper: HTMLDivElement;
 
   protected submitBtn: HTMLButtonElement;
 
@@ -94,6 +93,8 @@ class RegistrationPage extends Page {
   protected passwordErrorDiv: HTMLDivElement;
 
   protected rPasswordErrorDiv: HTMLDivElement;
+
+  protected registrationErrorPopup?: HTMLDivElement;
 
   constructor(router: Router, parentElement: HTMLElement) {
     super(router, parentElement);
@@ -195,7 +196,6 @@ class RegistrationPage extends Page {
     });
     this.rEmailErrorDiv = createDiv('error', this.repeatEmailWrapper);
 
-    // this.passwordWrapper = createDiv('password-wrapper', this.userInfoWrapper);
     this.passwordInputWrapper = createLabel(
       'wrapper',
       '',
@@ -231,8 +231,8 @@ class RegistrationPage extends Page {
       this.registerForm
     );
     this.addressesWrapper = createDiv('addresses-wrapper', this.registerForm);
-    this.addressesWrapper.append(this.shippingAddressBlock.getAddressess());
-    this.addressesWrapper.append(this.billingAddressBlock.getAddressess());
+    this.addressesWrapper.append(this.shippingAddressBlock.getAddresses());
+    this.addressesWrapper.append(this.billingAddressBlock.getAddresses());
 
     this.loginWrapper = createDiv('login-wrapper', this.registerForm);
     this.loginWrapper.textContent = 'Already have an account? ';
@@ -275,10 +275,10 @@ class RegistrationPage extends Page {
         validateCountryOnChange(value, target);
       }
     );
-    // this.registerForm.addEventListener(
-    //   'submit',
-    //   this.submitRegistration.bind(this)
-    // );
+    this.registerForm.addEventListener(
+      'submit',
+      this.submitRegistration.bind(this)
+    );
   }
 
   private handleInput(event: Event): void {
@@ -602,8 +602,6 @@ class RegistrationPage extends Page {
     }
   }
 
-  // private showInputHints(target) {}
-
   private checkAllInputs() {
     const validationArr: boolean[] = Object.values(this.areAllInputsValid);
     if (
@@ -616,9 +614,70 @@ class RegistrationPage extends Page {
     }
   }
 
-  // private submitRegistration(event: Event) {
-  //   event.preventDefault();
-  // }
+  private async submitRegistration(event: Event): Promise<void> {
+    event.preventDefault();
+    const userInfo: UserInfo = {
+      email: this.emailInput.value,
+      firstName: this.firstNameInput.value,
+      lastName: this.lastNameInput.value,
+      password: this.passwordInput.value,
+      shippingAddress: {
+        country: this.shippingAddressBlock.countryInput.value,
+        postCode: this.shippingAddressBlock.postInput.value,
+        city: this.shippingAddressBlock.cityInput.value,
+        street: this.shippingAddressBlock.streetInput.value,
+      },
+    };
+    if (!this.shippingAddressBlock.sameAsShippingCheckbox.checked) {
+      userInfo.shippingAddress.country =
+        this.billingAddressBlock.countryInput.value;
+      userInfo.shippingAddress.postCode =
+        this.billingAddressBlock.postInput.value;
+      userInfo.shippingAddress.city = this.billingAddressBlock.cityInput.value;
+      userInfo.shippingAddress.street =
+        this.billingAddressBlock.streetInput.value;
+    }
+    try {
+      await signUpUser(userInfo);
+      this.router.navigateTo(Pages.MAIN);
+    } catch (error) {
+      this.handleRegistrationError();
+    }
+  }
+
+  public handleRegistrationError(): void {
+    this.registrationErrorPopup = createDiv('loginErrorPopup', document.body);
+    const registrationErrorPopupContent = createDiv(
+      'loginErrorPopupContent',
+      this.registrationErrorPopup
+    );
+    const loginErrorPopupTop = createDiv(
+      'loginErrorPopupTop',
+      registrationErrorPopupContent
+    );
+
+    loginErrorPopupTop.innerHTML = '🐶🐶🐶';
+
+    const loginErrorPopupBottom = createDiv(
+      'loginErrorPopupBottom',
+      registrationErrorPopupContent
+    );
+    loginErrorPopupBottom.innerHTML = `${'We have tried to register you but the e-mail you entered has already been registered. <br> Please enter another e-mail or sign in.'}`;
+    this.registrationErrorPopup.addEventListener(
+      'click',
+      this.closeRegistrationErrorPopup.bind(this)
+    );
+  }
+
+  private closeRegistrationErrorPopup() {
+    if (this.registrationErrorPopup) {
+      this.registrationErrorPopup.classList.add('hidden');
+    }
+    this.emailInput.value = '';
+    this.passwordInput.value = '';
+    this.repeatPasswordInput.value = '';
+    this.confirmEmailInput.value = '';
+  }
 }
 
 export default RegistrationPage;
