@@ -1,0 +1,53 @@
+.container {
+  display: flex;
+  gap: 50px;
+  width: 768px;
+  margin: auto;
+  padding: 50px;
+}
+
+.error {
+  margin: 0;
+  color: peru;
+  font-weight: 800;
+}
+
+.h1 {
+  margin: 0;
+  font-size: 56px;
+}
+
+.description {
+  color: gray;
+  font-size: 20px;
+}
+
+.home {
+  display: block;
+  padding: 10px;
+  border: 2px solid transparent;
+  border-color: var(--accent-color);
+  text-align: center;
+  color: var(--accent-color);
+  font-weight: bold;
+  transition-duration: 0.25s;
+  cursor: pointer;
+}
+
+.home:hover {
+  color: var(--main-bg-color);
+  background-color: var(--accent-color);
+}
+
+@media screen and (max-width: 876px) {
+  .container {
+    padding: 20px;
+    width: 80%;
+    flex-direction: column-reverse;
+  }
+
+  .description {
+    font-size: 16px;
+    line-height: 24px;
+  }
+}
