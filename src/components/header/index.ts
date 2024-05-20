@@ -1,13 +1,26 @@
 import Router from '../../router';
 import Pages from '../../router/pageNames';
-import { createBtn, createDiv, createSpan } from '../../utils/elementCreator';
+import {
+  createBtn,
+  createDiv,
+  createLocalLink,
+  createParagraph,
+  createSpan,
+} from '../../utils/elementCreator';
 import styles from './header.module.css';
 import logo from '../../assets/logo.png';
 
 export default class Header {
   private container: HTMLElement;
 
+  private burgerMenu: HTMLElement;
+
+  private userControls: HTMLElement;
+
+  private router: Router;
+
   constructor(router: Router) {
+    this.router = router;
     this.container = document.createElement('header');
     this.container.classList.add(styles.header);
 
@@ -18,19 +31,83 @@ export default class Header {
     logoContainer.append(logoImage);
 
     const links = createDiv(styles.linksContainer, this.container);
-    const homeLink = createSpan(styles.link, 'Home', links);
-    homeLink.addEventListener('click', () => router.navigateTo(Pages.MAIN));
+    createLocalLink(
+      styles.link,
+      'Home',
+      () => router.navigateTo(Pages.MAIN),
+      links
+    );
 
-    const userControls = createDiv(styles.userControls, this.container);
-    const loginButton = createBtn(styles.button, 'Login', userControls);
-    loginButton.addEventListener('click', () => {
-      router.navigateTo(Pages.LOGIN);
-    });
+    this.userControls = createDiv(styles.userControls, this.container);
 
-    const registerButton = createBtn(styles.button, 'Register', userControls);
-    registerButton.addEventListener('click', () => {
-      router.navigateTo(Pages.REGISTRATION);
+    this.burgerMenu = createDiv(styles.burgerMenu, this.container);
+    this.addMenuItem('Home', () => router.navigateTo(Pages.MAIN));
+    this.updateHeader();
+
+    const burgerButton = createBtn(styles.burgerButton, '', this.container);
+    createSpan(styles.burgerIcon, '', burgerButton);
+    burgerButton.addEventListener('click', () => {
+      this.burgerMenu.classList.toggle(styles.burgerMenuOpen);
     });
+  }
+
+  updateHeader() {
+    this.userControls.innerHTML = '';
+
+    if (localStorage.getItem('id') && localStorage.getItem('token')) {
+      const logoutButton = createBtn(
+        styles.button,
+        'Logout',
+        this.userControls
+      );
+      logoutButton.addEventListener('click', () => {
+        localStorage.removeItem('id');
+        localStorage.removeItem('token');
+        this.updateHeader();
+        this.router.navigateTo(Pages.MAIN);
+      });
+    } else {
+      const loginButton = createBtn(styles.button, 'Login', this.userControls);
+      loginButton.addEventListener('click', () =>
+        this.router.navigateTo(Pages.LOGIN)
+      );
+      const registerButton = createBtn(
+        styles.button,
+        'Register',
+        this.userControls
+      );
+      registerButton.addEventListener('click', () =>
+        this.router.navigateTo(Pages.REGISTRATION)
+      );
+    }
+
+    this.burgerMenu.innerHTML = '';
+
+    this.addMenuItem('Home', () => this.router.navigateTo(Pages.MAIN));
+    if (localStorage.getItem('id') && localStorage.getItem('token')) {
+      this.addMenuItem('Logout', () => {
+        localStorage.removeItem('id');
+        localStorage.removeItem('token');
+        this.updateHeader();
+        this.router.navigateTo(Pages.MAIN);
+      });
+    } else {
+      this.addMenuItem('Login', () => this.router.navigateTo(Pages.LOGIN));
+      this.addMenuItem('Register', () =>
+        this.router.navigateTo(Pages.REGISTRATION)
+      );
+    }
+  }
+
+  private addMenuItem(text: string, onClick: () => void): HTMLDivElement {
+    const item = createParagraph(styles.menuItem, text, this.burgerMenu);
+    item.className = styles.menuItem;
+    item.textContent = text;
+    item.addEventListener('click', onClick);
+    item.addEventListener('click', () => {
+      this.burgerMenu.classList.toggle(styles.burgerMenuOpen);
+    });
+    return item;
   }
 
   getHeaderElement() {

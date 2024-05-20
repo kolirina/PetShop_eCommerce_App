@@ -53,6 +53,7 @@
 .eyeBtn {
   background-color: transparent;
   border: none;
+  cursor: pointer;
 }
 
 .emailErrors,
@@ -69,6 +70,7 @@
   background-color: var(--main-bg-color);
   border: 1px solid var(--accent-color);
   border-radius: 2px;
+  cursor: pointer;
 }
 
 .button:hover {
@@ -83,11 +85,15 @@
   color: rgb(204, 154, 125);
   background-color: var(--disabled-bg-color);
   border: 1px solid var(--disabled-border-color);
+  cursor: default;
 }
 
 .registerLink {
+  width: 100px;
   color: rgb(33, 85, 26);
   font-size: small;
+  text-decoration: underline;
+  cursor: pointer;
 }
 
 .registerLink:hover {

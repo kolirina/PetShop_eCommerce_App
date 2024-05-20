@@ -15,8 +15,7 @@ templatePage.render();
 router.addRoutes({
   [Pages.MAIN]: () =>
     new MainPage(router, templatePage.getMainElement()).render(),
-  [Pages.LOGIN]: () =>
-    new LoginPage(router, templatePage.getMainElement()).render(),
+  [Pages.LOGIN]: () => new LoginPage(router, templatePage).render(),
   [Pages.REGISTRATION]: () =>
     new RegistrationPage(router, templatePage.getMainElement()).render(),
   [Pages.NOT_FOUND]: () =>

@@ -129,3 +129,32 @@ export function createLink(
   appendToParent(element, parentElement);
   return element;
 }
+
+export function createLocalLink(
+  className: string,
+  text: string,
+  navCallback: () => void,
+  parentElement?: HTMLElement
+): HTMLAnchorElement {
+  const element: HTMLAnchorElement = document.createElement('a');
+  element.classList.add(className);
+  element.textContent = text;
+  element.addEventListener('click', (e) => {
+    e.preventDefault();
+    navCallback();
+  });
+  appendToParent(element, parentElement);
+  return element;
+}
+
+export function createParagraph(
+  className: string,
+  text: string,
+  parentElement?: HTMLElement
+): HTMLParagraphElement {
+  const element: HTMLParagraphElement = document.createElement('p');
+  element.classList.add(className);
+  element.textContent = text;
+  appendToParent(element, parentElement);
+  return element;
+}

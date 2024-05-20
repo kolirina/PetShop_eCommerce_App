@@ -5,7 +5,7 @@ import {
   createBtn,
   createInput,
   createDiv,
-  createLink,
+  createLocalLink,
 } from '../../utils/elementCreator';
 
 import { EmailValidationErrors, PasswordValidationErrors } from './constants';
@@ -13,10 +13,13 @@ import Pages from '../../router/pageNames';
 
 import Router from '../../router';
 import Page from '../Page';
+import TemplatePage from '../templatePage';
 
 import './loginPageStyles.css';
 
 export default class LoginPage extends Page {
+  private templatePage: TemplatePage;
+
   private loginForm: HTMLElement;
 
   private preWelcomeDiv: HTMLDivElement;
@@ -49,8 +52,9 @@ export default class LoginPage extends Page {
 
   private passwordErrorsDiv: HTMLDivElement;
 
-  constructor(router: Router, parentElement: HTMLElement) {
-    super(router, parentElement);
+  constructor(router: Router, templatePage: TemplatePage) {
+    super(router, templatePage.getMainElement());
+    this.templatePage = templatePage;
     this.container = createDiv('container', document.body);
     this.loginForm = createForm('loginForm', this.container);
     this.preWelcomeDiv = createDiv('preWelcomeDiv', this.loginForm);
@@ -89,16 +93,12 @@ export default class LoginPage extends Page {
     this.signInBtn = createBtn('button', 'SIGN IN', this.loginForm);
     this.signInBtn.disabled = true;
 
-    this.registerLink = createLink(
+    this.registerLink = createLocalLink(
       'registerLink',
       'Create Account',
-      '/registration',
+      () => router.navigateTo(Pages.REGISTRATION),
       this.loginForm
     );
-    this.registerLink.addEventListener('click', (e) => {
-      e.preventDefault();
-      router.navigateTo(Pages.REGISTRATION);
-    });
     this.loginForm.appendChild(this.registerLink);
     this.emailErrorsDiv = createDiv('emailErrors');
     this.emailInput.after(this.emailErrorsDiv);
@@ -225,6 +225,7 @@ export default class LoginPage extends Page {
     try {
       await loginUser(email, password);
       this.router.navigateTo(Pages.MAIN);
+      this.templatePage.getHeader().updateHeader();
     } catch (error) {
       this.handleLoginError();
     }
