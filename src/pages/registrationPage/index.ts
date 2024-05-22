@@ -10,7 +10,6 @@ import {
   createLocalLink,
 } from '../../utils/elementCreator';
 import Page from '../Page';
-import countryList from '../../assets/data/countryList';
 import './registrationPage.css';
 import postCodes from '../../assets/data/postal-codes';
 import { PostalCodeObj, UserInfo, ValidationObj } from '../../types';
@@ -467,9 +466,12 @@ class RegistrationPage extends Page {
 
     if (value.length > 0) {
       datalist.innerHTML = '';
-      const suggestedCountries: string[] = countryList.filter((el: string) =>
-        el.toLowerCase().startsWith(value.toLowerCase())
-      );
+      const suggestedCountries: string[] = postCodes
+        .filter((el: PostalCodeObj) =>
+          el.Country.toLowerCase().startsWith(value.toLowerCase())
+        )
+        .map((el: PostalCodeObj) => el.Country);
+
       suggestedCountries.forEach((el) => {
         const option: HTMLOptionElement = document.createElement('option');
         option.value = el;
@@ -478,8 +480,8 @@ class RegistrationPage extends Page {
     }
 
     if (
-      !countryList.find(
-        (el: string) => el.toLowerCase() === value.toLowerCase()
+      !postCodes.find(
+        (el: PostalCodeObj) => el.Country.toLowerCase() === value.toLowerCase()
       )
     ) {
       this.showInputStatus(activeBlock.countryWrapper, true, addressType);
