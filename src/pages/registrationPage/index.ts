@@ -14,7 +14,7 @@ import countryList from '../../assets/data/countryList';
 import './registrationPage.css';
 import postCodes from '../../assets/data/postal-codes';
 import { PostalCodeObj, UserInfo, ValidationObj } from '../../types';
-import { INPUT_FORM_COUNT, ValidationErrors } from './constants';
+import { INPUT_FORM_COUNT, MIN_AGE, ValidationErrors } from './constants';
 import AddressBlock from './addressesBlocks';
 import Pages from '../../router/pageNames';
 import TemplatePage from '../templatePage';
@@ -184,6 +184,7 @@ class RegistrationPage extends Page {
       placeholder: 'Enter an e-mail',
       parentElement: this.birthDateWrapper,
     });
+    this.birthDateInput.min = '1900-01-01';
     this.ageErrorDiv = createDiv('error', this.birthDateWrapper);
 
     this.emailWrapper = createDiv('email-wrapper', this.userInfoWrapper);
@@ -432,18 +433,21 @@ class RegistrationPage extends Page {
   }
 
   private validateDateOfBirth(value: string): void {
-    const year = new Date(value).getFullYear();
-    const thisYear = new Date().getFullYear();
-    if (thisYear - year < 110) {
-      if (thisYear - year < 13) {
-        this.showInputStatus(this.birthDateWrapper, true, 'birthDate');
-        this.ageErrorDiv.textContent = ValidationErrors.AGE_ERR;
-      } else {
-        this.showInputStatus(this.birthDateWrapper, false, 'birthDate');
-        this.ageErrorDiv.textContent = '';
-      }
-      this.checkAllInputs();
+    const birthDate = new Date(value);
+    const now = new Date();
+    const minBirthDate = new Date(
+      now.getFullYear() - MIN_AGE,
+      now.getMonth(),
+      now.getDate() + 1
+    );
+    if (birthDate >= minBirthDate) {
+      this.showInputStatus(this.birthDateWrapper, true, 'birthDate');
+      this.ageErrorDiv.textContent = ValidationErrors.AGE_ERR;
+    } else {
+      this.showInputStatus(this.birthDateWrapper, false, 'birthDate');
+      this.ageErrorDiv.textContent = '';
     }
+    this.checkAllInputs();
   }
 
   private validateCountry(value: string, target: HTMLInputElement): void {
