@@ -3,7 +3,7 @@ import Router from '../router';
 export default class Page {
   protected parentElement: HTMLElement;
 
-  protected container: HTMLElement;
+  public container: HTMLElement;
 
   protected router: Router;
 
