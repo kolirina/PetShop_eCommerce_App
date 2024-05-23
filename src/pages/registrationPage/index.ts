@@ -672,7 +672,7 @@ class RegistrationPage extends Page {
     const userInfo: UserInfo = this.createUserObj();
 
     try {
-      const userId = await signUpUser(userInfo);
+      const userId = (await signUpUser(userInfo)).id;
       await addAddresses(userInfo, userId);
       this.router.navigateTo(Pages.MAIN);
       this.templatePage.getHeader().updateHeader();

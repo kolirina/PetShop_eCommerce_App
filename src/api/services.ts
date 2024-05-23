@@ -10,13 +10,14 @@ import {
   setShippingAddress,
 } from './SDK';
 
-const getToken = async (): Promise<string> => {
+async function getToken(email: string, password: string): Promise<string> {
   const CTP_AUTH_URL = import.meta.env.VITE_CTP_AUTH_URL;
+  const CTP_PROJECT_KEY = import.meta.env.VITE_CTP_PROJECT_KEY;
   const CTP_CLIENT_ID = import.meta.env.VITE_CTP_CLIENT_ID;
   const CTP_CLIENT_SECRET = import.meta.env.VITE_CTP_CLIENT_SECRET;
 
   const response = await fetch(
-    `${CTP_AUTH_URL}/oauth/token?grant_type=client_credentials`,
+    `${CTP_AUTH_URL}/oauth/${CTP_PROJECT_KEY}/customers/token?grant_type=password&username=${email}&password=${password}`,
     {
       method: 'POST',
       headers: {
@@ -32,10 +33,10 @@ const getToken = async (): Promise<string> => {
 
   const data = await response.json();
   return data.access_token;
-};
+}
 
 const loginUser = async (email: string, password: string): Promise<string> => {
-  const token = await getToken();
+  const token = await getToken(email, password);
   localStorage.setItem('token', token);
 
   const response = await getUser(email, password, apiRoot);
@@ -49,16 +50,22 @@ const loginUser = async (email: string, password: string): Promise<string> => {
   return id;
 };
 
-const signUpUser = async (userInfo: UserInfo) => {
-  const token = await getToken();
-  localStorage.setItem('token', token);
-
+const signUpUser = async (
+  userInfo: UserInfo
+): Promise<{ id: string; token: string }> => {
   try {
     const response = await registerUser(userInfo);
     const { id } = response.body.customer;
     localStorage.setItem('id', id);
 
-    return id;
+    try {
+      const token = await getToken(userInfo.email, userInfo.password);
+      localStorage.setItem('token', token);
+
+      return { id, token };
+    } catch (tokenError) {
+      throw new Error('Failed to retrieve authentication token.');
+    }
   } catch (err) {
     throw new Error(
       'There is already an existing customer with the provided email.'
@@ -67,7 +74,7 @@ const signUpUser = async (userInfo: UserInfo) => {
 };
 
 const addAddresses = async (userInfo: UserInfo, userId: string) => {
-  const token = await getToken();
+  const token = await getToken(userInfo.email, userInfo.password);
   localStorage.setItem('token', token);
 
   try {
