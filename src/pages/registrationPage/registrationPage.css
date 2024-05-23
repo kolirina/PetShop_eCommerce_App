@@ -175,6 +175,10 @@
 .same-address {
   display: flex;
 }
+.same-addresses-checkbox {
+  flex-direction: column;
+  row-gap: 10px;
+}
 
 .invalid-input {
   outline: 2px solid #ff0000;

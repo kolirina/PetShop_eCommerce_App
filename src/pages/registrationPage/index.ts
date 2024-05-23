@@ -106,6 +106,14 @@ class RegistrationPage extends Page {
 
   protected registrationErrorPopup?: HTMLDivElement;
 
+  protected defaultBillingAddressLabel?: HTMLLabelElement;
+
+  protected defaultBillingAddressInput?: HTMLInputElement;
+
+  protected defaultShippingAddressLabel?: HTMLLabelElement;
+
+  protected defaultShippingAddressInput?: HTMLInputElement;
+
   constructor(router: Router, templatePage: TemplatePage) {
     super(router, templatePage.getMainElement());
     this.templatePage = templatePage;
@@ -589,8 +597,36 @@ class RegistrationPage extends Page {
 
   private copyAddress() {
     if (this.shippingAddressBlock.sameAsShippingCheckbox.checked === true) {
+      this.shippingAddressBlock.defaultAddressLabel.remove();
+      this.defaultShippingAddressLabel = createLabel(
+        'default-shipping-address-label',
+        'Set as default shipping address: '
+      );
+      this.defaultShippingAddressInput = createInput({
+        className: 'default-shipping-address-input',
+        type: 'checkbox',
+        parentElement: this.defaultShippingAddressLabel,
+      });
+      this.defaultBillingAddressLabel = createLabel(
+        'default-billing-address-label',
+        'Set as default billing address: '
+      );
+      this.defaultBillingAddressInput = createInput({
+        className: 'default-shipping-address-input',
+        type: 'checkbox',
+        parentElement: this.defaultBillingAddressLabel,
+      });
+      this.shippingAddressBlock.checkboxInputWrapper.prepend(
+        this.defaultBillingAddressLabel
+      );
+      this.shippingAddressBlock.checkboxInputWrapper.prepend(
+        this.defaultShippingAddressLabel
+      );
       this.billingAddressBlock.addressWrapper.classList.add(
         'address-inputs-wrapper-hidden'
+      );
+      this.shippingAddressBlock.checkboxInputWrapper.classList.add(
+        'same-addresses-checkbox'
       );
       this.areAllInputsValid.bi_country = true;
       this.areAllInputsValid.bi_postCode = true;
@@ -610,8 +646,16 @@ class RegistrationPage extends Page {
         this.shippingAddressBlock.streetInput.value;
       this.checkAllInputs();
     } else {
+      this.defaultBillingAddressLabel?.remove();
+      this.defaultShippingAddressLabel?.remove();
+      this.shippingAddressBlock.checkboxInputWrapper.prepend(
+        this.shippingAddressBlock.defaultAddressLabel
+      );
       this.billingAddressBlock.addressWrapper.classList.remove(
         'address-inputs-wrapper-hidden'
+      );
+      this.shippingAddressBlock.checkboxInputWrapper.classList.remove(
+        'same-addresses-checkbox'
       );
       this.areAllInputsValid.bi_country = false;
       this.areAllInputsValid.bi_postCode = false;
@@ -642,6 +686,18 @@ class RegistrationPage extends Page {
   }
 
   private createUserObj(): UserInfo {
+    let isDefaultShippingAddress =
+      this.shippingAddressBlock.defaultAddressCheckbox.checked;
+    let isDefaultBillingAddress =
+      this.billingAddressBlock.defaultAddressCheckbox.checked;
+    if (
+      this.shippingAddressBlock.sameAsShippingCheckbox.checked &&
+      this.defaultShippingAddressInput &&
+      this.defaultBillingAddressInput
+    ) {
+      isDefaultShippingAddress = this.defaultShippingAddressInput.checked;
+      isDefaultBillingAddress = this.defaultBillingAddressInput.checked;
+    }
     const userObj: UserInfo = {
       email: this.emailInput.value,
       firstName: this.firstNameInput.value,
@@ -652,7 +708,7 @@ class RegistrationPage extends Page {
         postCode: this.shippingAddressBlock.postInput.value,
         city: this.shippingAddressBlock.cityInput.value,
         street: this.shippingAddressBlock.streetInput.value,
-        isDefault: this.shippingAddressBlock.defaultAddressCheckbox.checked,
+        isDefault: isDefaultShippingAddress,
         countryISO: getCountryISOCode(
           this.shippingAddressBlock.countryInput.value
         ),
@@ -662,9 +718,7 @@ class RegistrationPage extends Page {
         postCode: this.billingAddressBlock.postInput.value,
         city: this.billingAddressBlock.cityInput.value,
         street: this.billingAddressBlock.streetInput.value,
-        isDefault: this.shippingAddressBlock.sameAsShippingCheckbox.checked
-          ? true
-          : this.billingAddressBlock.defaultAddressCheckbox.checked,
+        isDefault: isDefaultBillingAddress,
         countryISO: getCountryISOCode(
           this.billingAddressBlock.countryInput.value
         ),
