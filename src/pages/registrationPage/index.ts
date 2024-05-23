@@ -106,6 +106,10 @@ class RegistrationPage extends Page {
 
   protected registrationErrorPopup?: HTMLDivElement;
 
+  protected showHidePasswordBtn: HTMLButtonElement;
+
+  protected repeatShowHidePasswordBtn: HTMLButtonElement;
+
   protected defaultBillingAddressLabel?: HTMLLabelElement;
 
   protected defaultBillingAddressInput?: HTMLInputElement;
@@ -221,6 +225,11 @@ class RegistrationPage extends Page {
       '',
       this.userInfoWrapper
     );
+    this.showHidePasswordBtn = createBtn(
+      'show-hide-password',
+      '🙈',
+      this.passwordInputWrapper
+    );
     this.passwordInput = createInput({
       className: 'password',
       type: 'password',
@@ -235,6 +244,11 @@ class RegistrationPage extends Page {
       '',
       this.userInfoWrapper
     );
+    this.repeatShowHidePasswordBtn = createBtn(
+      'show-hide-password',
+      '🙈',
+      this.repeatPasswordWrapper
+    );
     this.repeatPasswordInput = createInput({
       className: 'repeat-password',
       type: 'password',
@@ -243,6 +257,7 @@ class RegistrationPage extends Page {
       placeholder: 'Repeat the password',
       parentElement: this.repeatPasswordWrapper,
     });
+
     this.rPasswordErrorDiv = createDiv('error', this.repeatPasswordWrapper);
 
     this.addressesHeading = createH3(
@@ -273,6 +288,14 @@ class RegistrationPage extends Page {
     this.submitBtn.type = 'submit';
     this.submitBtn.disabled = true;
     this.registerForm.addEventListener('input', this.handleInput.bind(this));
+
+    this.showHidePasswordBtn.addEventListener('click', (event) =>
+      this.showHidePwd(event)
+    );
+
+    this.repeatShowHidePasswordBtn.addEventListener('click', (event) =>
+      this.showHidePwd(event)
+    );
 
     this.shippingAddressBlock.countryInput.addEventListener(
       'change',
@@ -773,6 +796,22 @@ class RegistrationPage extends Page {
     this.passwordInput.value = '';
     this.repeatPasswordInput.value = '';
     this.confirmEmailInput.value = '';
+  }
+
+  private showHidePwd(event: Event) {
+    event.preventDefault();
+
+    if (this.passwordInput.type === 'password') {
+      this.showHidePasswordBtn.textContent = '👀';
+      this.repeatShowHidePasswordBtn.textContent = '👀';
+      this.passwordInput.type = 'text';
+      this.repeatPasswordInput.type = 'text';
+    } else {
+      this.showHidePasswordBtn.textContent = '🙈';
+      this.repeatShowHidePasswordBtn.textContent = '🙈';
+      this.passwordInput.type = 'password';
+      this.repeatPasswordInput.type = 'password';
+    }
   }
 }
 
