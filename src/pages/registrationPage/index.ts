@@ -28,83 +28,83 @@ function getCountryISOCode(country: string): string {
 }
 
 class RegistrationPage extends Page {
-  protected templatePage: TemplatePage;
+  public templatePage: TemplatePage;
 
-  protected registerForm: HTMLFormElement;
+  public registerForm: HTMLFormElement;
 
-  protected passwordInput: HTMLInputElement;
+  public passwordInput: HTMLInputElement;
 
-  protected repeatPasswordInput: HTMLInputElement;
+  public repeatPasswordInput: HTMLInputElement;
 
-  protected emailInput: HTMLInputElement;
+  public emailInput: HTMLInputElement;
 
-  protected confirmEmailInput: HTMLInputElement;
+  public confirmEmailInput: HTMLInputElement;
 
-  protected firstNameInput: HTMLInputElement;
+  public firstNameInput: HTMLInputElement;
 
-  protected lastNameInput: HTMLInputElement;
+  public lastNameInput: HTMLInputElement;
 
-  protected birthDateInput: HTMLInputElement;
+  public birthDateInput: HTMLInputElement;
 
-  protected birthDateLabel: HTMLLabelElement;
+  public birthDateLabel: HTMLLabelElement;
 
-  protected nameWrapper: HTMLDivElement;
+  public nameWrapper: HTMLDivElement;
 
-  protected emailWrapper: HTMLDivElement;
+  public emailWrapper: HTMLDivElement;
 
-  protected submitBtn: HTMLButtonElement;
+  public submitBtn: HTMLButtonElement;
 
-  protected areAllInputsValid: ValidationObj;
+  public areAllInputsValid: ValidationObj;
 
-  protected registerHeading: HTMLHeadingElement;
+  public registerHeading: HTMLHeadingElement;
 
-  protected registerImg: HTMLDivElement;
+  public registerImg: HTMLDivElement;
 
-  protected firstNameWrapper: HTMLLabelElement;
+  public firstNameWrapper: HTMLLabelElement;
 
-  protected lastNameWrapper: HTMLLabelElement;
+  public lastNameWrapper: HTMLLabelElement;
 
-  protected emailInputWrapper: HTMLLabelElement;
+  public emailInputWrapper: HTMLLabelElement;
 
-  protected repeatEmailWrapper: HTMLLabelElement;
+  public repeatEmailWrapper: HTMLLabelElement;
 
-  protected passwordInputWrapper: HTMLLabelElement;
+  public passwordInputWrapper: HTMLLabelElement;
 
-  protected repeatPasswordWrapper: HTMLLabelElement;
+  public repeatPasswordWrapper: HTMLLabelElement;
 
-  protected birthDateWrapper: HTMLDivElement;
+  public birthDateWrapper: HTMLDivElement;
 
-  protected userInfoHeading: HTMLHeadingElement;
+  public userInfoHeading: HTMLHeadingElement;
 
-  protected userInfoWrapper: HTMLDivElement;
+  public userInfoWrapper: HTMLDivElement;
 
-  protected shippingAddressBlock: AddressBlock;
+  public shippingAddressBlock: AddressBlock;
 
-  protected billingAddressBlock: AddressBlock;
+  public billingAddressBlock: AddressBlock;
 
-  protected addressesHeading: HTMLHeadingElement;
+  public addressesHeading: HTMLHeadingElement;
 
-  protected addressesWrapper: HTMLDivElement;
+  public addressesWrapper: HTMLDivElement;
 
-  protected loginWrapper: HTMLDivElement;
+  public loginWrapper: HTMLDivElement;
 
-  protected loginLink: HTMLAnchorElement;
+  public loginLink: HTMLAnchorElement;
 
-  protected firstNameErrorDiv: HTMLDivElement;
+  public firstNameErrorDiv: HTMLDivElement;
 
-  protected lastNameErrorDiv: HTMLDivElement;
+  public lastNameErrorDiv: HTMLDivElement;
 
-  protected ageErrorDiv: HTMLDivElement;
+  public ageErrorDiv: HTMLDivElement;
 
-  protected emailErrorDiv: HTMLDivElement;
+  public emailErrorDiv: HTMLDivElement;
 
-  protected rEmailErrorDiv: HTMLDivElement;
+  public rEmailErrorDiv: HTMLDivElement;
 
-  protected passwordErrorDiv: HTMLDivElement;
+  public passwordErrorDiv: HTMLDivElement;
 
-  protected rPasswordErrorDiv: HTMLDivElement;
+  public rPasswordErrorDiv: HTMLDivElement;
 
-  protected registrationErrorPopup?: HTMLDivElement;
+  public registrationErrorPopup?: HTMLDivElement;
 
   protected showHidePasswordBtn: HTMLButtonElement;
 
@@ -321,7 +321,7 @@ class RegistrationPage extends Page {
     );
   }
 
-  private handleInput(event: Event): void {
+  public handleInput(event: Event): void {
     const target: HTMLInputElement = event?.target as HTMLInputElement;
     if (target.className.includes('email')) {
       this.validateEmail(target.value);
@@ -358,7 +358,7 @@ class RegistrationPage extends Page {
     }
   }
 
-  private validateEmail(value: string): void {
+  public validateEmail(value: string): void {
     const template: RegExp = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
     if (!template.test(value.trim())) {
       this.showInputStatus(this.emailInputWrapper, true, 'email');
@@ -371,7 +371,7 @@ class RegistrationPage extends Page {
     this.checkAllInputs();
   }
 
-  private validateRepeatEmail(value: string): void {
+  public validateRepeatEmail(value: string): void {
     if (value.trim() !== this.emailInput.value.trim()) {
       this.showInputStatus(this.repeatEmailWrapper, true, 'remail');
       this.rEmailErrorDiv.textContent = ValidationErrors.REPEAT_EMAIL_ERR;
@@ -382,7 +382,7 @@ class RegistrationPage extends Page {
     this.checkAllInputs();
   }
 
-  private validatePassword(value: string): void {
+  public validatePassword(value: string): void {
     const template: RegExp =
       /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/;
     if (!template.test(value) || value.trim() !== value) {
@@ -396,7 +396,7 @@ class RegistrationPage extends Page {
     this.checkAllInputs();
   }
 
-  private validateRepeatPassword(value: string): void {
+  public validateRepeatPassword(value: string): void {
     if (value !== this.passwordInput.value) {
       this.showInputStatus(this.repeatPasswordWrapper, true, 'rpassword');
       this.rPasswordErrorDiv.textContent = ValidationErrors.REPEAT_PASSWORD_ERR;
@@ -407,7 +407,7 @@ class RegistrationPage extends Page {
     this.checkAllInputs();
   }
 
-  private validateNamesAndCity(value: string, target: EventTarget): void {
+  public validateNamesAndCity(value: string, target: EventTarget): void {
     const template: RegExp = /^[a-zA-Z]+$/;
     const targetEl: HTMLDivElement = target as HTMLDivElement;
     let isValidated: boolean = false;
@@ -462,7 +462,7 @@ class RegistrationPage extends Page {
     this.checkAllInputs();
   }
 
-  private validateDateOfBirth(value: string): void {
+  public validateDateOfBirth(value: string): void {
     const birthDate = new Date(value);
     const now = new Date();
     const minBirthDate = new Date(
@@ -480,7 +480,7 @@ class RegistrationPage extends Page {
     this.checkAllInputs();
   }
 
-  private validateCountry(value: string, target: HTMLInputElement): void {
+  public validateCountry(value: string, target: HTMLInputElement): void {
     let datalist: HTMLDataListElement;
     let activeBlock: AddressBlock;
     let addressType: keyof ValidationObj;
@@ -535,7 +535,7 @@ class RegistrationPage extends Page {
     this.checkAllInputs();
   }
 
-  private validatePostalCode(value: string, target: HTMLInputElement): void {
+  public validatePostalCode(value: string, target: HTMLInputElement): void {
     let activeBlock: AddressBlock;
     let addressType: keyof ValidationObj;
 
@@ -576,7 +576,7 @@ class RegistrationPage extends Page {
     this.checkAllInputs();
   }
 
-  private validateStreet(value: string, target: HTMLInputElement): void {
+  public validateStreet(value: string, target: HTMLInputElement): void {
     let activeBlock: AddressBlock;
     let addressType: keyof ValidationObj;
 
@@ -598,7 +598,7 @@ class RegistrationPage extends Page {
     this.checkAllInputs();
   }
 
-  private showInputStatus<K extends keyof ValidationObj>(
+  public showInputStatus<K extends keyof ValidationObj>(
     input: HTMLInputElement | HTMLLabelElement | HTMLDivElement,
     isWrong: boolean,
     keyName: K
@@ -618,7 +618,7 @@ class RegistrationPage extends Page {
     }
   }
 
-  private copyAddress() {
+  public copyAddress() {
     if (this.shippingAddressBlock.sameAsShippingCheckbox.checked === true) {
       this.shippingAddressBlock.defaultAddressLabel.remove();
       this.defaultShippingAddressLabel = createLabel(
@@ -696,7 +696,7 @@ class RegistrationPage extends Page {
     }
   }
 
-  private checkAllInputs() {
+  public checkAllInputs() {
     const validationArr: boolean[] = Object.values(this.areAllInputsValid);
     if (
       validationArr.length === INPUT_FORM_COUNT &&
@@ -708,7 +708,7 @@ class RegistrationPage extends Page {
     }
   }
 
-  private createUserObj(): UserInfo {
+  public createUserObj(): UserInfo {
     let isDefaultShippingAddress =
       this.shippingAddressBlock.defaultAddressCheckbox.checked;
     let isDefaultBillingAddress =
@@ -750,7 +750,7 @@ class RegistrationPage extends Page {
     return userObj;
   }
 
-  private async submitRegistration(event: Event): Promise<void> {
+  public async submitRegistration(event: Event): Promise<void> {
     event.preventDefault();
     const userInfo: UserInfo = this.createUserObj();
 
@@ -788,7 +788,7 @@ class RegistrationPage extends Page {
     );
   }
 
-  private closeRegistrationErrorPopup() {
+  public closeRegistrationErrorPopup() {
     if (this.registrationErrorPopup) {
       this.registrationErrorPopup.classList.add('hidden');
     }
