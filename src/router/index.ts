@@ -1,7 +1,7 @@
 import Pages from './pageNames';
 
 export default class Router {
-  private routes: { [key: string]: () => void } = {};
+  public routes: { [key: string]: () => void } = {};
 
   addRoutes(routes: { [key: string]: () => void }) {
     this.routes = routes;
