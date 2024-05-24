@@ -1484,7 +1484,6 @@ const postCodes: PostalCodeObj[] = [
     Country: 'Sweden',
     ISO: 'SE',
     Format: 'NNNNN',
-    Regex: '^\\d{3}\\s*\\d{2}$',
   },
   {
     Note: 'With Liechtenstein, ordered from west to east. In Geneva and other big cities, like Basel, Bern, Zurich, there may be one or two digits after the name of the city when the generic City code (1211) is used instead of the area-specific code (1201, 1202...), e.g.: 1211 Geneva 13. The digit identifies the post office. This addressing is generally used for P.O. box deliveries.',
