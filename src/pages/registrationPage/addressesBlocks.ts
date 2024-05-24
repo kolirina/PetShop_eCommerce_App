@@ -28,9 +28,9 @@ class AddressBlock {
 
   protected shippingAddressText: HTMLSpanElement;
 
-  protected checkboxInputWrapper: HTMLDivElement;
+  public checkboxInputWrapper: HTMLDivElement;
 
-  protected defaultAddressLabel: HTMLLabelElement;
+  public defaultAddressLabel: HTMLLabelElement;
 
   public defaultAddressCheckbox: HTMLInputElement;
 
@@ -121,7 +121,7 @@ class AddressBlock {
     );
     this.defaultAddressLabel = createLabel(
       'default-address-label',
-      'Set as default ',
+      'Set as default: ',
       this.checkboxInputWrapper
     );
     this.defaultAddressCheckbox = createInput({

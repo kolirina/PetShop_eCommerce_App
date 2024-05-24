@@ -10,11 +10,10 @@ import {
   createLocalLink,
 } from '../../utils/elementCreator';
 import Page from '../Page';
-import countryList from '../../assets/data/countryList';
 import './registrationPage.css';
 import postCodes from '../../assets/data/postal-codes';
 import { PostalCodeObj, UserInfo, ValidationObj } from '../../types';
-import { INPUT_FORM_COUNT, ValidationErrors } from './constants';
+import { INPUT_FORM_COUNT, MIN_AGE, ValidationErrors } from './constants';
 import AddressBlock from './addressesBlocks';
 import Pages from '../../router/pageNames';
 import TemplatePage from '../templatePage';
@@ -107,6 +106,18 @@ class RegistrationPage extends Page {
 
   protected registrationErrorPopup?: HTMLDivElement;
 
+  protected showHidePasswordBtn: HTMLButtonElement;
+
+  protected repeatShowHidePasswordBtn: HTMLButtonElement;
+
+  protected defaultBillingAddressLabel?: HTMLLabelElement;
+
+  protected defaultBillingAddressInput?: HTMLInputElement;
+
+  protected defaultShippingAddressLabel?: HTMLLabelElement;
+
+  protected defaultShippingAddressInput?: HTMLInputElement;
+
   constructor(router: Router, templatePage: TemplatePage) {
     super(router, templatePage.getMainElement());
     this.templatePage = templatePage;
@@ -184,6 +195,7 @@ class RegistrationPage extends Page {
       placeholder: 'Enter an e-mail',
       parentElement: this.birthDateWrapper,
     });
+    this.birthDateInput.min = '1900-01-01';
     this.ageErrorDiv = createDiv('error', this.birthDateWrapper);
 
     this.emailWrapper = createDiv('email-wrapper', this.userInfoWrapper);
@@ -213,6 +225,11 @@ class RegistrationPage extends Page {
       '',
       this.userInfoWrapper
     );
+    this.showHidePasswordBtn = createBtn(
+      'show-hide-password',
+      '🙈',
+      this.passwordInputWrapper
+    );
     this.passwordInput = createInput({
       className: 'password',
       type: 'password',
@@ -227,6 +244,11 @@ class RegistrationPage extends Page {
       '',
       this.userInfoWrapper
     );
+    this.repeatShowHidePasswordBtn = createBtn(
+      'show-hide-password',
+      '🙈',
+      this.repeatPasswordWrapper
+    );
     this.repeatPasswordInput = createInput({
       className: 'repeat-password',
       type: 'password',
@@ -235,6 +257,7 @@ class RegistrationPage extends Page {
       placeholder: 'Repeat the password',
       parentElement: this.repeatPasswordWrapper,
     });
+
     this.rPasswordErrorDiv = createDiv('error', this.repeatPasswordWrapper);
 
     this.addressesHeading = createH3(
@@ -265,6 +288,14 @@ class RegistrationPage extends Page {
     this.submitBtn.type = 'submit';
     this.submitBtn.disabled = true;
     this.registerForm.addEventListener('input', this.handleInput.bind(this));
+
+    this.showHidePasswordBtn.addEventListener('click', (event) =>
+      this.showHidePwd(event)
+    );
+
+    this.repeatShowHidePasswordBtn.addEventListener('click', (event) =>
+      this.showHidePwd(event)
+    );
 
     this.shippingAddressBlock.countryInput.addEventListener(
       'change',
@@ -432,18 +463,21 @@ class RegistrationPage extends Page {
   }
 
   private validateDateOfBirth(value: string): void {
-    const year = new Date(value).getFullYear();
-    const thisYear = new Date().getFullYear();
-    if (thisYear - year < 110) {
-      if (thisYear - year < 13) {
-        this.showInputStatus(this.birthDateWrapper, true, 'birthDate');
-        this.ageErrorDiv.textContent = ValidationErrors.AGE_ERR;
-      } else {
-        this.showInputStatus(this.birthDateWrapper, false, 'birthDate');
-        this.ageErrorDiv.textContent = '';
-      }
-      this.checkAllInputs();
+    const birthDate = new Date(value);
+    const now = new Date();
+    const minBirthDate = new Date(
+      now.getFullYear() - MIN_AGE,
+      now.getMonth(),
+      now.getDate() + 1
+    );
+    if (birthDate >= minBirthDate) {
+      this.showInputStatus(this.birthDateWrapper, true, 'birthDate');
+      this.ageErrorDiv.textContent = ValidationErrors.AGE_ERR;
+    } else {
+      this.showInputStatus(this.birthDateWrapper, false, 'birthDate');
+      this.ageErrorDiv.textContent = '';
     }
+    this.checkAllInputs();
   }
 
   private validateCountry(value: string, target: HTMLInputElement): void {
@@ -463,9 +497,12 @@ class RegistrationPage extends Page {
 
     if (value.length > 0) {
       datalist.innerHTML = '';
-      const suggestedCountries: string[] = countryList.filter((el: string) =>
-        el.toLowerCase().startsWith(value.toLowerCase())
-      );
+      const suggestedCountries: string[] = postCodes
+        .filter((el: PostalCodeObj) =>
+          el.Country.toLowerCase().startsWith(value.toLowerCase())
+        )
+        .map((el: PostalCodeObj) => el.Country);
+
       suggestedCountries.forEach((el) => {
         const option: HTMLOptionElement = document.createElement('option');
         option.value = el;
@@ -474,8 +511,8 @@ class RegistrationPage extends Page {
     }
 
     if (
-      !countryList.find(
-        (el: string) => el.toLowerCase() === value.toLowerCase()
+      !postCodes.find(
+        (el: PostalCodeObj) => el.Country.toLowerCase() === value.toLowerCase()
       )
     ) {
       this.showInputStatus(activeBlock.countryWrapper, true, addressType);
@@ -583,8 +620,36 @@ class RegistrationPage extends Page {
 
   private copyAddress() {
     if (this.shippingAddressBlock.sameAsShippingCheckbox.checked === true) {
+      this.shippingAddressBlock.defaultAddressLabel.remove();
+      this.defaultShippingAddressLabel = createLabel(
+        'default-shipping-address-label',
+        'Set as default shipping address: '
+      );
+      this.defaultShippingAddressInput = createInput({
+        className: 'default-shipping-address-input',
+        type: 'checkbox',
+        parentElement: this.defaultShippingAddressLabel,
+      });
+      this.defaultBillingAddressLabel = createLabel(
+        'default-billing-address-label',
+        'Set as default billing address: '
+      );
+      this.defaultBillingAddressInput = createInput({
+        className: 'default-shipping-address-input',
+        type: 'checkbox',
+        parentElement: this.defaultBillingAddressLabel,
+      });
+      this.shippingAddressBlock.checkboxInputWrapper.prepend(
+        this.defaultBillingAddressLabel
+      );
+      this.shippingAddressBlock.checkboxInputWrapper.prepend(
+        this.defaultShippingAddressLabel
+      );
       this.billingAddressBlock.addressWrapper.classList.add(
         'address-inputs-wrapper-hidden'
+      );
+      this.shippingAddressBlock.checkboxInputWrapper.classList.add(
+        'same-addresses-checkbox'
       );
       this.areAllInputsValid.bi_country = true;
       this.areAllInputsValid.bi_postCode = true;
@@ -604,8 +669,16 @@ class RegistrationPage extends Page {
         this.shippingAddressBlock.streetInput.value;
       this.checkAllInputs();
     } else {
+      this.defaultBillingAddressLabel?.remove();
+      this.defaultShippingAddressLabel?.remove();
+      this.shippingAddressBlock.checkboxInputWrapper.prepend(
+        this.shippingAddressBlock.defaultAddressLabel
+      );
       this.billingAddressBlock.addressWrapper.classList.remove(
         'address-inputs-wrapper-hidden'
+      );
+      this.shippingAddressBlock.checkboxInputWrapper.classList.remove(
+        'same-addresses-checkbox'
       );
       this.areAllInputsValid.bi_country = false;
       this.areAllInputsValid.bi_postCode = false;
@@ -636,6 +709,18 @@ class RegistrationPage extends Page {
   }
 
   private createUserObj(): UserInfo {
+    let isDefaultShippingAddress =
+      this.shippingAddressBlock.defaultAddressCheckbox.checked;
+    let isDefaultBillingAddress =
+      this.billingAddressBlock.defaultAddressCheckbox.checked;
+    if (
+      this.shippingAddressBlock.sameAsShippingCheckbox.checked &&
+      this.defaultShippingAddressInput &&
+      this.defaultBillingAddressInput
+    ) {
+      isDefaultShippingAddress = this.defaultShippingAddressInput.checked;
+      isDefaultBillingAddress = this.defaultBillingAddressInput.checked;
+    }
     const userObj: UserInfo = {
       email: this.emailInput.value,
       firstName: this.firstNameInput.value,
@@ -646,7 +731,7 @@ class RegistrationPage extends Page {
         postCode: this.shippingAddressBlock.postInput.value,
         city: this.shippingAddressBlock.cityInput.value,
         street: this.shippingAddressBlock.streetInput.value,
-        isDefault: this.shippingAddressBlock.defaultAddressCheckbox.checked,
+        isDefault: isDefaultShippingAddress,
         countryISO: getCountryISOCode(
           this.shippingAddressBlock.countryInput.value
         ),
@@ -656,9 +741,7 @@ class RegistrationPage extends Page {
         postCode: this.billingAddressBlock.postInput.value,
         city: this.billingAddressBlock.cityInput.value,
         street: this.billingAddressBlock.streetInput.value,
-        isDefault: this.shippingAddressBlock.sameAsShippingCheckbox.checked
-          ? true
-          : this.billingAddressBlock.defaultAddressCheckbox.checked,
+        isDefault: isDefaultBillingAddress,
         countryISO: getCountryISOCode(
           this.billingAddressBlock.countryInput.value
         ),
@@ -672,7 +755,7 @@ class RegistrationPage extends Page {
     const userInfo: UserInfo = this.createUserObj();
 
     try {
-      const userId = (await signUpUser(userInfo)).id;
+      const userId = await signUpUser(userInfo);
       await addAddresses(userInfo, userId);
       this.router.navigateTo(Pages.MAIN);
       this.templatePage.getHeader().updateHeader();
@@ -713,6 +796,22 @@ class RegistrationPage extends Page {
     this.passwordInput.value = '';
     this.repeatPasswordInput.value = '';
     this.confirmEmailInput.value = '';
+  }
+
+  private showHidePwd(event: Event) {
+    event.preventDefault();
+
+    if (this.passwordInput.type === 'password') {
+      this.showHidePasswordBtn.textContent = '👀';
+      this.repeatShowHidePasswordBtn.textContent = '👀';
+      this.passwordInput.type = 'text';
+      this.repeatPasswordInput.type = 'text';
+    } else {
+      this.showHidePasswordBtn.textContent = '🙈';
+      this.repeatShowHidePasswordBtn.textContent = '🙈';
+      this.passwordInput.type = 'password';
+      this.repeatPasswordInput.type = 'password';
+    }
   }
 }
 

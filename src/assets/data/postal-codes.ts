@@ -86,13 +86,6 @@ const postCodes: PostalCodeObj[] = [
     Regex: '',
   },
   {
-    Note: 'Single code used for all addresses. Part of UK system.',
-    Country: 'Ascension island',
-    ISO: 'AC',
-    Format: 'ASCN 1ZZ',
-    Regex: '^[Aa][Ss][Cc][Nn]\\s{0,1}[1][Zz][Zz]$',
-  },
-  {
     Note: 'In general, the first digit identifies the state or territory.',
     Country: 'Australia',
     ISO: 'AU',
@@ -219,13 +212,6 @@ const postCodes: PostalCodeObj[] = [
     Regex: '^\\d{5}-\\d{3}$',
   },
   {
-    Note: 'Single code used for all addresses.',
-    Country: 'British Antarctic Territory',
-    ISO: '',
-    Format: 'BIQQ 1ZZ',
-    Regex: '^[Bb][Ii][Qq]{2}\\s{0,1}[1][Zz]{2}$',
-  },
-  {
     Note: 'UK territory, but not UK postcode.',
     Country: 'British Indian Ocean Territory',
     ISO: 'IO',
@@ -234,7 +220,7 @@ const postCodes: PostalCodeObj[] = [
   },
   {
     Note: 'Specifically, VG1110 through VG1160[1]',
-    Country: 'British Virgin Islands',
+    Country: 'Virgin Islands',
     ISO: 'VG',
     Format: 'CCNNNN',
     Regex: '^[Vv][Gg]\\d{4}$',
@@ -340,7 +326,7 @@ const postCodes: PostalCodeObj[] = [
   },
   {
     Note: 'Part of the Australian postal code system.',
-    Country: 'Cocos (Keeling) Island',
+    Country: 'Cocos Island',
     ISO: 'CC',
     Format: 'NNNN',
     Regex: '^\\d{4}$',
@@ -361,17 +347,10 @@ const postCodes: PostalCodeObj[] = [
   },
   {
     Note: '',
-    Country: 'Congo (Brazzaville)',
+    Country: 'Congo',
     ISO: 'CG',
     Format: 'no codes',
     Regex: '',
-  },
-  {
-    Note: '',
-    Country: 'Congo, Democratic Republic',
-    ISO: 'CD',
-    Format: 'no codes',
-    Regex: '^[Cc][Dd]$',
   },
   {
     Note: '',
@@ -564,7 +543,7 @@ const postCodes: PostalCodeObj[] = [
   },
   {
     Note: 'French codes in the 98400 range have been reserved.',
-    Country: 'French Southern and Antarctic Territories',
+    Country: 'French Southern Territories',
     ISO: 'TF',
     Format: 'no codes',
     Regex: '',
@@ -830,24 +809,17 @@ const postCodes: PostalCodeObj[] = [
   },
   {
     Note: '',
-    Country: 'Korea, North',
+    Country: 'North Korea',
     ISO: 'KP',
     Format: 'no codes',
     Regex: '',
   },
   {
     Note: '',
-    Country: 'Korea, South',
+    Country: 'South Korea',
     ISO: 'KR',
     Format: 'NNNNNN',
     Regex: '^\\d{6}$',
-  },
-  {
-    Note: 'A separate postal code for Kosovo was introduced by the UNMIK postal administration in 2004. Serbian postcodes are still widely used in the Serbian enclaves. No country code has been assigned.',
-    Country: 'Kosovo',
-    ISO: 'XK',
-    Format: 'NNNNN',
-    Regex: '^\\d{5}$',
   },
   {
     Note: 'The first two digits represent the sector and the last three digits represents the post office.',
@@ -1480,13 +1452,6 @@ const postCodes: PostalCodeObj[] = [
     Regex: '^[Ss][Ii][Qq]{2}\\s{0,1}[1][Zz]{2}$',
   },
   {
-    Note: '',
-    Country: 'South Korea',
-    ISO: 'KR',
-    Format: 'NNNNNN (NNN-NNN)',
-    Regex: '^\\d{6}\\s\\(\\d{3}-\\d{3}\\)$',
-  },
-  {
     Note: 'First two indicate the province, range 01-52',
     Country: 'Spain',
     ISO: 'ES',
@@ -1515,18 +1480,10 @@ const postCodes: PostalCodeObj[] = [
     Regex: '',
   },
   {
-    Note: "The letter identifies one of the country's four districts.",
-    Country: 'Swaziland',
-    ISO: 'SZ',
-    Format: 'ANNN',
-    Regex: '^[A-Za-z]\\d{3}$',
-  },
-  {
     Note: '',
     Country: 'Sweden',
     ISO: 'SE',
-    Format: 'NNNNN (NNN NN)',
-    Regex: '^\\d{3}\\s*\\d{2}$',
+    Format: 'NNNNN',
   },
   {
     Note: 'With Liechtenstein, ordered from west to east. In Geneva and other big cities, like Basel, Bern, Zurich, there may be one or two digits after the name of the city when the generic City code (1211) is used instead of the area-specific code (1201, 1202...), e.g.: 1211 Geneva 13. The digit identifies the post office. This addressing is generally used for P.O. box deliveries.',
@@ -1672,8 +1629,8 @@ const postCodes: PostalCodeObj[] = [
     Note: 'Known as the postcode. The first letter(s) indicate the postal area, such as the town or part of London. Placed on a separate line below the city (or county, if used). The UK postcode is made up of two parts separated by a space. These are known as the outward postcode and the inward postcode. The outward postcode is always one of the following formats: AN, ANN, AAN, AANN, ANA, AANA, AAA. The inward postcode is always formatted as NAA. A valid inward postcode never contains the letters: C, I, K, M, O or V. The British Forces Post Office has a different system, but as of 2012 has also adopted UK-style postcodes that begin with "BF1" for electronic compatibility.',
     Country: 'United Kingdom',
     ISO: 'GB',
-    Format: 'A(A)N(A/N)NAA (A[A]N[A/N] NAA)',
-    Regex: '^[A-Z]{1,2}[0-9R][0-9A-Z]?\\s*[0-9][A-Z-[CIKMOV]]{2}',
+    Format: 'AANA NAA',
+    Regex: '^[A-Z]{2}[0-9]{1}[A-Z]{1} [0-9]{1}[A-Z]{2}',
   },
   {
     Note: 'Known as the ZIP Code with five digits 99999* or the ZIP+4 Code with nine digits 99999-9999* (while the minimum requirement is the first five digits, the U.S. Postal Service encourages everyone to use all nine). Also used by the former US Pacific Territories: Federated States of Micronesia; Palau; and the Marshall Islands, as well as in current US territories American Samoa, Guam, Northern Mariana Islands, Puerto Rico, and the United States Virgin Islands. An individual delivery point may be represented as an 11-digit number, but these are usually represented by Intelligent Mail barcode or formerly POSTNET bar code.',

@@ -1,7 +1,5 @@
 export const INPUT_FORM_COUNT = 15;
 
-export const TEMP = 0;
-
 export enum ValidationErrors {
   NAMES_CITY_ERR = '* Must contain latin letters',
   AGE_ERR = '* User must be older than 13',
@@ -13,3 +11,5 @@ export enum ValidationErrors {
   POSTCODE_ERR = '* Invalid post code',
   STREET_ERR = '* Must contain more than 1 symbol',
 }
+
+export const MIN_AGE = 13;
