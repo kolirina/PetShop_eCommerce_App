@@ -1,5 +1,9 @@
 import Pages from './pageNames';
 
+interface Parameters {
+  id: string;
+}
+
 export default class Router {
   public routes: { [key: string]: () => void } = {};
 
@@ -7,9 +11,12 @@ export default class Router {
     this.routes = routes;
   }
 
-  navigateTo(path: Pages) {
+  navigateTo(path: Pages, parameters?: Parameters) {
     const currentPath = window.location.pathname;
-    if (path !== currentPath) {
+    if (parameters && currentPath !== `${path}/${parameters.id}`) {
+      window.history.pushState({}, '', `${path}/${parameters.id}`);
+      this.handleRoute();
+    } else if (!parameters && path !== currentPath) {
       window.history.pushState({}, '', path);
       this.handleRoute();
     }
@@ -33,8 +40,18 @@ export default class Router {
       !localStorage.getItem('token') &&
       !localStorage.getItem('id')
     ) {
-      this.navigateTo(Pages.MAIN);
+      this.navigateTo(Pages.LOGIN);
       return;
+    }
+
+    // Access product by id
+    if (path.match(/\/product\/\d+/)) {
+      const match = path.match(/\d+/);
+      if (match) {
+        this.navigateTo(Pages.PRODUCT, { id: match[0] });
+        this.routes[Pages.PRODUCT]();
+        return;
+      }
     }
 
     if (path in this.routes) {
