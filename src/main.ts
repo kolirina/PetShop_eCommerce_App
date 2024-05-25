@@ -6,6 +6,7 @@ import NotFoundPage from './pages/notFoundPage';
 import RegistrationPage from './pages/registrationPage';
 import Pages from './router/pageNames';
 import TemplatePage from './pages/templatePage';
+import ProfilePage from './pages/profilePage';
 
 const router = new Router();
 
@@ -18,6 +19,8 @@ router.addRoutes({
   [Pages.LOGIN]: () => new LoginPage(router, templatePage).render(),
   [Pages.REGISTRATION]: () =>
     new RegistrationPage(router, templatePage).render(),
+  [Pages.PROFILE]: () =>
+    new ProfilePage(router, templatePage.getMainElement()).render(),
   [Pages.NOT_FOUND]: () =>
     new NotFoundPage(router, templatePage.getMainElement()).render(),
 });

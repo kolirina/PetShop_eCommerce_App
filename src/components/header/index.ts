@@ -55,6 +55,14 @@ export default class Header {
     this.userControls.innerHTML = '';
 
     if (localStorage.getItem('id') && localStorage.getItem('token')) {
+      const profileButton = createBtn(
+        styles.button,
+        'Profile',
+        this.userControls
+      );
+      profileButton.addEventListener('click', () =>
+        this.router.navigateTo(Pages.PROFILE)
+      );
       const logoutButton = createBtn(
         styles.button,
         'Logout',
@@ -85,6 +93,7 @@ export default class Header {
 
     this.addMenuItem('Home', () => this.router.navigateTo(Pages.MAIN));
     if (localStorage.getItem('id') && localStorage.getItem('token')) {
+      this.addMenuItem('Profile', () => this.router.navigateTo(Pages.PROFILE));
       this.addMenuItem('Logout', () => {
         localStorage.removeItem('id');
         localStorage.removeItem('token');

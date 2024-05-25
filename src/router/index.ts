@@ -17,6 +17,7 @@ export default class Router {
 
   handleRoute() {
     const path = window.location.pathname;
+    // Prevent logged in user to access Login and Registration pages
     if (
       (path === Pages.LOGIN || path === Pages.REGISTRATION) &&
       localStorage.getItem('token') &&
@@ -25,6 +26,17 @@ export default class Router {
       this.navigateTo(Pages.MAIN);
       return;
     }
+
+    // Prevent not logged in user to access Profile page
+    if (
+      path === Pages.PROFILE &&
+      !localStorage.getItem('token') &&
+      !localStorage.getItem('id')
+    ) {
+      this.navigateTo(Pages.MAIN);
+      return;
+    }
+
     if (path in this.routes) {
       this.routes[path]();
     } else {
