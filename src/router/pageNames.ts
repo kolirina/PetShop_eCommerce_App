@@ -1,5 +1,6 @@
 enum Pages {
   MAIN = '/',
+  CATALOG = '/catalog',
   LOGIN = '/login',
   REGISTRATION = '/registration',
   PROFILE = '/profile',

@@ -38,6 +38,13 @@ export default class Header {
       () => router.navigateTo(Pages.MAIN),
       links
     );
+    createLocalLink(
+      styles.link,
+      'Catalog',
+      Pages.CATALOG,
+      () => router.navigateTo(Pages.CATALOG),
+      links
+    );
 
     this.userControls = createDiv(styles.userControls, this.container);
     this.burgerMenu = createDiv(styles.burgerMenu, this.container);
@@ -92,6 +99,7 @@ export default class Header {
     this.burgerMenu.innerHTML = '';
 
     this.addMenuItem('Home', () => this.router.navigateTo(Pages.MAIN));
+    this.addMenuItem('Catalog', () => this.router.navigateTo(Pages.CATALOG));
     if (localStorage.getItem('id') && localStorage.getItem('token')) {
       this.addMenuItem('Profile', () => this.router.navigateTo(Pages.PROFILE));
       this.addMenuItem('Logout', () => {

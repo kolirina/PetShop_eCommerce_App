@@ -7,6 +7,7 @@ import RegistrationPage from './pages/registrationPage';
 import Pages from './router/pageNames';
 import TemplatePage from './pages/templatePage';
 import ProfilePage from './pages/profilePage';
+import CatalogPage from './pages/catalogPage';
 
 const router = new Router();
 
@@ -16,6 +17,8 @@ templatePage.render();
 router.addRoutes({
   [Pages.MAIN]: () =>
     new MainPage(router, templatePage.getMainElement()).render(),
+  [Pages.CATALOG]: () =>
+    new CatalogPage(router, templatePage.getMainElement()).render(),
   [Pages.LOGIN]: () => new LoginPage(router, templatePage).render(),
   [Pages.REGISTRATION]: () =>
     new RegistrationPage(router, templatePage).render(),
