@@ -83,7 +83,7 @@ describe('Header', () => {
 
     const logoutButton = header
       .getHeaderElement()
-      .querySelector(`.${styles.userControls} .${styles.button}`);
+      .querySelector(`.${styles.userControls} .${styles.button}:nth-child(2)`);
     expect(logoutButton).not.toBeNull();
     expect(logoutButton!.textContent).toBe('Logout');
   });
@@ -132,7 +132,7 @@ describe('Header', () => {
     const logoutButton = header
       .getHeaderElement()
       .querySelector(
-        `.${styles.userControls} .${styles.button}`
+        `.${styles.userControls} .${styles.button}:nth-child(2)`
       ) as HTMLElement;
     logoutButton.click();
 
