@@ -7,7 +7,7 @@ class ProductPage extends Page {
   constructor(router: Router, parentElement: HTMLElement) {
     super(router, parentElement);
     const match = window.location.pathname.match(/\d+/);
-    [this.id] = match ?? 'Error';
+    this.id = match ? match[0] : 'Error';
     this.container.textContent = `Product with id: ${this.id}`;
   }
 }

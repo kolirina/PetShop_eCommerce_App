@@ -130,16 +130,16 @@
 }
 
 .menu-item {
+  width: 75%;
+  margin: 0;
+  padding: 24px;
+  text-align: center;
   font-family: 'Roboto', sans-serif;
   font-size: 20px;
   font-weight: 600;
   color: var(--accent-color);
-  margin: 0;
-  padding: 24px;
   cursor: pointer;
   border-bottom: solid 2px var(--accent-color);
-  width: 75%;
-  text-align: center;
 }
 
 @media screen and (max-width: 768px) {

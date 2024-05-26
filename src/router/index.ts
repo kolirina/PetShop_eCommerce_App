@@ -1,3 +1,4 @@
+import isLoggedIn from '../utils/checkFunctions';
 import Pages from './pageNames';
 
 interface Parameters {
@@ -25,33 +26,27 @@ export default class Router {
   handleRoute() {
     const path = window.location.pathname;
     // Prevent logged in user to access Login and Registration pages
-    if (
-      (path === Pages.LOGIN || path === Pages.REGISTRATION) &&
-      localStorage.getItem('token') &&
-      localStorage.getItem('id')
-    ) {
+    if ((path === Pages.LOGIN || path === Pages.REGISTRATION) && isLoggedIn()) {
       this.navigateTo(Pages.MAIN);
       return;
     }
 
     // Prevent not logged in user to access Profile page
-    if (
-      path === Pages.PROFILE &&
-      !localStorage.getItem('token') &&
-      !localStorage.getItem('id')
-    ) {
+    if (path === Pages.PROFILE && !isLoggedIn()) {
       this.navigateTo(Pages.LOGIN);
       return;
     }
 
     // Access product by id
-    if (path.match(/\/product\/\d+/)) {
-      const match = path.match(/\d+/);
+    if (path.match(Pages.PRODUCT)) {
+      const match = path.match(/^\/product\/([a-z0-9-]+)$/);
       if (match) {
-        this.navigateTo(Pages.PRODUCT, { id: match[0] });
+        this.navigateTo(Pages.PRODUCT, { id: match[1] });
         this.routes[Pages.PRODUCT]();
         return;
       }
+      this.routes[Pages.NOT_FOUND]();
+      return;
     }
 
     if (path in this.routes) {

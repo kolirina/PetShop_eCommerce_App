@@ -9,6 +9,7 @@ import {
 } from '../../utils/elementCreator';
 import styles from './header.module.css';
 import logo from '../../assets/logo.png';
+import isLoggedIn from '../../utils/checkFunctions';
 
 export default class Header {
   private container: HTMLElement;
@@ -61,7 +62,7 @@ export default class Header {
   updateHeader() {
     this.userControls.innerHTML = '';
 
-    if (localStorage.getItem('id') && localStorage.getItem('token')) {
+    if (isLoggedIn()) {
       const profileButton = createBtn(
         styles.button,
         'Profile',
@@ -100,7 +101,7 @@ export default class Header {
 
     this.addMenuItem('Home', () => this.router.navigateTo(Pages.MAIN));
     this.addMenuItem('Catalog', () => this.router.navigateTo(Pages.CATALOG));
-    if (localStorage.getItem('id') && localStorage.getItem('token')) {
+    if (isLoggedIn()) {
       this.addMenuItem('Profile', () => this.router.navigateTo(Pages.PROFILE));
       this.addMenuItem('Logout', () => {
         localStorage.removeItem('id');
