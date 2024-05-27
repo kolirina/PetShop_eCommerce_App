@@ -16,9 +16,11 @@
 .links-container {
   display: flex;
   align-items: center;
+  gap: 20px;
 }
 
 .link {
+  color: black;
   font-size: large;
   cursor: pointer;
 }
@@ -28,9 +30,10 @@
 }
 
 .user-controls {
+  width: 224px;
   display: flex;
   align-items: center;
-  gap: 20px;
+  justify-content: space-around;
 }
 
 .button {
@@ -127,12 +130,16 @@
 }
 
 .menu-item {
+  width: 75%;
+  margin: 0;
+  padding: 24px;
+  text-align: center;
   font-family: 'Roboto', sans-serif;
   font-size: 20px;
   font-weight: 600;
   color: var(--accent-color);
-  padding: 12px 24px;
   cursor: pointer;
+  border-bottom: solid 2px var(--accent-color);
 }
 
 @media screen and (max-width: 768px) {
