@@ -169,6 +169,15 @@ async function setDefaultBillingAddress(userId: string, addressId: string) {
     .execute();
 }
 
+async function fetchProducts() {
+  const resp = await apiRoot
+    .withProjectKey({ projectKey })
+    .products()
+    .get({ queryArgs: { limit: 100 } })
+    .execute();
+  return resp.body.results;
+}
+
 export {
   getUser,
   registerUser,
@@ -177,4 +186,5 @@ export {
   setBillingAddress,
   setDefaultShippingAddress,
   setDefaultBillingAddress,
+  fetchProducts,
 };
