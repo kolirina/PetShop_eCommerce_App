@@ -6,7 +6,6 @@ import styles from './mainPage.module.css';
 
 class MainPage extends Page {
   constructor(router: Router, parentElement: HTMLElement) {
-    // parentElement.classList.add(styles.main);
     super(router, parentElement);
     this.container.classList.add(styles.container);
     createLocalLink(
