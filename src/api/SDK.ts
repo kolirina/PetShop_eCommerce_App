@@ -1,7 +1,7 @@
 import { ApiRoot, ClientResponse } from '@commercetools/platform-sdk';
 import { apiRoot, projectKey } from './ApiRoot';
 import { AddressTypes, UserAddress, UserInfo } from '../types';
-import MAX_NUMBER_OF_PRODUCTS_DISPLAYED from '../pages/catalogPage/constants';
+import { MAX_NUMBER_OF_PRODUCTS_DISPLAYED } from '../pages/catalogPage/constants';
 
 async function getUser(
   email: string,

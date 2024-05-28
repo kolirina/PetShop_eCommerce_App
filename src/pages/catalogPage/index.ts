@@ -1,5 +1,6 @@
 import Router from '../../router';
 import Page from '../Page';
+import { Eng } from './constants';
 import { createDiv, createImg } from '../../utils/elementCreator';
 import { fetchProducts } from '../../api/SDK';
 import './catalogPageStyles.css';
@@ -41,10 +42,10 @@ class CatalogPage extends Page {
       productCard.appendChild(productImage);
       const productName = createDiv('productName', productCard);
       productName.innerHTML =
-        product.masterData.current.name['en-US'].toUpperCase();
+        product.masterData.current.name[Eng].toUpperCase();
       const productInfoBrief = createDiv('productInfoBrief', productCard);
       const productInfoBriefText = product.masterData.current.description
-        ? product.masterData.current.description['en-US'] ||
+        ? product.masterData.current.description[Eng] ||
           'Sorry, no description available.'
         : 'Sorry, no description available.';
       productInfoBrief.innerHTML = productInfoBriefText;
