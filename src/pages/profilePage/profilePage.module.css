@@ -1,0 +1,43 @@
+* {
+  box-sizing: border-box;
+}
+
+.container {
+  display: grid;
+  grid-template-columns: 250px 1fr;
+  width: 100%;
+  height: 100%;
+}
+.aside-block {
+  padding: 30px;
+  border-right: 2px solid var(--accent-color);
+}
+.options-list {
+  list-style-type: none;
+  padding: 0;
+}
+.options-list-el {
+  text-align: center;
+}
+.options-list-el:not(:first-child) {
+  margin: 15px auto 0 auto;
+}
+.option-link,
+.option-link:visited {
+  text-decoration: none;
+  color: var(--text-color);
+  transition: color 0.2s ease-in-out;
+}
+.option-link:hover {
+  color: var(--accent-color);
+}
+.profile-main-block {
+  display: flex;
+  padding: 30px;
+}
+.main-block-wrapper {
+  flex-basis: 300px;
+  margin: 0 auto;
+}
+.input-label {
+}

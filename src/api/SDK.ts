@@ -177,4 +177,5 @@ export {
   setBillingAddress,
   setDefaultShippingAddress,
   setDefaultBillingAddress,
+  getUserById,
 };
