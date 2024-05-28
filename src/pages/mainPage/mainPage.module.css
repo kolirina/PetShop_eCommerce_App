@@ -21,3 +21,8 @@
   text-decoration: underline;
   border-color: var(--accent-color);
 }
+.main {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
