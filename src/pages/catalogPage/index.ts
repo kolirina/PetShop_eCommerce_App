@@ -15,7 +15,7 @@ class CatalogPage extends Page {
 
   constructor(router: Router, parentElement: HTMLElement) {
     super(router, parentElement);
-    this.container = createDiv('container', document.body);
+    this.container = createDiv('catalogContainer', document.body);
     this.banner = createDiv('banner', this.container);
     this.filterSortPanel = createDiv('filterSortPanel', this.container);
     this.filterSortPanel.innerHTML = 'Filter and sort here.';
