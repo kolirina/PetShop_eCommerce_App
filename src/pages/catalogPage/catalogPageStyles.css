@@ -36,6 +36,21 @@
   border-radius: 5px;
 }
 
+.productCard:hover {
+  background-color: rgba(218, 223, 219, 0.5);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+  transform: scale(1.05);
+  transition:
+    background-color 0.3s ease,
+    box-shadow 0.3s ease,
+    transform 0.3s ease;
+}
+
+.productCard img {
+  margin-bottom: 7px;
+  border-radius: 5px;
+}
+
 .productName {
   font-size: large;
   font-weight: bold;
