@@ -1,6 +1,7 @@
 import { ApiRoot, ClientResponse } from '@commercetools/platform-sdk';
 import { apiRoot, projectKey } from './ApiRoot';
 import { AddressTypes, UserAddress, UserInfo } from '../types';
+import MAX_NUMBER_OF_PRODUCTS_DISPLAYED from '../pages/catalogPage/constants';
 
 async function getUser(
   email: string,
@@ -173,7 +174,7 @@ async function fetchProducts() {
   const resp = await apiRoot
     .withProjectKey({ projectKey })
     .products()
-    .get({ queryArgs: { limit: 100 } })
+    .get({ queryArgs: { limit: MAX_NUMBER_OF_PRODUCTS_DISPLAYED } })
     .execute();
   return resp.body.results;
 }
