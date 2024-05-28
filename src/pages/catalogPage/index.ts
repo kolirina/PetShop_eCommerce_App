@@ -1,8 +1,13 @@
+import { fetchProducts } from '../../api/SDK';
+
+import { createDiv, createImg } from '../../utils/elementCreator';
+import priceFormatter from '../../utils/priceFormatter';
+
+import { Eng } from './constants';
+
 import Router from '../../router';
 import Page from '../Page';
-import { Eng } from './constants';
-import { createDiv, createImg } from '../../utils/elementCreator';
-import { fetchProducts } from '../../api/SDK';
+
 import './catalogPageStyles.css';
 
 class CatalogPage extends Page {
@@ -55,7 +60,7 @@ class CatalogPage extends Page {
         if (product.masterData.current.masterVariant.prices[0].value) {
           const regularPrice =
             product.masterData.current.masterVariant.prices[0].value.centAmount;
-          regularPriceDiv.innerHTML = `€${(regularPrice / 100).toFixed(2)}`;
+          regularPriceDiv.innerHTML = priceFormatter(regularPrice);
         } else {
           regularPriceDiv.innerHTML = 'No data';
         }
@@ -70,7 +75,7 @@ class CatalogPage extends Page {
         const discountPrice =
           product.masterData.current.masterVariant.prices[0].discounted.value
             .centAmount;
-        discountPriceDiv.innerHTML = `Now €${(discountPrice / 100).toFixed(2)}`;
+        discountPriceDiv.innerHTML = priceFormatter(discountPrice);
       }
     });
   }
