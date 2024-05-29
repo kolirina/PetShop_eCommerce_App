@@ -75,7 +75,7 @@ class CatalogPage extends Page {
         const discountPrice =
           product.masterData.current.masterVariant.prices[0].discounted.value
             .centAmount;
-        discountPriceDiv.innerHTML = priceFormatter(discountPrice);
+        discountPriceDiv.innerHTML = `Now ${priceFormatter(discountPrice)}`;
       }
     });
   }
