@@ -182,3 +182,16 @@ export function createListElement(
   appendToParent(element, parentElement);
   return element;
 }
+export function createImg(
+  className: string,
+  src: string,
+  alt: string,
+  parentElement: HTMLElement
+): HTMLImageElement {
+  const element = document.createElement('img');
+  element.classList.add(className);
+  element.src = src;
+  element.alt = alt;
+  appendToParent(element, parentElement);
+  return element;
+}
