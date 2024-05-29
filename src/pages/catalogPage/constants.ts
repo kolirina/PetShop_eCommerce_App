@@ -1,0 +1,3 @@
+const MAX_NUMBER_OF_PRODUCTS_DISPLAYED = 100;
+const Eng = 'en-US';
+export { MAX_NUMBER_OF_PRODUCTS_DISPLAYED, Eng };
