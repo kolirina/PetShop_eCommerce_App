@@ -161,6 +161,25 @@ export function createParagraph(
   return element;
 }
 
+export function createList(
+  className: string,
+  parentElement?: HTMLElement
+): HTMLUListElement {
+  const element: HTMLUListElement = document.createElement('ul');
+  element.classList.add(className);
+  appendToParent(element, parentElement);
+  return element;
+}
+
+export function createListElement(
+  className: string,
+  text: string,
+  parentElement?: HTMLElement
+): HTMLLIElement {
+  const element: HTMLLIElement = document.createElement('li');
+  element.classList.add(className);
+  element.textContent = text;
+}
 export function createImg(
   className: string,
   src: string,
