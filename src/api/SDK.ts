@@ -32,6 +32,7 @@ async function registerUser(userInfo: UserInfo) {
         firstName: userInfo.firstName,
         lastName: userInfo.lastName,
         password: userInfo.password,
+        dateOfBirth: userInfo.dateOfBirth,
       },
     })
     .execute();

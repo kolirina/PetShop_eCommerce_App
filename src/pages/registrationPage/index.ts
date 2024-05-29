@@ -725,6 +725,7 @@ class RegistrationPage extends Page {
       email: this.emailInput.value,
       firstName: this.firstNameInput.value,
       lastName: this.lastNameInput.value,
+      dateOfBirth: this.birthDateInput.value,
       password: this.passwordInput.value,
       shippingAddress: {
         country: this.shippingAddressBlock.countryInput.value,

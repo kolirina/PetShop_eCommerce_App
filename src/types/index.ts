@@ -40,6 +40,7 @@ export type UserInfo = {
   firstName: string;
   lastName: string;
   password: string;
+  dateOfBirth: string;
   shippingAddress: UserAddress;
   billingAddress: UserAddress;
 };

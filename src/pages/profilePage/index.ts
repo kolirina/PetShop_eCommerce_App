@@ -1,15 +1,18 @@
-// import { ClientResponse } from '@commercetools/platform-sdk';
-// import { getUserById } from '../../api/SDK';
+import { Address } from '@commercetools/platform-sdk';
+import { getUserById } from '../../api/SDK';
 import Router from '../../router';
 import {
+  createBtn,
   createDiv,
-  // createInput,
-  // createLabel,
+  createForm,
+  createH3,
   createLink,
   createList,
   createListElement,
 } from '../../utils/elementCreator';
 import Page from '../Page';
+import ProfileAddressBlock from './addressBlock';
+import ProfilePersonalBlock from './personalBlock';
 import styles from './profilePage.module.css';
 
 class ProfilePage extends Page {
@@ -31,18 +34,20 @@ class ProfilePage extends Page {
 
   public profileMainBlock: HTMLDivElement;
 
-  public mainBlockWrapper: HTMLDivElement;
+  public mainBlockForm: HTMLFormElement;
 
-  // public userId: string;
+  public btnWrapper: HTMLDivElement;
 
-  // public userInfo: ClientResponse;
+  public resetBtn: HTMLButtonElement;
+
+  public saveBtn: HTMLButtonElement;
+
+  public profilePersonalBlock?: ProfilePersonalBlock;
+
+  public profileAddressBlock?: HTMLDivElement;
 
   constructor(router: Router, parentElement: HTMLElement) {
     super(router, parentElement);
-    // this.userId = localStorage.getItem('id')
-    //   ? JSON.parse(localStorage.getItem('id'))
-    //   : null;
-    // this.userInfo = getUserById(this.userId);
     this.container.classList.add(styles.container);
     this.asideBlock = createDiv(styles.asideBlock, this.container);
     this.optionList = createList(styles.optionsList, this.asideBlock);
@@ -75,48 +80,95 @@ class ProfilePage extends Page {
     );
     this.passwordLink = createLink(
       styles.optionLink,
-      'Change password',
+      'Account information',
       '',
       this.passwordListElement
     );
 
     this.profileMainBlock = createDiv(styles.profileMainBlock, this.container);
-    this.mainBlockWrapper = createDiv(
-      styles.mainBlockWrapper,
+    this.mainBlockForm = createForm(
+      styles.mainBlockForm,
       this.profileMainBlock
     );
 
-    // this.optionList.addEventListener(
-    //   'click',
-    //   this.handleOptionClick.bind(this)
-    // );
+    this.createPersonalInfo();
+
+    this.btnWrapper = createDiv(styles.profileBtnWrapper, this.mainBlockForm);
+    this.saveBtn = createBtn(styles.profileBtn, 'Edit', this.btnWrapper);
+    this.resetBtn = createBtn(
+      styles.profileBtn,
+      'Reset changes',
+      this.btnWrapper
+    );
+    this.resetBtn.disabled = true;
+
+    this.optionList.addEventListener(
+      'click',
+      this.handleOptionClick.bind(this)
+    );
   }
 
-  // private handleOptionClick(e: Event) {
-  //   const target: HTMLAnchorElement = e.target as HTMLAnchorElement;
-  //   e.preventDefault();
-  //   if (target === this.personalLink) {
-  //     this.createPersonalInfo();
-  //   }
-  //   if (target === this.addressLink) {
-  //   }
-  //   if (target === this.passwordLink) {
-  //   }
-  // }
+  private handleOptionClick(e: Event) {
+    const target: HTMLAnchorElement = e.target as HTMLAnchorElement;
+    e.preventDefault();
+    if (target === this.personalLink) {
+      this.createPersonalInfo();
+    }
+    if (target === this.addressLink) {
+      this.createAddressInfo();
+    }
+  }
 
-  // private createPersonalInfo() {
-  //   const firstNameLabel = createLabel(
-  //     styles.inputLabel,
-  //     'First name:',
-  //     this.mainBlockWrapper
-  //   );
-  //   const firstNameInput = createInput({
-  //     className: styles.input,
-  //     type: 'text',
-  //     isActive: false,
-  //     parentElement: firstNameLabel,
-  //   });
-  // }
+  private async createPersonalInfo() {
+    this.mainBlockForm.firstChild?.remove();
+    const userId = localStorage.getItem('id');
+    this.personalLink.classList.add('link-active');
+    if (userId) {
+      const userInfo = await getUserById(userId);
+      // console.log(userInfo);
+      this.profilePersonalBlock = new ProfilePersonalBlock();
+      this.profilePersonalBlock.setFirstName(await userInfo.body.firstName);
+      this.profilePersonalBlock.setLastName(await userInfo.body.lastName);
+      this.profilePersonalBlock.setDateOfBirth(await userInfo.body.dateOfBirth);
+      this.mainBlockForm.prepend(this.profilePersonalBlock.getBlock());
+      this.saveBtn.dataset.block = 'personal';
+    } else {
+      throw new Error('There is no such user');
+    }
+  }
+
+  private async createAddressInfo() {
+    this.mainBlockForm.firstChild?.remove();
+    const userId = localStorage.getItem('id');
+    // this.personalLink.classList.add('link-active');
+
+    if (userId) {
+      const userInfo = await getUserById(userId);
+      const addressesWrapper = createDiv(
+        styles.addressesWrapper,
+        this.mainBlockForm
+      );
+      const addressesHeading = createH3(
+        styles.addressesHeading,
+        'Registered addresses'
+      );
+      addressesWrapper.append(addressesHeading);
+      // console.log(userInfo);
+
+      await userInfo.body.addresses.forEach((e: Address) => {
+        const block = new ProfileAddressBlock(
+          e,
+          userInfo.body.defaultBillingAddressId,
+          userInfo.body.defaultShippingAddressId
+        );
+        addressesWrapper.append(block.getBlock());
+      });
+      this.profileAddressBlock = addressesWrapper;
+      this.mainBlockForm.prepend(this.profileAddressBlock);
+    } else {
+      throw new Error('There is no such user');
+    }
+  }
 }
 
 export default ProfilePage;
