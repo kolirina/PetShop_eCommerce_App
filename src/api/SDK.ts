@@ -193,6 +193,7 @@
 import { ApiRoot, ClientResponse } from '@commercetools/platform-sdk';
 import { apiRoot, projectKey } from './ApiRoot';
 import { AddressTypes, UserAddress, UserInfo } from '../types';
+import { MAX_NUMBER_OF_PRODUCTS_DISPLAYED } from '../pages/catalogPage/constants';
 
 async function getUser(
   email: string,
@@ -365,7 +366,7 @@ async function fetchProducts() {
   const resp = await apiRoot
     .withProjectKey({ projectKey })
     .products()
-    .get({ queryArgs: { limit: 100 } })
+    .get({ queryArgs: { limit: MAX_NUMBER_OF_PRODUCTS_DISPLAYED } })
     .execute();
   return resp.body.results;
 }
@@ -378,7 +379,51 @@ async function fetchFilteredByPrice(minPrice: number, maxPrice: number) {
     .get({
       queryArgs: {
         'filter.query': `variants.price.centAmount:range(${minPrice} to ${maxPrice})`,
-        limit: 100,
+        limit: MAX_NUMBER_OF_PRODUCTS_DISPLAYED,
+      },
+    })
+    .execute();
+  return resp.body.results;
+}
+
+async function fetchFilteredByBrand(brand: string) {
+  const resp = await apiRoot
+    .withProjectKey({ projectKey })
+    .productProjections()
+    .search()
+    .get({
+      queryArgs: {
+        'filter.query': `variants.attributes.brand:"${brand}"`,
+        limit: MAX_NUMBER_OF_PRODUCTS_DISPLAYED,
+      },
+    })
+    .execute();
+  return resp.body.results;
+}
+
+async function fetchFilteredByPriceAndBrand(
+  minPrice: number,
+  maxPrice: number,
+  brand: string
+) {
+  const filterQueries = [];
+  if (maxPrice && minPrice) {
+    filterQueries.push(
+      `variants.price.centAmount:range(${minPrice} to ${maxPrice})`
+    );
+  }
+  if (brand) {
+    filterQueries.push(`variants.attributes.brand:"${brand}"`);
+  }
+
+  const resp = await apiRoot
+    .withProjectKey({ projectKey })
+    .productProjections()
+    .search()
+    .get({
+      queryArgs: {
+        'filter.query': filterQueries,
+        limit: MAX_NUMBER_OF_PRODUCTS_DISPLAYED,
       },
     })
     .execute();
@@ -394,5 +439,8 @@ export {
   setDefaultShippingAddress,
   setDefaultBillingAddress,
   fetchProducts,
+  // fetchFiltered,
   fetchFilteredByPrice,
+  fetchFilteredByBrand,
+  fetchFilteredByPriceAndBrand,
 };
