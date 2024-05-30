@@ -179,6 +179,8 @@ export function createListElement(
   const element: HTMLLIElement = document.createElement('li');
   element.classList.add(className);
   element.textContent = text;
+  appendToParent(element, parentElement);
+  return element;
 }
 export function createImg(
   className: string,

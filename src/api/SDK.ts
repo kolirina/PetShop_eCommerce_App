@@ -179,6 +179,16 @@ async function fetchProducts() {
   return resp.body.results;
 }
 
+async function getProduct(id: string) {
+  const resp = await apiRoot
+    .withProjectKey({ projectKey })
+    .products()
+    .withId({ ID: id })
+    .get()
+    .execute();
+  return resp;
+}
+
 export {
   getUser,
   registerUser,
@@ -188,4 +198,5 @@ export {
   setDefaultShippingAddress,
   setDefaultBillingAddress,
   fetchProducts,
+  getProduct,
 };

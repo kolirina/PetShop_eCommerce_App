@@ -9,6 +9,7 @@ import Router from '../../router';
 import Page from '../Page';
 
 import './catalogPageStyles.css';
+import Pages from '../../router/pageNames';
 
 class CatalogPage extends Page {
   public banner: HTMLDivElement;
@@ -35,6 +36,9 @@ class CatalogPage extends Page {
     const productsData = await fetchProducts();
     productsData.forEach((product) => {
       const productCard = createDiv('productCard', this.productsContainer);
+      productCard.addEventListener('click', () =>
+        this.router.navigateTo(Pages.PRODUCT, { id: product.id })
+      );
       const productImageSrc =
         product.masterData.current.masterVariant.images?.[0]?.url ||
         '../../assets/placeholder.png';
