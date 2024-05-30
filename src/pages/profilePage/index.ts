@@ -2,7 +2,6 @@ import { Address } from '@commercetools/platform-sdk';
 import { getUserById } from '../../api/SDK';
 import Router from '../../router';
 import {
-  createBtn,
   createDiv,
   createForm,
   createH3,
@@ -35,12 +34,6 @@ class ProfilePage extends Page {
   public profileMainBlock: HTMLDivElement;
 
   public mainBlockForm: HTMLFormElement;
-
-  public btnWrapper: HTMLDivElement;
-
-  public resetBtn: HTMLButtonElement;
-
-  public saveBtn: HTMLButtonElement;
 
   public profilePersonalBlock?: ProfilePersonalBlock;
 
@@ -90,22 +83,11 @@ class ProfilePage extends Page {
       styles.mainBlockForm,
       this.profileMainBlock
     );
-
-    this.createPersonalInfo();
-
-    this.btnWrapper = createDiv(styles.profileBtnWrapper, this.mainBlockForm);
-    this.saveBtn = createBtn(styles.profileBtn, 'Edit', this.btnWrapper);
-    this.resetBtn = createBtn(
-      styles.profileBtn,
-      'Reset changes',
-      this.btnWrapper
-    );
-    this.resetBtn.disabled = true;
-
     this.optionList.addEventListener(
       'click',
       this.handleOptionClick.bind(this)
     );
+    this.createPersonalInfo();
   }
 
   private handleOptionClick(e: Event) {
@@ -126,12 +108,12 @@ class ProfilePage extends Page {
     if (userId) {
       const userInfo = await getUserById(userId);
       // console.log(userInfo);
-      this.profilePersonalBlock = new ProfilePersonalBlock();
+      this.profilePersonalBlock = new ProfilePersonalBlock(userInfo.body);
       this.profilePersonalBlock.setFirstName(await userInfo.body.firstName);
       this.profilePersonalBlock.setLastName(await userInfo.body.lastName);
       this.profilePersonalBlock.setDateOfBirth(await userInfo.body.dateOfBirth);
       this.mainBlockForm.prepend(this.profilePersonalBlock.getBlock());
-      this.saveBtn.dataset.block = 'personal';
+      this.profilePersonalBlock.saveBtn.dataset.block = 'personal';
     } else {
       throw new Error('There is no such user');
     }
@@ -140,7 +122,6 @@ class ProfilePage extends Page {
   private async createAddressInfo() {
     this.mainBlockForm.firstChild?.remove();
     const userId = localStorage.getItem('id');
-    // this.personalLink.classList.add('link-active');
 
     if (userId) {
       const userInfo = await getUserById(userId);
@@ -153,7 +134,6 @@ class ProfilePage extends Page {
         'Registered addresses'
       );
       addressesWrapper.append(addressesHeading);
-      // console.log(userInfo);
 
       await userInfo.body.addresses.forEach((e: Address) => {
         const block = new ProfileAddressBlock(

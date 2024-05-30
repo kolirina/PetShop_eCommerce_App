@@ -171,6 +171,69 @@ async function setDefaultBillingAddress(userId: string, addressId: string) {
     .execute();
 }
 
+async function setFirstName(value: string, id: string) {
+  const user = await getUserById(id);
+
+  await apiRoot
+    .withProjectKey({ projectKey })
+    .customers()
+    .withId({ ID: id })
+    .post({
+      body: {
+        version: user.body.version,
+        actions: [
+          {
+            action: 'setFirstName',
+            firstName: value,
+          },
+        ],
+      },
+    })
+    .execute();
+}
+
+async function setLastName(value: string, id: string) {
+  const user = await getUserById(id);
+
+  await apiRoot
+    .withProjectKey({ projectKey })
+    .customers()
+    .withId({ ID: id })
+    .post({
+      body: {
+        version: user.body.version,
+        actions: [
+          {
+            action: 'setLastName',
+            lastName: value,
+          },
+        ],
+      },
+    })
+    .execute();
+}
+
+async function setDateOfBirth(value: string, id: string) {
+  const user = await getUserById(id);
+
+  await apiRoot
+    .withProjectKey({ projectKey })
+    .customers()
+    .withId({ ID: id })
+    .post({
+      body: {
+        version: user.body.version,
+        actions: [
+          {
+            action: 'setDateOfBirth',
+            dateOfBirth: value,
+          },
+        ],
+      },
+    })
+    .execute();
+}
+
 async function fetchProducts() {
   const resp = await apiRoot
     .withProjectKey({ projectKey })
@@ -190,4 +253,7 @@ export {
   setDefaultBillingAddress,
   fetchProducts,
   getUserById,
+  setFirstName,
+  setLastName,
+  setDateOfBirth,
 };

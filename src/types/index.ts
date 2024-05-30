@@ -16,6 +16,12 @@ export type ValidationObj = {
   bi_street: boolean;
 };
 
+export type ValidationObjPersonal = {
+  firstName: boolean;
+  lastName: boolean;
+  birthDate: boolean;
+};
+
 export type CountryArr = string[];
 
 export type PostalCodeObj = {

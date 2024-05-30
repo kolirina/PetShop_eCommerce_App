@@ -55,12 +55,45 @@
 }
 .input-label {
   font-size: small;
+  position: relative;
 }
+.cross {
+}
+.cross::after {
+  content: '\2BBE';
+  position: absolute;
+  right: 5px;
+  top: 18.5px;
+  font-size: medium;
+  color: #ff0000;
+}
+
+.correct {
+}
+.correct::after {
+  content: '\2713';
+  position: absolute;
+  right: 5px;
+  top: 18.5px;
+  font-size: medium;
+  color: #18e418;
+}
+.invalid-input {
+  border-color: #ff0000;
+}
+
+.valid-input {
+  border-color: #18e418;
+}
+
 .input {
   display: block;
   width: 100%;
   height: 30px;
+  padding-right: 23px;
   font-size: medium;
+  border-radius: 4px;
+  border-style: solid;
 }
 .checkbox-wrapper {
   display: flex;
@@ -80,7 +113,7 @@
   display: flex;
   justify-content: space-between;
   width: 250px;
-  margin: 20px auto 0 auto;
+  margin: 0 auto 0 auto;
 }
 .profile-btn {
   width: 115px;
