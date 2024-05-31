@@ -23,7 +23,9 @@ class CatalogPage extends Page {
 
   public categoryBanner: HTMLDivElement;
 
-  public filterSortPanel: HTMLDivElement;
+  public sortSearchPanel: HTMLDivElement;
+
+  public showFiltersButton: HTMLButtonElement;
 
   public productsContainerPlusAside: HTMLDivElement;
 
@@ -57,8 +59,62 @@ class CatalogPage extends Page {
     super(router, parentElement);
     this.container = createDiv('catalogContainer', document.body);
     this.banner = createDiv('banner', this.container);
-    this.filterSortPanel = createDiv('filterSortPanel', this.container);
-    this.filterSortPanel.innerHTML = '';
+    this.sortSearchPanel = createDiv('sortSearchPanel', this.container);
+    this.showFiltersButton = createBtn(
+      'catalogButton',
+      'Show Filters',
+      this.sortSearchPanel
+    );
+    this.showFiltersButton.classList.add('showFiltersButton');
+    this.showFiltersButton.addEventListener('click', () => {
+      this.aside.classList.toggle('visible');
+      if (this.aside.classList.contains('visible')) {
+        this.showFiltersButton.textContent = 'Hide Filters';
+      } else {
+        this.showFiltersButton.textContent = 'Show Filters';
+      }
+    });
+    const searchDiv = createDiv('searchDiv', this.sortSearchPanel);
+    const searchInput = createInput({
+      className: 'searchInput',
+      type: 'text',
+      placeholder: 'Search on PetShop',
+      parentElement: searchDiv,
+    });
+    searchDiv.appendChild(searchInput);
+    const searchButton = createBtn('searchButton', '🔍', searchDiv);
+    searchDiv.appendChild(searchButton);
+    const sortDiv = createDiv('sort', this.sortSearchPanel);
+
+    const sortBySelect = document.createElement('select');
+    sortBySelect.classList.add('catalogSelect');
+    const placeholderOption = document.createElement('option');
+    placeholderOption.value = '';
+    placeholderOption.textContent = 'Sort By';
+    placeholderOption.disabled = true;
+    placeholderOption.selected = true;
+    placeholderOption.hidden = true;
+
+    const priceAscOption = document.createElement('option');
+    priceAscOption.value = 'price-asc';
+    priceAscOption.textContent = 'Price Ascending';
+
+    const priceDescOption = document.createElement('option');
+    priceDescOption.value = 'price-desc';
+    priceDescOption.textContent = 'Price Descending';
+
+    const nameOption = document.createElement('option');
+    nameOption.value = 'name';
+    nameOption.textContent = 'Name';
+
+    sortBySelect.appendChild(placeholderOption);
+    sortBySelect.appendChild(priceAscOption);
+    sortBySelect.appendChild(priceDescOption);
+    sortBySelect.appendChild(nameOption);
+
+    sortDiv.appendChild(sortBySelect);
+    // sortBySelect.addEventListener('change', this.sortProducts.bind(this));
+
     this.categoryBanner = createDiv('categoryBanner', this.container);
     this.productsContainerPlusAside = createDiv(
       'productsContainerPlusAside',
@@ -77,7 +133,7 @@ class CatalogPage extends Page {
       'CatalogAsideTitle',
       this.filterByPrice
     );
-    this.filterByPriceTitle.innerHTML = 'Price';
+    this.filterByPriceTitle.innerHTML = 'Price, €';
 
     this.priceRange = createDiv(
       'filterByPriceInputWrapper',
@@ -104,6 +160,10 @@ class CatalogPage extends Page {
       this.priceRange
     );
     this.showFilteredByPrice.addEventListener('click', async () => {
+      if (this.aside.classList.contains('visible')) {
+        this.aside.classList.remove('visible');
+        this.showFiltersButton.textContent = 'Show Filters';
+      }
       this.productsContainer.innerHTML = '';
       this.productsDisplayed = [];
       this.minPrice = Number(this.minPriceInput.value) * 100;
@@ -143,38 +203,6 @@ class CatalogPage extends Page {
   }
 
   public createAsideContent(asideElement: HTMLElement): void {
-    const sortDiv = createDiv('sort', asideElement);
-
-    const sortBySelect = document.createElement('select');
-    sortBySelect.classList.add('catalogSelect');
-    const placeholderOption = document.createElement('option');
-    placeholderOption.value = '';
-    placeholderOption.textContent = 'Sort By';
-    placeholderOption.disabled = true;
-    placeholderOption.selected = true;
-    placeholderOption.hidden = true;
-
-    const priceAscOption = document.createElement('option');
-    priceAscOption.value = 'price-asc';
-    priceAscOption.textContent = 'Price Ascending';
-
-    const priceDescOption = document.createElement('option');
-    priceDescOption.value = 'price-desc';
-    priceDescOption.textContent = 'Price Descending';
-
-    const nameOption = document.createElement('option');
-    nameOption.value = 'name';
-    nameOption.textContent = 'Name';
-
-    sortBySelect.appendChild(placeholderOption);
-    sortBySelect.appendChild(priceAscOption);
-    sortBySelect.appendChild(priceDescOption);
-    sortBySelect.appendChild(nameOption);
-
-    sortDiv.appendChild(sortBySelect);
-
-    // sortBySelect.addEventListener('change', this.sortProducts.bind(this));
-
     const resetBtn = createBtn(
       'catalogButton',
       'Reset all filters',
