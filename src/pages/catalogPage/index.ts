@@ -1,6 +1,6 @@
 import Router from '../../router';
 import Page from '../Page';
-import { Product, Products } from '../../types/product';
+import SortBy from '../../types/sortBy';
 import { FilteredProduct, FilteredProducts } from '../../types/filterProducts';
 import {
   createDiv,
@@ -12,9 +12,8 @@ import {
 } from '../../utils/elementCreator';
 import {
   fetchProducts,
-  fetchFilteredByPriceAndBrand,
-  fetchFilteredByPrice,
-  fetchFilteredByBrand,
+  fetchFilteredByPriceAndBrandAndSearch,
+  getSearchResult,
 } from '../../api/SDK';
 import './catalogPageStyles.css';
 
@@ -26,6 +25,14 @@ class CatalogPage extends Page {
   public sortSearchPanel: HTMLDivElement;
 
   public showFiltersButton: HTMLButtonElement;
+
+  public searchDiv: HTMLDivElement;
+
+  public searchInput: HTMLInputElement;
+
+  public searchButton: HTMLButtonElement;
+
+  public searchWord: string = '';
 
   public productsContainerPlusAside: HTMLDivElement;
 
@@ -55,6 +62,8 @@ class CatalogPage extends Page {
 
   public productsDisplayed: FilteredProducts = [];
 
+  public sortBy: SortBy = SortBy.PRICE_ASC;
+
   constructor(router: Router, parentElement: HTMLElement) {
     super(router, parentElement);
     this.container = createDiv('catalogContainer', document.body);
@@ -74,46 +83,74 @@ class CatalogPage extends Page {
         this.showFiltersButton.textContent = 'Show Filters';
       }
     });
-    const searchDiv = createDiv('searchDiv', this.sortSearchPanel);
-    const searchInput = createInput({
+    this.searchDiv = createDiv('searchDiv', this.sortSearchPanel);
+    this.searchInput = createInput({
       className: 'searchInput',
       type: 'text',
       placeholder: 'Search on PetShop',
-      parentElement: searchDiv,
+      parentElement: this.searchDiv,
     });
-    searchDiv.appendChild(searchInput);
-    const searchButton = createBtn('searchButton', '🔍', searchDiv);
-    searchDiv.appendChild(searchButton);
-    const sortDiv = createDiv('sort', this.sortSearchPanel);
+    this.searchDiv.appendChild(this.searchInput);
+    this.searchButton = createBtn('searchButton', '🔍', this.searchDiv);
+    this.searchButton.addEventListener('click', async () => {
+      this.searchWord = this.searchInput.value;
+      this.productsContainer.innerHTML = '';
+      this.productsDisplayed = [];
+      this.minPriceInput.value = '';
+      this.maxPriceInput.value = '';
+      this.minPriceInput.classList.remove('chosen');
+      this.maxPriceInput.classList.remove('chosen');
+      this.filterByBrandDiv.innerHTML = '';
+      this.chosenBrands = [];
+      this.minPrice = 0;
+      this.maxPrice = 0;
+      const searchResult = await getSearchResult(
+        this.searchInput.value,
+        this.sortBy
+      );
 
+      this.getInfoFilteredProducts(searchResult);
+      this.getBrandsOfFilteredProducts(searchResult);
+    });
+
+    const sortDiv = createDiv('sort', this.sortSearchPanel);
     const sortBySelect = document.createElement('select');
     sortBySelect.classList.add('catalogSelect');
-    const placeholderOption = document.createElement('option');
-    placeholderOption.value = '';
-    placeholderOption.textContent = 'Sort By';
-    placeholderOption.disabled = true;
-    placeholderOption.selected = true;
-    placeholderOption.hidden = true;
 
     const priceAscOption = document.createElement('option');
-    priceAscOption.value = 'price-asc';
+    priceAscOption.value = SortBy.PRICE_ASC;
     priceAscOption.textContent = 'Price Ascending';
 
     const priceDescOption = document.createElement('option');
-    priceDescOption.value = 'price-desc';
+    priceDescOption.value = SortBy.PRICE_DESC;
     priceDescOption.textContent = 'Price Descending';
 
     const nameOption = document.createElement('option');
-    nameOption.value = 'name';
-    nameOption.textContent = 'Name';
+    nameOption.value = SortBy.NAME_ASC;
+    nameOption.textContent = 'Name A-Z';
 
-    sortBySelect.appendChild(placeholderOption);
     sortBySelect.appendChild(priceAscOption);
     sortBySelect.appendChild(priceDescOption);
     sortBySelect.appendChild(nameOption);
 
+    sortBySelect.value = SortBy.PRICE_ASC;
+
     sortDiv.appendChild(sortBySelect);
-    // sortBySelect.addEventListener('change', this.sortProducts.bind(this));
+
+    sortBySelect.addEventListener('change', async () => {
+      this.sortBy = sortBySelect.value as SortBy;
+      this.productsContainer.innerHTML = '';
+      const filteredProducts = await fetchFilteredByPriceAndBrandAndSearch(
+        this.minPrice,
+        this.maxPrice,
+        this.chosenBrands,
+        this.searchWord,
+        this.sortBy
+      );
+      this.getInfoFilteredProducts(filteredProducts);
+      this.filterByBrandDiv.innerHTML = '';
+      this.getBrandsOfFilteredProducts(filteredProducts);
+    });
 
     this.categoryBanner = createDiv('categoryBanner', this.container);
     this.productsContainerPlusAside = createDiv(
@@ -169,36 +206,22 @@ class CatalogPage extends Page {
       this.minPrice = Number(this.minPriceInput.value) * 100;
       this.maxPrice = Number(this.maxPriceInput.value) * 100;
       let filteredProducts: FilteredProduct[] = [];
-      if (this.chosenBrands.length === 0) {
-        filteredProducts = await fetchFilteredByPrice(
-          this.minPrice,
-          this.maxPrice
-        );
-        this.getInfoFilteredProducts(filteredProducts);
-        this.filterByBrandDiv.innerHTML = '';
-        this.getBrandsOfFilteredProducts(filteredProducts);
-        this.minPriceInput.classList.add('chosen');
-        this.maxPriceInput.classList.add('chosen');
-      } else {
-        this.chosenBrands.forEach(async (chosenBrand) => {
-          if (this.minPrice && this.maxPrice) {
-            filteredProducts = await fetchFilteredByPriceAndBrand(
-              this.minPrice,
-              this.maxPrice,
-              chosenBrand
-            );
-          }
 
-          this.minPriceInput.classList.add('chosen');
-          this.maxPriceInput.classList.add('chosen');
-
-          this.getInfoFilteredProducts(filteredProducts);
-          this.filterByBrandDiv.innerHTML = '';
-          this.getBrandsOfFilteredProducts(filteredProducts);
-        });
-      }
+      filteredProducts = await fetchFilteredByPriceAndBrandAndSearch(
+        this.minPrice,
+        this.maxPrice,
+        this.chosenBrands,
+        this.searchWord,
+        this.sortBy
+      );
+      this.filterByBrandDiv.innerHTML = '';
+      this.getInfoFilteredProducts(filteredProducts);
+      this.getBrandsOfFilteredProducts(filteredProducts);
+      this.minPriceInput.classList.add('chosen');
+      this.maxPriceInput.classList.add('chosen');
     });
     this.filterByBrandDiv = createDiv('filterByBrandDiv', this.aside);
+
     this.fetchProducts();
   }
 
@@ -214,59 +237,9 @@ class CatalogPage extends Page {
   }
 
   async fetchProducts(): Promise<void> {
-    const productsData = await fetchProducts();
-    this.getInfoProducts(productsData);
-    this.getBrands(productsData);
-  }
-
-  public getInfoProducts(products: Products) {
-    products.forEach((product: Product) => {
-      // const { id } = product;
-
-      let name = '';
-      if (product.masterData.current?.name?.['en-US']) {
-        const productNameString = product.masterData.current?.name?.['en-US'];
-        name = productNameString?.toUpperCase();
-      }
-
-      const imageSrc =
-        product.masterData.current.masterVariant.images?.[0]?.url ||
-        '../../assets/placeholder.png';
-
-      const description = product.masterData.current.description
-        ? product.masterData.current.description['en-US'] ||
-          'Sorry, no description available.'
-        : 'Sorry, no description available.';
-
-      let regularPrice = 0;
-      if (product.masterData.current.masterVariant.prices) {
-        if (product.masterData.current.masterVariant.prices[0].value) {
-          regularPrice =
-            product.masterData.current.masterVariant.prices[0].value.centAmount;
-        }
-      }
-      let discountedPrice = 0;
-      if (
-        product.masterData.current.masterVariant.prices &&
-        product.masterData.current.masterVariant.prices[0] &&
-        product.masterData.current.masterVariant.prices[0].discounted &&
-        product.masterData.current.masterVariant.prices[0].discounted.value
-          .centAmount
-      ) {
-        discountedPrice =
-          product.masterData.current.masterVariant.prices[0].discounted.value
-            .centAmount;
-      }
-
-      this.displayProductCard(
-        // id,
-        name,
-        imageSrc,
-        description,
-        regularPrice,
-        discountedPrice
-      );
-    });
+    const productsData = await fetchProducts(this.sortBy);
+    this.getInfoFilteredProducts(productsData);
+    this.getBrandsOfFilteredProducts(productsData);
   }
 
   public getInfoFilteredProducts(filteredProducts: FilteredProducts) {
@@ -313,22 +286,6 @@ class CatalogPage extends Page {
         discountedPrice
       );
     });
-  }
-
-  public getBrands(products: Products) {
-    const brands: string[] = [];
-    products.forEach((product: Product) => {
-      const brandAttribute =
-        product.masterData.current?.masterVariant.attributes?.find(
-          (attr) => attr.name === 'brand'
-        );
-      const brandName: { [key: string]: string } | undefined =
-        brandAttribute?.value;
-      if (typeof brandName === 'string') {
-        brands.push(brandName);
-      }
-    });
-    this.createBrandAndCountArray(brands);
   }
 
   public getBrandsOfFilteredProducts(products: FilteredProducts) {
@@ -400,28 +357,35 @@ class CatalogPage extends Page {
           }
         }
         if (this.chosenBrands.length === 0) {
-          const filteredProducts = await fetchFilteredByPrice(
+          const filteredProducts = await fetchFilteredByPriceAndBrandAndSearch(
             this.minPrice,
-            this.maxPrice
+            this.maxPrice,
+            this.chosenBrands,
+            this.searchWord,
+            this.sortBy
           );
           this.getInfoFilteredProducts(filteredProducts);
           this.filterByBrandDiv.innerHTML = '';
           this.getBrandsOfFilteredProducts(filteredProducts);
         }
+        if (
+          !this.minPrice &&
+          !this.maxPrice &&
+          this.chosenBrands.length === 0 &&
+          !this.searchWord
+        ) {
+          this.reset();
+        }
+
         try {
-          this.chosenBrands.forEach(async (chosenBrand) => {
-            let filteredProducts = [];
-            if (this.minPrice && this.maxPrice) {
-              filteredProducts = await fetchFilteredByPriceAndBrand(
-                this.minPrice,
-                this.maxPrice,
-                chosenBrand
-              );
-            } else {
-              filteredProducts = await fetchFilteredByBrand(chosenBrand);
-            }
-            this.getInfoFilteredProducts(filteredProducts);
-          });
+          const filteredProducts = await fetchFilteredByPriceAndBrandAndSearch(
+            this.minPrice,
+            this.maxPrice,
+            this.chosenBrands,
+            this.searchWord,
+            this.sortBy
+          );
+          this.getInfoFilteredProducts(filteredProducts);
         } catch (error) {
           throw new Error('Error fetching filtered products');
         }
@@ -476,6 +440,8 @@ class CatalogPage extends Page {
     this.chosenBrands = [];
     this.minPrice = 0;
     this.maxPrice = 0;
+    this.searchInput.value = '';
+    this.searchWord = '';
   }
 }
 
