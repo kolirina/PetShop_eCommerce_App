@@ -32,8 +32,6 @@ class CatalogPage extends Page {
 
   public searchButton: HTMLButtonElement;
 
-  public searchWord: string = '';
-
   public productsContainerPlusAside: HTMLDivElement;
 
   public productsContainer: HTMLDivElement;
@@ -41,8 +39,6 @@ class CatalogPage extends Page {
   public aside: HTMLElement;
 
   public filterByBrandDiv: HTMLDivElement;
-
-  public chosenBrands: string[] = [];
 
   public filterByPrice: HTMLDivElement;
 
@@ -56,11 +52,15 @@ class CatalogPage extends Page {
 
   public showFilteredByPrice: HTMLButtonElement;
 
+  public productsDisplayed: FilteredProducts = [];
+
   public minPrice: number = 0;
 
   public maxPrice: number = 0;
 
-  public productsDisplayed: FilteredProducts = [];
+  public chosenBrands: string[] = [];
+
+  public searchWord: string = '';
 
   public sortBy: SortBy = SortBy.PRICE_ASC;
 
