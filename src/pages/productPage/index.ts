@@ -4,6 +4,8 @@ import {
   createBtn,
   createDiv,
   createImg,
+  createList,
+  createListElement,
   createParagraph,
 } from '../../utils/elementCreator';
 import priceFormatter from '../../utils/priceFormatter';
@@ -39,17 +41,28 @@ class ProductPage extends Page {
     if (response.statusCode === 200) {
       const product = response.body.masterData.current;
       const baseInfo = createDiv(styles.baseInfo, this.container);
+
       const imageContainer = createDiv(styles.imageContainer, baseInfo);
       imageContainer.append(this.carousel);
       product.masterVariant.images?.forEach((image) => {
         createImg(styles.productImage, image.url, 'product', this.carousel);
       });
-      const prevButton = createBtn(styles.carouselButton, '<', imageContainer);
-      prevButton.classList.add(styles.prevButton);
-      prevButton.addEventListener('click', () => this.moveCarousel(-1));
-      const nextButton = createBtn(styles.carouselButton, '>', imageContainer);
-      nextButton.classList.add(styles.nextButton);
-      nextButton.addEventListener('click', () => this.moveCarousel(1));
+      if (this.carousel.childElementCount > 1) {
+        const prevButton = createBtn(
+          styles.carouselButton,
+          '<',
+          imageContainer
+        );
+        prevButton.classList.add(styles.prevButton);
+        prevButton.addEventListener('click', () => this.moveCarousel(-1));
+        const nextButton = createBtn(
+          styles.carouselButton,
+          '>',
+          imageContainer
+        );
+        nextButton.classList.add(styles.nextButton);
+        nextButton.addEventListener('click', () => this.moveCarousel(1));
+      }
 
       const infoContainer = createDiv(styles.infoContainer, baseInfo);
       createParagraph(styles.productName, product.name['en-US'], infoContainer);
@@ -57,14 +70,14 @@ class ProductPage extends Page {
         product.description!['en-US'] ?? 'No description available';
       createParagraph(styles.shortDescription, shortDescription, infoContainer);
 
-      const priceDiv = createDiv('priceDiv', infoContainer);
-      const regularPriceDiv = createDiv('regularPrice', priceDiv);
+      const priceDiv = createDiv(styles.priceDiv, infoContainer);
+      const regularPriceDiv = createDiv(styles.regularPrice, priceDiv);
       if (product.masterVariant.prices) {
         if (product.masterVariant.prices[0].value) {
           const regularPrice = product.masterVariant.prices[0].value.centAmount;
-          regularPriceDiv.innerHTML = priceFormatter(regularPrice);
+          regularPriceDiv.textContent = priceFormatter(regularPrice);
         } else {
-          regularPriceDiv.innerHTML = 'No data';
+          regularPriceDiv.textContent = 'Error when price fetching';
         }
       }
       if (
@@ -72,22 +85,35 @@ class ProductPage extends Page {
         product.masterVariant.prices[0] &&
         product.masterVariant.prices[0].discounted
       ) {
-        regularPriceDiv.classList.add('crossedOut');
-        const discountPriceDiv = createDiv('discountPrice', priceDiv);
+        regularPriceDiv.classList.add(styles.crossedOut);
+        const discountPriceDiv = createDiv(styles.discountPrice, priceDiv);
         const discountPrice =
           product.masterVariant.prices[0].discounted.value.centAmount;
-        discountPriceDiv.innerHTML = `Now ${priceFormatter(discountPrice)}`;
+        discountPriceDiv.textContent = `Now ${priceFormatter(discountPrice)}`;
       }
+
       const detailedInfo = createDiv(styles.detailedInfo, this.container);
       product.masterVariant.attributes?.forEach((attribute) => {
         if (isDescription(attribute.name)) {
+          const description = createDiv(styles.description);
+          createParagraph(styles.title, 'Description:', description);
           createParagraph(
             styles.detailedDescription,
             attribute.value,
-            detailedInfo
+            description
           );
+          detailedInfo.prepend(description);
         } else if (isSpecification(attribute.name)) {
-          createParagraph(styles.specification, attribute.value, detailedInfo);
+          createParagraph(styles.title, 'Specifications:', detailedInfo);
+          const specsList = createList(styles.specsList);
+          attribute.value
+            .split('\n')
+            .forEach((spec: string, index: number) =>
+              index === 0
+                ? createParagraph(styles.spec, spec, detailedInfo)
+                : createListElement(styles.spec, spec, specsList)
+            );
+          detailedInfo.append(specsList);
         }
       });
     }
