@@ -1,3 +1,4 @@
+import { Image } from '@commercetools/platform-sdk';
 import { getProduct } from '../../api/SDK';
 import Router from '../../router';
 import {
@@ -19,22 +20,20 @@ class ProductPage extends Page {
 
   currentIndex: number = 0;
 
-  carousel: HTMLDivElement;
-
   constructor(router: Router, parentElement: HTMLElement) {
     super(router, parentElement);
     this.container.classList.add(styles.productPage);
-    this.carousel = createDiv(styles.carousel);
     const match = window.location.pathname.match(/^\/product\/([a-z0-9-]+)$/);
     this.id = match ? match[1] : 'Error';
     this.displayProductInfo();
   }
 
-  moveCarousel(direction: number) {
-    const totalImages = this.carousel.childElementCount;
+  moveCarousel(editableCarousel: HTMLDivElement, direction: number) {
+    const carousel = editableCarousel;
+    const totalImages = carousel.childElementCount;
     this.currentIndex =
       (this.currentIndex + direction + totalImages) % totalImages;
-    this.carousel.style.transform = `translateX(-${this.currentIndex * 100}%)`;
+    carousel.style.transform = `translateX(-${this.currentIndex * 100}%)`;
   }
 
   async displayProductInfo() {
@@ -44,31 +43,38 @@ class ProductPage extends Page {
       const baseInfo = createDiv(styles.baseInfo, this.container);
 
       const imageContainer = createDiv(styles.imageContainer, baseInfo);
-      imageContainer.append(this.carousel);
+      const carousel = createDiv(styles.carousel, imageContainer);
       product.masterVariant.images?.forEach((image) => {
         const img = createImg(
           styles.productImage,
           image.url,
           'product',
-          this.carousel
+          carousel
         );
-        img.addEventListener('click', () => this.openModal(image.url));
+        img.addEventListener('click', () => {
+          document.body.classList.add(styles.noscroll);
+          this.openModal(carousel, product.masterVariant.images!);
+        });
       });
-      if (this.carousel.childElementCount > 1) {
+      if (carousel.childElementCount > 1) {
         const prevButton = createBtn(
           styles.carouselButton,
           '<',
           imageContainer
         );
         prevButton.classList.add(styles.prevButton);
-        prevButton.addEventListener('click', () => this.moveCarousel(-1));
+        prevButton.addEventListener('click', () =>
+          this.moveCarousel(carousel, -1)
+        );
         const nextButton = createBtn(
           styles.carouselButton,
           '>',
           imageContainer
         );
         nextButton.classList.add(styles.nextButton);
-        nextButton.addEventListener('click', () => this.moveCarousel(1));
+        nextButton.addEventListener('click', () =>
+          this.moveCarousel(carousel, 1)
+        );
       }
 
       const infoContainer = createDiv(styles.infoContainer, baseInfo);
@@ -126,16 +132,33 @@ class ProductPage extends Page {
     }
   }
 
-  openModal(imageUrl: string) {
+  openModal(smallCarousel: HTMLDivElement, images: Image[]) {
     const modal = createDiv(styles.modal, document.body);
     const modalContent = createDiv(styles.modalContent, modal);
-    createImg(styles.modalImage, imageUrl, 'enlarged image', modalContent);
+    const modalCarousel = createDiv(styles.modalCarousel, modalContent);
+    images.forEach((image) => {
+      createImg(styles.modalImage, image.url, 'enlarged image', modalCarousel);
+    });
+    this.moveCarousel(modalCarousel, 0);
     const closeButton = createSpan(styles.closeButton, '×', modalContent);
     closeButton.addEventListener('click', () => {
       modal.remove();
-      // delete this
-      this.carousel = createDiv(styles.delete);
+      document.body.classList.remove(styles.noscroll);
+      this.moveCarousel(smallCarousel, 0);
     });
+    if (modalCarousel.childElementCount > 1) {
+      const prevModalButton = createBtn(styles.modalButton, '<', modalContent);
+      prevModalButton.classList.add(styles.prevModalButton);
+      prevModalButton.addEventListener('click', () =>
+        this.moveCarousel(modalCarousel, -1)
+      );
+
+      const nextModalButton = createBtn(styles.modalButton, '>', modalContent);
+      nextModalButton.classList.add(styles.nextModalButton);
+      nextModalButton.addEventListener('click', () =>
+        this.moveCarousel(modalCarousel, 1)
+      );
+    }
   }
 }
 export default ProductPage;

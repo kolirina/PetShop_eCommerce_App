@@ -11,10 +11,10 @@
 }
 
 .image-container {
+  position: relative;
   width: 50%;
   max-width: 600px;
   overflow: hidden;
-  position: relative;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -89,10 +89,12 @@
   color: green;
   font-weight: bold;
 }
+
 .crossed-out {
   color: #777;
   text-decoration: line-through;
 }
+
 .detailed-info {
   max-width: 1240px;
   padding: 20px;
@@ -100,6 +102,7 @@
   border-radius: 10px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
+
 .title {
   font-size: 36px;
   font-weight: bold;
@@ -113,6 +116,10 @@
   white-space: pre-line;
 }
 
+.noscroll {
+  overflow: hidden;
+}
+
 .modal {
   display: flex;
   justify-content: center;
@@ -122,41 +129,74 @@
   left: 0;
   width: 100%;
   height: 100%;
+  padding: 20px;
+  box-sizing: border-box;
   background-color: rgba(0, 0, 0, 0.8);
-  z-index: 1000;
+  z-index: 5;
 }
 
 .modal-content {
   position: relative;
   background-color: white;
-  padding: 30px;
   border-radius: 10px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-  max-width: 90vw;
+  max-width: 800px;
   max-height: 80vh;
   display: flex;
   justify-content: center;
+  overflow: hidden;
+}
+
+.modal-carousel {
+  width: 100%;
+  display: flex;
+  transition: transform 0.5s ease-in-out;
 }
 
 .modal-image {
-  max-width: 90%;
-  max-height: 90%;
+  flex: 0 0 100%;
+  max-width: 100%;
+  max-height: 100%;
+  box-sizing: border-box;
+  padding: 30px;
   border-radius: 10px;
+  object-fit: contain;
 }
 
 .close-button {
   position: absolute;
   top: 10px;
   right: 10px;
-  font-size: 24px;
+  font-size: 28px;
   color: black;
   cursor: pointer;
+}
+
+.modal-button {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background-color: rgba(0, 0, 0, 0.5);
+  color: white;
+  border: none;
+  padding: 10px 14px;
+  cursor: pointer;
+  border-radius: 50%;
+}
+
+.prev-modal-button {
+  left: 10px;
+}
+
+.next-modal-button {
+  right: 10px;
 }
 
 @media screen and (max-width: 768px) {
   .base-info {
     flex-direction: column;
   }
+
   .image-container,
   .info-container {
     box-sizing: border-box;
