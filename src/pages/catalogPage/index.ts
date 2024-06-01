@@ -207,6 +207,12 @@ class CatalogPage extends Page {
       this.productsDisplayed = [];
       this.minPrice = Number(this.minPriceInput.value) * 100;
       this.maxPrice = Number(this.maxPriceInput.value) * 100;
+      if (!this.minPrice) {
+        this.minPrice = 1;
+      }
+      if (!this.maxPrice) {
+        this.maxPrice = 999 * 100;
+      }
       let filteredProducts: FilteredProduct[] = [];
 
       filteredProducts = await fetchFilteredByPriceAndBrandAndSearch(
