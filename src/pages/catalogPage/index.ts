@@ -345,10 +345,12 @@ class CatalogPage extends Page {
     );
     filterByBrandTitle.innerHTML = 'Brand';
     brands.forEach((brand) => {
+      const label = createLabel('label', `${brand.brand} (${brand.count})`);
+      this.filterByBrandDiv.appendChild(label);
       const checkbox = createInput({
         className: 'checkbox',
         type: 'checkbox',
-        parentElement: this.filterByBrandDiv,
+        parentElement: label,
       });
       checkbox.value = brand.brand;
       checkbox.name = 'brands';
@@ -356,9 +358,6 @@ class CatalogPage extends Page {
         checkbox.checked = true;
       }
 
-      const label = createLabel('label', `${brand.brand} (${brand.count})`);
-      this.filterByBrandDiv.appendChild(label);
-      this.filterByBrandDiv.appendChild(document.createElement('br'));
       checkbox.addEventListener('click', async () => {
         this.productsContainer.innerHTML = '';
         if (!this.chosenBrands.includes(brand.brand)) {

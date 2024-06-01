@@ -161,6 +161,11 @@ input[type='number'] {
 }
 
 .label {
+  display: flex;
+  flex-direction: row-reverse;
+  justify-content: flex-end;
+  align-items: center;
+  margin-bottom: 5px;
   font-size: small;
   font-weight: bolder;
   color: var(--text-color);
