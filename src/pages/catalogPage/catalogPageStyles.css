@@ -26,14 +26,14 @@
 }
 
 aside {
+  position: sticky;
+  top: 200px;
   align-self: flex-start;
   width: 200px;
   padding: 20px;
   background-color: #f4f4f4;
   overflow-y: auto;
   box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
-  position: sticky;
-  top: 200px;
 }
 
 .productsContainer {
