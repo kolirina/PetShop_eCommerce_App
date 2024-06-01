@@ -16,6 +16,7 @@ import {
   fetchFilteredByPriceAndBrandAndSearch,
   getSearchResult,
 } from '../../api/SDK';
+import priceFormatter from '../../utils/priceFormatter';
 import './catalogPageStyles.css';
 
 class CatalogPage extends Page {
@@ -432,12 +433,12 @@ class CatalogPage extends Page {
     productInfoBrief.innerHTML = productInfoBriefText;
     const priceDiv = createDiv('priceDiv', productCard);
     const regularPriceDiv = createDiv('regularPrice', priceDiv);
-    regularPriceDiv.innerHTML = `€${(regularPrice / 100).toFixed(2)}`;
+    regularPriceDiv.innerHTML = `${priceFormatter(regularPrice)}`;
 
     if (discountedPrice) {
       regularPriceDiv.classList.add('crossedOut');
       const discountPriceDiv = createDiv('discountPrice', priceDiv);
-      discountPriceDiv.innerHTML = `Now €${(discountedPrice / 100).toFixed(2)}`;
+      discountPriceDiv.innerHTML = `Now ${priceFormatter(discountedPrice)}`;
     }
   }
 
