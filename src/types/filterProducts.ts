@@ -88,11 +88,11 @@ type Availability = {
 };
 
 type ChannelAvailability = {
-  // isOnStock: boolean;
-  // restockableInDays: number;
-  // availableQuantity: number;
-  // version: number;
-  // id: string;
+  isOnStock?: boolean;
+  restockableInDays?: number;
+  availableQuantity?: number;
+  version?: number;
+  id?: string;
 };
 
 export type FilteredProducts = FilteredProduct[];
