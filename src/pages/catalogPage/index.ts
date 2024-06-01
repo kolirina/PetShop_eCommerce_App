@@ -93,24 +93,26 @@ class CatalogPage extends Page {
     this.searchDiv.appendChild(this.searchInput);
     this.searchButton = createBtn('searchButton', '🔍', this.searchDiv);
     this.searchButton.addEventListener('click', async () => {
-      this.searchWord = this.searchInput.value;
-      this.productsContainer.innerHTML = '';
-      this.productsDisplayed = [];
-      this.minPriceInput.value = '';
-      this.maxPriceInput.value = '';
-      this.minPriceInput.classList.remove('chosen');
-      this.maxPriceInput.classList.remove('chosen');
-      this.filterByBrandDiv.innerHTML = '';
-      this.chosenBrands = [];
-      this.minPrice = 0;
-      this.maxPrice = 0;
-      const searchResult = await getSearchResult(
-        this.searchInput.value,
-        this.sortBy
-      );
+      if (this.searchInput.value) {
+        this.searchWord = this.searchInput.value;
+        this.productsContainer.innerHTML = '';
+        this.productsDisplayed = [];
+        this.minPriceInput.value = '';
+        this.maxPriceInput.value = '';
+        this.minPriceInput.classList.remove('chosen');
+        this.maxPriceInput.classList.remove('chosen');
+        this.filterByBrandDiv.innerHTML = '';
+        this.chosenBrands = [];
+        this.minPrice = 0;
+        this.maxPrice = 0;
+        const searchResult = await getSearchResult(
+          this.searchInput.value,
+          this.sortBy
+        );
 
-      this.getInfoFilteredProducts(searchResult);
-      this.getBrandsOfFilteredProducts(searchResult);
+        this.getInfoFilteredProducts(searchResult);
+        this.getBrandsOfFilteredProducts(searchResult);
+      }
     });
 
     const sortDiv = createDiv('sort', this.sortSearchPanel);
