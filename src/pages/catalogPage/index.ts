@@ -2,6 +2,7 @@ import Router from '../../router';
 import Page from '../Page';
 import SortBy from '../../types/sortBy';
 import { FilteredProduct, FilteredProducts } from '../../types/filterProducts';
+import { lang } from './constants';
 import {
   createDiv,
   createImg,
@@ -261,7 +262,7 @@ class CatalogPage extends Page {
 
       let name = '';
       if (product.name) {
-        const productNameString = product.name?.['en-US'];
+        const productNameString = product.name?.[lang];
         name = productNameString?.toUpperCase();
       }
 
@@ -269,9 +270,8 @@ class CatalogPage extends Page {
         product.masterVariant.images?.[0]?.url ||
         '../../assets/placeholder.png';
 
-      const description = product.description
-        ? product.description['en-US'] || 'Sorry, no description available.'
-        : 'Sorry, no description available.';
+      const description =
+        product.description?.[lang] || 'Sorry, no description available.';
 
       let regularPrice = 0;
       if (product.masterVariant.prices) {

@@ -1,8 +1,11 @@
 import { ApiRoot, ClientResponse } from '@commercetools/platform-sdk';
 import { apiRoot, projectKey } from './ApiRoot';
 import { AddressTypes, UserAddress, UserInfo } from '../types';
+import {
+  lang,
+  MAX_NUMBER_OF_PRODUCTS_DISPLAYED,
+} from '../pages/catalogPage/constants';
 import SortBy from '../types/sortBy';
-import { MAX_NUMBER_OF_PRODUCTS_DISPLAYED } from '../pages/catalogPage/constants';
 
 async function getUser(
   email: string,
@@ -210,7 +213,7 @@ async function fetchFilteredByPriceAndBrandAndSearch(
       .get({
         queryArgs: {
           'filter.query': filterQueries,
-          'text.en-US': `"${searchWord}"`,
+          [`text.${lang}`]: `"${searchWord}"`,
           limit: MAX_NUMBER_OF_PRODUCTS_DISPLAYED,
           fuzzy: true,
           staged: true,
@@ -244,7 +247,7 @@ async function getSearchResult(word: string, sortBy: SortBy) {
       queryArgs: {
         staged: true,
         limit: MAX_NUMBER_OF_PRODUCTS_DISPLAYED,
-        'text.en-US': `"${word}"`,
+        [`text.${lang}`]: `"${word}"`,
         fuzzy: true,
         sort: `${sortBy}`,
       },
