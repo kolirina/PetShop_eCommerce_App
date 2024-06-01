@@ -5,6 +5,24 @@
   padding: 20px;
 }
 
+.catalogButton {
+  display: block;
+  padding: 10px;
+  border: 2px solid transparent;
+  border-color: var(--accent-color);
+  text-align: center;
+  color: var(--accent-color);
+  background-color: var(--main-bg-color);
+  font-weight: bold;
+  transition-duration: 0.25s;
+  cursor: pointer;
+}
+
+.catalogButton:hover {
+  color: var(--main-bg-color);
+  background-color: var(--accent-color);
+}
+
 .base-info {
   display: flex;
   gap: 40px;

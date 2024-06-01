@@ -14,6 +14,7 @@ import priceFormatter from '../../utils/priceFormatter';
 import Page from '../Page';
 import { isDescription, isSpecification } from './constants';
 import styles from './productPage.module.css';
+import Pages from '../../router/pageNames';
 
 class ProductPage extends Page {
   id: string;
@@ -37,8 +38,22 @@ class ProductPage extends Page {
   }
 
   async displayProductInfo() {
-    const response = await getProduct(this.id);
-    if (response.statusCode === 200) {
+    let response;
+    try {
+      response = await getProduct(this.id);
+    } catch {
+      this.container.textContent = `No product with id: ${this.id}`;
+      const catalogButton = createBtn(
+        styles.catalogButton,
+        'Go to Catalog',
+        this.container
+      );
+      catalogButton.addEventListener('click', () =>
+        this.router.navigateTo(Pages.CATALOG)
+      );
+      return;
+    }
+    if (response && response.statusCode === 200) {
       const product = response.body.masterData.current;
       const baseInfo = createDiv(styles.baseInfo, this.container);
 
