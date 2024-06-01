@@ -7,6 +7,7 @@ import {
   createList,
   createListElement,
   createParagraph,
+  createSpan,
 } from '../../utils/elementCreator';
 import priceFormatter from '../../utils/priceFormatter';
 import Page from '../Page';
@@ -45,7 +46,13 @@ class ProductPage extends Page {
       const imageContainer = createDiv(styles.imageContainer, baseInfo);
       imageContainer.append(this.carousel);
       product.masterVariant.images?.forEach((image) => {
-        createImg(styles.productImage, image.url, 'product', this.carousel);
+        const img = createImg(
+          styles.productImage,
+          image.url,
+          'product',
+          this.carousel
+        );
+        img.addEventListener('click', () => this.openModal(image.url));
       });
       if (this.carousel.childElementCount > 1) {
         const prevButton = createBtn(
@@ -117,6 +124,18 @@ class ProductPage extends Page {
         }
       });
     }
+  }
+
+  openModal(imageUrl: string) {
+    const modal = createDiv(styles.modal, document.body);
+    const modalContent = createDiv(styles.modalContent, modal);
+    createImg(styles.modalImage, imageUrl, 'enlarged image', modalContent);
+    const closeButton = createSpan(styles.closeButton, '×', modalContent);
+    closeButton.addEventListener('click', () => {
+      modal.remove();
+      // delete this
+      this.carousel = createDiv(styles.delete);
+    });
   }
 }
 export default ProductPage;
