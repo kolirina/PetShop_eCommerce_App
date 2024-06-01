@@ -427,9 +427,8 @@ class CatalogPage extends Page {
     const productNameString = name;
     productName.innerHTML = productNameString;
     const productInfoBrief = createDiv('productInfoBrief', productCard);
-    const productInfoBriefText = description
-      ? description || 'Sorry, no description available.'
-      : 'Sorry, no description available.';
+    const productInfoBriefText =
+      description || 'Sorry, no description available.';
     productInfoBrief.innerHTML = productInfoBriefText;
     const priceDiv = createDiv('priceDiv', productCard);
     const regularPriceDiv = createDiv('regularPrice', priceDiv);
