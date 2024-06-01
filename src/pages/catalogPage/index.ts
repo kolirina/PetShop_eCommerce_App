@@ -243,6 +243,10 @@ class CatalogPage extends Page {
   }
 
   public getInfoFilteredProducts(filteredProducts: FilteredProducts) {
+    if (filteredProducts.length === 0) {
+      this.productsContainer.innerHTML =
+        'It seems that no product matches your request. Please try again.';
+    }
     this.productsDisplayed = filteredProducts;
     filteredProducts.forEach((product: FilteredProduct) => {
       // const { id } = product;

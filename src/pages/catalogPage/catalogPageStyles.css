@@ -43,6 +43,7 @@ aside {
   justify-content: center;
   width: calc(100% - 240px);
   height: 100%;
+  color: rgba(3, 14, 6, 0.2);
 }
 
 .productCard {
@@ -50,6 +51,7 @@ aside {
   flex-direction: column;
   max-width: 200px;
   padding: 10px;
+  color: var(--text-color);
   border: 1px solid rgba(197, 190, 190, 0.384);
   border-radius: 5px;
 }
