@@ -1,0 +1,223 @@
+.product-page {
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+  padding: 20px;
+}
+
+.catalogButton {
+  display: block;
+  padding: 10px;
+  text-align: center;
+  color: var(--accent-color);
+  font-weight: bold;
+  border: 2px solid var(--accent-color);
+  background-color: var(--main-bg-color);
+  transition-duration: 0.25s;
+  cursor: pointer;
+}
+
+.catalogButton:hover {
+  color: var(--main-bg-color);
+  background-color: var(--accent-color);
+}
+
+.base-info {
+  display: flex;
+  gap: 40px;
+}
+
+.image-container {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 50%;
+  max-width: 600px;
+  overflow: hidden;
+}
+
+.carousel {
+  display: flex;
+  transition: transform 0.5s ease-in-out;
+}
+
+.product-image {
+  min-width: 100%;
+  max-width: 100%;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.carousel-button {
+  position: absolute;
+  top: 50%;
+  padding: 10px 14px;
+  color: white;
+  background-color: rgba(0, 0, 0, 0.5);
+  border: none;
+  border-radius: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+}
+
+.prev-button {
+  left: 10px;
+}
+
+.next-button {
+  right: 10px;
+}
+
+.info-container {
+  width: 50%;
+  max-width: 600px;
+  padding: 20px;
+  background-color: #f9f9f9;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.product-name {
+  margin-bottom: 10px;
+  font-size: 36px;
+  font-weight: bold;
+}
+
+.short-description {
+  margin-bottom: 20px;
+  font-size: 20px;
+  color: #555;
+}
+
+.price-div {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 20px;
+}
+
+.regular-price {
+  margin-right: 10px;
+  font-size: 28px;
+}
+
+.discount-price {
+  font-size: 28px;
+  font-weight: bold;
+  color: green;
+}
+
+.crossed-out {
+  color: #777;
+  text-decoration: line-through;
+}
+
+.detailed-info {
+  max-width: 1240px;
+  padding: 20px;
+  background-color: #f9f9f9;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.title {
+  font-size: 36px;
+  font-weight: bold;
+}
+
+.detailed-description,
+.spec {
+  margin-bottom: 10px;
+  font-size: 20px;
+  color: #333;
+  white-space: pre-line;
+}
+
+.noscroll {
+  overflow: hidden;
+}
+
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 5;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  padding: 20px;
+  box-sizing: border-box;
+  background-color: rgba(0, 0, 0, 0.8);
+}
+
+.modal-content {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  max-width: 800px;
+  max-height: 80vh;
+  overflow: hidden;
+  background-color: white;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.modal-carousel {
+  display: flex;
+  width: 100%;
+  transition: transform 0.5s ease-in-out;
+}
+
+.modal-image {
+  flex: 0 0 100%;
+  max-width: 100%;
+  max-height: 100%;
+  padding: 30px;
+  box-sizing: border-box;
+  object-fit: contain;
+  border-radius: 10px;
+}
+
+.close-button {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  font-size: 28px;
+  color: black;
+  cursor: pointer;
+}
+
+.modal-button {
+  position: absolute;
+  top: 50%;
+  padding: 10px 14px;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  background-color: rgba(0, 0, 0, 0.5);
+  transform: translateY(-50%);
+  cursor: pointer;
+}
+
+.prev-modal-button {
+  left: 10px;
+}
+
+.next-modal-button {
+  right: 10px;
+}
+
+@media screen and (max-width: 768px) {
+  .base-info {
+    flex-direction: column;
+  }
+
+  .image-container,
+  .info-container {
+    box-sizing: border-box;
+    width: 100%;
+    max-width: 100%;
+  }
+}

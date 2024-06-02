@@ -18,6 +18,7 @@ import {
 } from '../../api/SDK';
 import priceFormatter from '../../utils/priceFormatter';
 import './catalogPageStyles.css';
+import Pages from '../../router/pageNames';
 
 class CatalogPage extends Page {
   public banner: HTMLDivElement;
@@ -259,7 +260,7 @@ class CatalogPage extends Page {
     }
     this.productsDisplayed = filteredProducts;
     filteredProducts.forEach((product: FilteredProduct) => {
-      // const { id } = product;
+      const { id } = { id: product.id };
 
       let name = '';
       if (product.name) {
@@ -291,7 +292,7 @@ class CatalogPage extends Page {
       }
 
       this.displayProductCard(
-        // id,
+        { id },
         name,
         imageSrc,
         description,
@@ -406,7 +407,7 @@ class CatalogPage extends Page {
   }
 
   public displayProductCard(
-    // id: string,
+    { id }: { id: FilteredProduct['id'] },
     name: string,
     imageSrc: string,
     description: string,
@@ -438,6 +439,9 @@ class CatalogPage extends Page {
       const discountPriceDiv = createDiv('discountPrice', priceDiv);
       discountPriceDiv.innerHTML = `Now ${priceFormatter(discountedPrice)}`;
     }
+    productCard.addEventListener('click', () =>
+      this.router.navigateTo(Pages.PRODUCT, { id })
+    );
   }
 
   public reset() {

@@ -1,5 +1,6 @@
 .container {
   padding: 20px;
+  width: 100%;
 }
 
 .link {
@@ -20,4 +21,9 @@
 .link:hover {
   text-decoration: underline;
   border-color: var(--accent-color);
+}
+.main {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 }

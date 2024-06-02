@@ -12,6 +12,7 @@ export default class TemplatePage extends Page {
   constructor(router: Router, parentElement: HTMLElement) {
     super(router, parentElement);
     this.main = document.createElement('main');
+    this.main.classList.add(styles.main);
     this.container.classList.add(styles.page);
     this.header = new Header(router);
     this.container.append(

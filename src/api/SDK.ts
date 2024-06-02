@@ -253,6 +253,16 @@ async function getSearchResult(word: string, sortBy: SortBy) {
   return resp.body.results;
 }
 
+async function getProduct(id: string) {
+  const resp = await apiRoot
+    .withProjectKey({ projectKey })
+    .products()
+    .withId({ ID: id })
+    .get()
+    .execute();
+  return resp;
+}
+
 export {
   getUser,
   registerUser,
@@ -264,4 +274,5 @@ export {
   fetchProducts,
   getSearchResult,
   fetchFilteredByPriceAndBrandAndSearch,
+  getProduct,
 };
