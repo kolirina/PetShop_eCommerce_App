@@ -89,6 +89,10 @@ export default class ProfileAddressBlock {
 
   public addressChangeResult: HTMLDivElement;
 
+  public defaultShippingAddress: string;
+
+  public defaultBillingAddress: string;
+
   constructor(
     address: Address,
     defaultBilling: string,
@@ -105,6 +109,8 @@ export default class ProfileAddressBlock {
     this.address = address;
     this.addressId = address.id ? address.id : '';
     this.userId = userId;
+    this.defaultShippingAddress = defaultShipping;
+    this.defaultBillingAddress = defaultBilling;
 
     this.blockWrapper = createDiv(styles.inputsWrapper);
     this.countryLabel = createLabel(
@@ -462,6 +468,10 @@ export default class ProfileAddressBlock {
       this.streetLabel.classList.value = styles.inputLabel;
       this.streetNumberInput.classList.value = styles.input;
       this.streetNumberLabel.classList.value = styles.inputLabel;
+      this.defaultShippingAddressInput.checked =
+        this.addressId === this.defaultShippingAddress;
+      this.defaultBillingAddressInput.checked =
+        this.addressId === this.defaultBillingAddress;
     }
   }
 
