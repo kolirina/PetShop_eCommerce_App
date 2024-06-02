@@ -10,11 +10,12 @@ import {
   createParagraph,
   createSpan,
 } from '../../utils/elementCreator';
-import priceFormatter from '../../utils/priceFormatter';
 import Page from '../Page';
-import { isDescription, isSpecification } from './constants';
-import styles from './productPage.module.css';
 import Pages from '../../router/pageNames';
+import priceFormatter from '../../utils/priceFormatter';
+import { isDescription, isSpecification } from './constants';
+import { lang } from '../../constants';
+import styles from './productPage.module.css';
 
 class ProductPage extends Page {
   id: string;
@@ -93,9 +94,9 @@ class ProductPage extends Page {
       }
 
       const infoContainer = createDiv(styles.infoContainer, baseInfo);
-      createParagraph(styles.productName, product.name['en-US'], infoContainer);
+      createParagraph(styles.productName, product.name[lang], infoContainer);
       const shortDescription =
-        product.description!['en-US'] ?? 'No description available';
+        product.description![lang] ?? 'No description available';
       createParagraph(styles.shortDescription, shortDescription, infoContainer);
 
       const priceDiv = createDiv(styles.priceDiv, infoContainer);
@@ -149,6 +150,14 @@ class ProductPage extends Page {
 
   openModal(smallCarousel: HTMLDivElement, images: Image[]) {
     const modal = createDiv(styles.modal, document.body);
+    const closeModal = () => {
+      modal.remove();
+      document.body.classList.remove(styles.noscroll);
+      this.moveCarousel(smallCarousel, 0);
+    };
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) closeModal();
+    });
     const modalContent = createDiv(styles.modalContent, modal);
     const modalCarousel = createDiv(styles.modalCarousel, modalContent);
     images.forEach((image) => {
@@ -156,11 +165,7 @@ class ProductPage extends Page {
     });
     this.moveCarousel(modalCarousel, 0);
     const closeButton = createSpan(styles.closeButton, '×', modalContent);
-    closeButton.addEventListener('click', () => {
-      modal.remove();
-      document.body.classList.remove(styles.noscroll);
-      this.moveCarousel(smallCarousel, 0);
-    });
+    closeButton.addEventListener('click', closeModal);
     if (modalCarousel.childElementCount > 1) {
       const prevModalButton = createBtn(styles.modalButton, '<', modalContent);
       prevModalButton.classList.add(styles.prevModalButton);
