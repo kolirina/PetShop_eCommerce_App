@@ -25,6 +25,7 @@ import {
   getCountryFromISO,
 } from '../../utils/getCountryISO';
 import { changeUsersAddress } from '../../api/services';
+import { NO_INFO } from './constants';
 
 export default class ProfileAddressBlock {
   public address: Address;
@@ -206,22 +207,22 @@ export default class ProfileAddressBlock {
 
     this.countryInput.value = getCountryFromISO(address.country);
     if (!address.postalCode) {
-      this.postCodeInput.placeholder = 'Not added...';
+      this.postCodeInput.placeholder = NO_INFO;
     } else {
       this.postCodeInput.value = address.postalCode;
     }
     if (!address.city) {
-      this.cityInput.placeholder = 'Not added...';
+      this.cityInput.placeholder = NO_INFO;
     } else {
       this.cityInput.value = address.city;
     }
     if (!address.streetName) {
-      this.streetInput.placeholder = 'Not added...';
+      this.streetInput.placeholder = NO_INFO;
     } else {
       this.streetInput.value = address.streetName;
     }
     if (!address.streetNumber) {
-      this.streetNumberInput.placeholder = 'Not added...';
+      this.streetNumberInput.placeholder = NO_INFO;
     } else {
       this.streetNumberInput.value = address.streetNumber;
     }

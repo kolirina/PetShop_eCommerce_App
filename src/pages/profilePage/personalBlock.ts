@@ -18,6 +18,7 @@ import {
   setUsersLastName,
 } from '../../api/services';
 import { ValidationErrors } from '../registrationPage/constants';
+import { NO_DATA } from './constants';
 
 export default class ProfilePersonalBlock {
   private userInfo: Customer;
@@ -169,13 +170,13 @@ export default class ProfilePersonalBlock {
     if (target === this.resetBtn) {
       this.firstNameInput.value = this.userInfo.firstName
         ? this.userInfo.firstName
-        : 'No data';
+        : NO_DATA;
       this.lastNameInput.value = this.userInfo.lastName
         ? this.userInfo.lastName
-        : 'No data';
+        : NO_DATA;
       this.birthDateInput.value = this.userInfo.dateOfBirth
         ? this.userInfo.dateOfBirth
-        : 'No data';
+        : NO_DATA;
       this.firstNameInput.classList.value = styles.input;
       this.firstNameLabel.classList.value = styles.inputLabel;
       this.lastNameInput.classList.value = styles.input;
