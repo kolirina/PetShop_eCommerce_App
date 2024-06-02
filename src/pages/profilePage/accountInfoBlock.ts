@@ -8,6 +8,7 @@ import {
 import { validateEmail, validatePassword } from '../../utils/validateData';
 import { ValidationErrors } from '../registrationPage/constants';
 import { changeUsersEmail, changeUsersPassword } from '../../api/services';
+import { REMOVE_TIMEOUT } from './constants';
 import styles from './profilePage.module.css';
 
 function showInputStatus(
@@ -271,7 +272,7 @@ export default class ProfileAccountBlock {
           'The e-mail has been changed successfully.';
         setTimeout(() => {
           this.emailChangeResults.remove();
-        }, 3000);
+        }, REMOVE_TIMEOUT);
       })
       .catch(() => {
         this.emailLabel.append(this.emailChangeResults);
@@ -280,7 +281,7 @@ export default class ProfileAccountBlock {
         this.emailChangeResults.textContent = "The e-mail hasn't been changed.";
         setTimeout(() => {
           this.emailChangeResults.remove();
-        }, 3000);
+        }, REMOVE_TIMEOUT);
       });
   }
 
@@ -300,7 +301,7 @@ export default class ProfileAccountBlock {
           'The password has been changed successfully.';
         setTimeout(() => {
           this.passwordChangeResults.remove();
-        }, 3000);
+        }, REMOVE_TIMEOUT);
       })
       .catch(() => {
         this.passwordLabel.append(this.passwordChangeResults);
@@ -314,7 +315,7 @@ export default class ProfileAccountBlock {
           "The password hasn't been changed.";
         setTimeout(() => {
           this.passwordChangeResults.remove();
-        }, 3000);
+        }, REMOVE_TIMEOUT);
       });
   }
 

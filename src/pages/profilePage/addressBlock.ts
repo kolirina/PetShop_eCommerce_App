@@ -24,7 +24,7 @@ import {
   getCountryFromISO,
 } from '../../utils/getCountryISO';
 import { changeUsersAddress } from '../../api/services';
-import { NO_INFO } from './constants';
+import { NO_INFO, REMOVE_TIMEOUT } from './constants';
 import styles from './profilePage.module.css';
 
 export default class ProfileAddressBlock {
@@ -480,7 +480,7 @@ export default class ProfileAddressBlock {
           'The address has been changed successfully.';
         setTimeout(() => {
           this.addressChangeResult.remove();
-        }, 2000);
+        }, REMOVE_TIMEOUT);
       })
       .catch(() => {
         this.blockWrapper.append(this.addressChangeResult);
@@ -490,7 +490,7 @@ export default class ProfileAddressBlock {
           "The address hasn't been changed.";
         setTimeout(() => {
           this.addressChangeResult.remove();
-        }, 2000);
+        }, REMOVE_TIMEOUT);
       });
   }
 }

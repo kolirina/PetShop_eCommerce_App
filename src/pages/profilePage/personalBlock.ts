@@ -17,7 +17,7 @@ import {
   setUsersLastName,
 } from '../../api/services';
 import { ValidationErrors } from '../registrationPage/constants';
-import { NO_DATA } from './constants';
+import { NO_DATA, REMOVE_TIMEOUT } from './constants';
 import styles from './profilePage.module.css';
 
 export default class ProfilePersonalBlock {
@@ -252,7 +252,7 @@ export default class ProfilePersonalBlock {
               'The personal info has been changed successfully.';
             setTimeout(() => {
               this.personalChangeResult.remove();
-            }, 2000);
+            }, REMOVE_TIMEOUT);
           })
           .catch(() => {
             this.blockWrapper.append(this.personalChangeResult);
@@ -262,7 +262,7 @@ export default class ProfilePersonalBlock {
               "The personal info hasn't been changed.";
             setTimeout(() => {
               this.personalChangeResult.remove();
-            }, 2000);
+            }, REMOVE_TIMEOUT);
           })
       )
     );
