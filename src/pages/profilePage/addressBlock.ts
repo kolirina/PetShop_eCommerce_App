@@ -169,7 +169,7 @@ export default class ProfileAddressBlock {
 
     this.streetNumberLabel = createLabel(
       styles.inputLabel,
-      'Street number:',
+      'House number:',
       this.blockWrapper
     );
     this.streetNumberInput = createInput({
