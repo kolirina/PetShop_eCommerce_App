@@ -8,18 +8,12 @@ import {
 
 export function validateOnlyAZ(value: string): boolean {
   const template: RegExp = /^[a-zA-Z]+$/;
-  if (!template.test(value)) {
-    return false;
-  }
-  return true;
+  return template.test(value);
 }
 
 export function validateAZAndNum(value: string): boolean {
   const template: RegExp = /^[a-zA-Z0-9]+$/;
-  if (!template.test(value)) {
-    return false;
-  }
-  return true;
+  return template.test(value);
 }
 
 export function validateDateOfBirth(value: string): boolean {
@@ -71,36 +65,24 @@ export function validatePostalCode(
 }
 
 export function validateStreet(value: string): boolean {
-  if (value.length < 1) {
-    return false;
-  }
-  return true;
+  return value.length >= 1;
 }
 
 export function validateStreetNum(value: string): boolean {
   const template: RegExp = /^\d+[A-Za-z]?$/;
-  if (!template.test(value)) {
-    return false;
-  }
-  return true;
+  return template.test(value);
 }
 
 export function checkAllInputs(
   objForCheck: ValidationObjPersonal | ValidationObjAddresses
 ) {
   const validationArr: boolean[] = Object.values(objForCheck);
-  if (validationArr.every((el) => el === true)) {
-    return true;
-  }
-  return false;
+  return validationArr.every((el) => el === true);
 }
 
 export function validateEmail(value: string): boolean {
   const template: RegExp = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-  if (!template.test(value.trim())) {
-    return false;
-  }
-  return true;
+  return template.test(value.trim());
 }
 
 export function validatePassword(value: string): boolean {
