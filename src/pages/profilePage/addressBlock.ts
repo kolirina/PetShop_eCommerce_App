@@ -5,7 +5,6 @@ import {
   createInput,
   createLabel,
 } from '../../utils/elementCreator';
-import styles from './profilePage.module.css';
 import postCodes from '../../assets/data/postal-codes';
 import {
   AddressToChange,
@@ -26,6 +25,7 @@ import {
 } from '../../utils/getCountryISO';
 import { changeUsersAddress } from '../../api/services';
 import { NO_INFO } from './constants';
+import styles from './profilePage.module.css';
 
 export default class ProfileAddressBlock {
   public address: Address;

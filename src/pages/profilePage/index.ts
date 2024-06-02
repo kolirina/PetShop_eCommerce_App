@@ -12,8 +12,8 @@ import {
 import Page from '../Page';
 import ProfileAddressBlock from './addressBlock';
 import ProfilePersonalBlock from './personalBlock';
-import styles from './profilePage.module.css';
 import ProfileAccountBlock from './accountInfoBlock';
+import styles from './profilePage.module.css';
 
 class ProfilePage extends Page {
   public asideBlock: HTMLDivElement;

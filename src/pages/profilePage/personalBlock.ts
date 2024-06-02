@@ -5,7 +5,6 @@ import {
   createInput,
   createLabel,
 } from '../../utils/elementCreator';
-import styles from './profilePage.module.css';
 import { ValidationObjPersonal } from '../../types';
 import {
   checkAllInputs,
@@ -19,6 +18,7 @@ import {
 } from '../../api/services';
 import { ValidationErrors } from '../registrationPage/constants';
 import { NO_DATA } from './constants';
+import styles from './profilePage.module.css';
 
 export default class ProfilePersonalBlock {
   private userInfo: Customer;

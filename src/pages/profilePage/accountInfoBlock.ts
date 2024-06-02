@@ -5,11 +5,10 @@ import {
   createInput,
   createLabel,
 } from '../../utils/elementCreator';
-
-import styles from './profilePage.module.css';
 import { validateEmail, validatePassword } from '../../utils/validateData';
 import { ValidationErrors } from '../registrationPage/constants';
 import { changeUsersEmail, changeUsersPassword } from '../../api/services';
+import styles from './profilePage.module.css';
 
 function showInputStatus(
   input: HTMLInputElement | HTMLLabelElement | HTMLDivElement,
