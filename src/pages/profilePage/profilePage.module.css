@@ -53,9 +53,13 @@
   border: 1px solid var(--text-color);
   border-radius: 15px;
 }
-.input-label {
+.input-label,
+.current-input-label {
   font-size: small;
   position: relative;
+}
+.current-input-label {
+  margin-bottom: 10px;
 }
 .cross {
 }

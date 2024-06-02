@@ -106,7 +106,7 @@ export default class ProfileAccountBlock {
     this.emailChangeResults = createDiv(styles.accountChangeResultOk);
 
     this.prevPasswordLabel = createLabel(
-      styles.inputLabel,
+      styles.currentInputLabel,
       'Current password:'
     );
     this.prevPasswordInput = createInput({
