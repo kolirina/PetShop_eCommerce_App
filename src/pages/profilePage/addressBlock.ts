@@ -385,7 +385,7 @@ export default class ProfileAddressBlock {
     const validationRes = validateStreetNum(this.streetNumberInput.value);
     this.showInputStatus(this.streetNumberLabel, !validationRes, 'streetNum');
     if (!validationRes) {
-      this.streetNumErrorDiv.textContent = ValidationErrors.NAMES_CITY_ERR;
+      this.streetNumErrorDiv.textContent = ValidationErrors.STREET_NUM_ERR;
     } else {
       this.streetNumErrorDiv.textContent = '';
     }
