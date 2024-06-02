@@ -1,10 +1,7 @@
 import { ApiRoot, ClientResponse } from '@commercetools/platform-sdk';
 import { apiRoot, projectKey } from './ApiRoot';
 import { AddressTypes, UserAddress, UserInfo } from '../types';
-import {
-  lang,
-  MAX_NUMBER_OF_PRODUCTS_DISPLAYED,
-} from '../pages/catalogPage/constants';
+import { lang, MAX_NUMBER_OF_PRODUCTS_DISPLAYED } from '../constants';
 import SortBy from '../types/sortBy';
 
 async function getUser(

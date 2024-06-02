@@ -2,7 +2,7 @@ import Router from '../../router';
 import Page from '../Page';
 import SortBy from '../../types/sortBy';
 import { FilteredProduct, FilteredProducts } from '../../types/filterProducts';
-import { lang } from './constants';
+import { lang } from '../../constants';
 import {
   createDiv,
   createImg,
