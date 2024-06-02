@@ -107,7 +107,6 @@ class ProfilePage extends Page {
     this.personalLink.classList.add('link-active');
     if (userId) {
       const userInfo = await getUserById(userId);
-      // console.log(userInfo);
       this.profilePersonalBlock = new ProfilePersonalBlock(userInfo.body);
       this.profilePersonalBlock.setFirstName(await userInfo.body.firstName);
       this.profilePersonalBlock.setLastName(await userInfo.body.lastName);
@@ -135,11 +134,12 @@ class ProfilePage extends Page {
       );
       addressesWrapper.append(addressesHeading);
 
-      await userInfo.body.addresses.forEach((e: Address) => {
+      userInfo.body.addresses.forEach((e: Address) => {
         const block = new ProfileAddressBlock(
           e,
           userInfo.body.defaultBillingAddressId,
-          userInfo.body.defaultShippingAddressId
+          userInfo.body.defaultShippingAddressId,
+          userInfo.body.id
         );
         addressesWrapper.append(block.getBlock());
       });

@@ -1,7 +1,8 @@
-import { AddressTypes, UserInfo } from '../types';
+import { AddressToChange, AddressTypes, UserInfo } from '../types';
 import { apiRoot } from './ApiRoot';
 import {
   addAddress,
+  changeAddress,
   getUser,
   registerUser,
   setBillingAddress,
@@ -141,6 +142,18 @@ const setUsersDateOfBirth = async (
   }
 };
 
+const changeUsersAddress = async (
+  addressId: string,
+  address: AddressToChange,
+  userId: string
+) => {
+  try {
+    await changeAddress(addressId, address, userId);
+  } catch (error) {
+    throw new Error("Address wasn't changed");
+  }
+};
+
 export {
   getToken,
   loginUser,
@@ -149,4 +162,5 @@ export {
   setUsersFirstName,
   setUsersLastName,
   setUsersDateOfBirth,
+  changeUsersAddress,
 };

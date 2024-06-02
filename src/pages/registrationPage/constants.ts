@@ -1,7 +1,7 @@
 export const INPUT_FORM_COUNT = 15;
 
 export enum ValidationErrors {
-  NAMES_CITY_ERR = '* Must contain latin letters',
+  NAMES_CITY_ERR = '* Must contain latin letters and digits',
   AGE_ERR = '* User must be older than 13',
   EMAIL_ERR = '* Invalid format (e.g., user@example.com)',
   REPEAT_EMAIL_ERR = '* Emails are different',
@@ -10,6 +10,7 @@ export enum ValidationErrors {
   COUNTRY_ERR = '* There is no such country',
   POSTCODE_ERR = '* Invalid post code',
   STREET_ERR = '* Must contain more than 1 symbol',
+  NO_COUNTRY = '* First enter a country',
 }
 
 export const MIN_AGE = 13;

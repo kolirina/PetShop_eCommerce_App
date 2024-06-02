@@ -140,3 +140,41 @@
   border: 1px solid var(--disabled-border-color);
   cursor: default;
 }
+
+.delete-btn {
+  width: 250px;
+  height: 30px;
+  margin: 0 auto;
+  font-weight: 600;
+  color: #ffffff;
+  background-color: #d31414;
+  border: 1px solid #000000;
+  border-radius: 2px;
+  cursor: pointer;
+  transition: 0.2s ease-in-out;
+}
+
+.delete-btn:hover {
+  color: var(--main-bg-color);
+  background-color: #ff0000;
+
+  border: 1px solid var(--accent-color);
+}
+.error {
+  position: absolute;
+  top: 45px;
+  left: 2;
+  margin-top: 2px;
+  font-size: 9px;
+  color: #ff0000;
+}
+
+.address-change-result-ok {
+  text-align: center;
+  color: #18e418;
+}
+
+.address-change-result-false {
+  text-align: center;
+  color: #ff0000;
+}

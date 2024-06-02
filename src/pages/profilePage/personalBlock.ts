@@ -17,9 +17,12 @@ import {
   setUsersFirstName,
   setUsersLastName,
 } from '../../api/services';
+import { ValidationErrors } from '../registrationPage/constants';
 
 export default class ProfilePersonalBlock {
   private userInfo: Customer;
+
+  public personalChangeResult: HTMLDivElement;
 
   public blockWrapper: HTMLDivElement;
 
@@ -43,6 +46,12 @@ export default class ProfilePersonalBlock {
 
   public areAllInputsValid: ValidationObjPersonal;
 
+  public firstNameErrorDiv: HTMLDivElement;
+
+  public lastNameErrorDiv: HTMLDivElement;
+
+  public dateOfBirthErrorDiv: HTMLDivElement;
+
   constructor(userInfo: Customer) {
     this.userInfo = userInfo;
 
@@ -53,6 +62,7 @@ export default class ProfilePersonalBlock {
     };
 
     this.blockWrapper = createDiv(styles.inputsWrapper);
+
     this.firstNameLabel = createLabel(
       styles.inputLabel,
       'First name:',
@@ -64,6 +74,8 @@ export default class ProfilePersonalBlock {
       isActive: false,
       parentElement: this.firstNameLabel,
     });
+    this.firstNameErrorDiv = createDiv(styles.error, this.firstNameLabel);
+
     this.lastNameLabel = createLabel(
       styles.inputLabel,
       'Last name:',
@@ -75,6 +87,7 @@ export default class ProfilePersonalBlock {
       isActive: false,
       parentElement: this.lastNameLabel,
     });
+    this.lastNameErrorDiv = createDiv(styles.error, this.lastNameLabel);
 
     this.birthDateLabel = createLabel(
       styles.inputLabel,
@@ -88,6 +101,7 @@ export default class ProfilePersonalBlock {
       isRequired: true,
       parentElement: this.birthDateLabel,
     });
+    this.dateOfBirthErrorDiv = createDiv(styles.error, this.birthDateLabel);
 
     this.btnWrapper = createDiv(styles.profileBtnWrapper, this.blockWrapper);
     this.saveBtn = createBtn(styles.profileBtn, 'Edit', this.btnWrapper);
@@ -97,8 +111,9 @@ export default class ProfilePersonalBlock {
       'Reset changes',
       this.btnWrapper
     );
-    // this.resetBtn.type = 'reset';
     this.resetBtn.disabled = true;
+
+    this.personalChangeResult = createDiv(styles.changeResultOk);
 
     this.saveBtn.addEventListener('click', this.switchEditMode.bind(this));
     this.resetBtn.addEventListener('click', this.exitEditMode.bind(this));
@@ -130,44 +145,11 @@ export default class ProfilePersonalBlock {
       this.lastNameInput.disabled = false;
       this.birthDateInput.disabled = false;
     } else {
-      let validationResult = validateOnlyAZ(this.firstNameInput.value);
-      if (!validationResult) {
-        this.showInputStatus(
-          this.firstNameLabel,
-          !validationResult,
-          'firstName'
-        );
-      } else {
-        this.showInputStatus(
-          this.firstNameLabel,
-          !validationResult,
-          'firstName'
-        );
-      }
+      this.validateFirstNameInput();
+      this.validateLastNameInput();
+      this.validateDateOfBirthInput();
 
-      validationResult = validateOnlyAZ(this.lastNameInput.value);
-      if (!validationResult) {
-        this.showInputStatus(this.lastNameLabel, !validationResult, 'lastName');
-      } else {
-        this.showInputStatus(this.lastNameLabel, !validationResult, 'lastName');
-      }
-
-      validationResult = validateDateOfBirth(this.birthDateInput.value);
-      if (!validationResult) {
-        this.showInputStatus(
-          this.birthDateLabel,
-          !validationResult,
-          'birthDate'
-        );
-      } else {
-        this.showInputStatus(
-          this.birthDateLabel,
-          !validationResult,
-          'birthDate'
-        );
-      }
       if (checkAllInputs(this.areAllInputsValid)) {
-        // console.log('good');
         this.exitEditMode();
         this.setUsersPersonalData();
       }
@@ -203,6 +185,36 @@ export default class ProfilePersonalBlock {
     }
   }
 
+  private validateFirstNameInput() {
+    const validationRes = validateOnlyAZ(this.firstNameInput.value);
+    this.showInputStatus(this.firstNameLabel, !validationRes, 'firstName');
+    if (!validationRes) {
+      this.firstNameErrorDiv.textContent = ValidationErrors.NAMES_CITY_ERR;
+    } else {
+      this.firstNameErrorDiv.textContent = '';
+    }
+  }
+
+  private validateLastNameInput() {
+    const validationRes = validateOnlyAZ(this.lastNameInput.value);
+    this.showInputStatus(this.lastNameLabel, !validationRes, 'lastName');
+    if (!validationRes) {
+      this.lastNameErrorDiv.textContent = ValidationErrors.NAMES_CITY_ERR;
+    } else {
+      this.lastNameErrorDiv.textContent = '';
+    }
+  }
+
+  private validateDateOfBirthInput() {
+    const validationRes = validateDateOfBirth(this.birthDateInput.value);
+    this.showInputStatus(this.birthDateLabel, !validationRes, 'birthDate');
+    if (!validationRes) {
+      this.dateOfBirthErrorDiv.textContent = ValidationErrors.AGE_ERR;
+    } else {
+      this.dateOfBirthErrorDiv.textContent = '';
+    }
+  }
+
   public showInputStatus<K extends keyof ValidationObjPersonal>(
     input: HTMLInputElement | HTMLLabelElement | HTMLDivElement,
     isWrong: boolean,
@@ -227,6 +239,30 @@ export default class ProfilePersonalBlock {
     setUsersFirstName(this.firstNameInput.value, this.userInfo.id).then(() =>
       setUsersLastName(this.lastNameInput.value, this.userInfo.id).then(() =>
         setUsersDateOfBirth(this.birthDateInput.value, this.userInfo.id)
+          .then(() => {
+            this.blockWrapper.append(this.personalChangeResult);
+            this.personalChangeResult.classList.add(
+              styles.addressChangeResultOk
+            );
+            this.personalChangeResult.classList.remove(
+              styles.addressChangeResultFalse
+            );
+            this.personalChangeResult.textContent =
+              'The personal info has been changed successfully.';
+            setTimeout(() => {
+              this.personalChangeResult.remove();
+            }, 2000);
+          })
+          .catch(() => {
+            this.blockWrapper.append(this.personalChangeResult);
+            this.personalChangeResult.classList.remove(styles.changeResultOk);
+            this.personalChangeResult.classList.add(styles.changeResultFalse);
+            this.personalChangeResult.textContent =
+              "The personal info hasn't been changed.";
+            setTimeout(() => {
+              this.personalChangeResult.remove();
+            }, 2000);
+          })
       )
     );
   }

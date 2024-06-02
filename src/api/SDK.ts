@@ -1,6 +1,6 @@
 import { ApiRoot, ClientResponse } from '@commercetools/platform-sdk';
 import { apiRoot, projectKey } from './ApiRoot';
-import { AddressTypes, UserAddress, UserInfo } from '../types';
+import { AddressToChange, AddressTypes, UserAddress, UserInfo } from '../types';
 import { MAX_NUMBER_OF_PRODUCTS_DISPLAYED } from '../pages/catalogPage/constants';
 
 async function getUser(
@@ -243,6 +243,32 @@ async function fetchProducts() {
   return resp.body.results;
 }
 
+async function changeAddress(
+  addressId: string,
+  address: AddressToChange,
+  userId: string
+) {
+  const user = await getUserById(userId);
+
+  await apiRoot
+    .withProjectKey({ projectKey })
+    .customers()
+    .withId({ ID: userId })
+    .post({
+      body: {
+        version: user.body.version,
+        actions: [
+          {
+            action: 'changeAddress',
+            addressId,
+            address,
+          },
+        ],
+      },
+    })
+    .execute();
+}
+
 export {
   getUser,
   registerUser,
@@ -256,4 +282,5 @@ export {
   setFirstName,
   setLastName,
   setDateOfBirth,
+  changeAddress,
 };

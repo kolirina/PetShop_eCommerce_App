@@ -18,14 +18,7 @@ import AddressBlock from './addressesBlocks';
 import Pages from '../../router/pageNames';
 import TemplatePage from '../templatePage';
 import { addAddresses, signUpUser } from '../../api/services';
-
-function getCountryISOCode(country: string): string {
-  const countryObj = postCodes.find(
-    (el: PostalCodeObj) => el.Country.toLowerCase() === country.toLowerCase()
-  );
-  const ISO = countryObj?.ISO ? countryObj.ISO : '';
-  return ISO;
-}
+import { getCountryISOCode } from '../../utils/getCountryISO';
 
 class RegistrationPage extends Page {
   public templatePage: TemplatePage;
