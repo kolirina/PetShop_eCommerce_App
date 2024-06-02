@@ -3,6 +3,8 @@ import { apiRoot } from './ApiRoot';
 import {
   addAddress,
   changeAddress,
+  changeEmail,
+  changePassword,
   getUser,
   registerUser,
   setBillingAddress,
@@ -154,6 +156,26 @@ const changeUsersAddress = async (
   }
 };
 
+const changeUsersEmail = async (email: string, userId: string) => {
+  try {
+    await changeEmail(email, userId);
+  } catch (error) {
+    throw new Error("Address wasn't changed");
+  }
+};
+
+const changeUsersPassword = async (
+  curPwd: string,
+  newPwd: string,
+  userId: string
+) => {
+  try {
+    await changePassword(curPwd, newPwd, userId);
+  } catch (error) {
+    throw new Error("Address wasn't changed");
+  }
+};
+
 export {
   getToken,
   loginUser,
@@ -163,4 +185,6 @@ export {
   setUsersLastName,
   setUsersDateOfBirth,
   changeUsersAddress,
+  changeUsersEmail,
+  changeUsersPassword,
 };

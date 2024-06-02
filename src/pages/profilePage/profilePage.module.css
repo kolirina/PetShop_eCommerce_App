@@ -109,11 +109,19 @@
   margin: 0;
   text-align: center;
 }
-.profile-btn-wrapper {
+.profile-btn-wrapper,
+.profile-btn-wrapper-email,
+.profile-btn-wrapper-pwd {
   display: flex;
   justify-content: space-between;
   width: 250px;
   margin: 0 auto 0 auto;
+}
+.profile-btn-wrapper-email {
+  margin-top: 15px;
+}
+.profile-btn-wrapper-pwd {
+  margin-top: 30px;
 }
 .profile-btn {
   width: 115px;
@@ -169,12 +177,19 @@
   color: #ff0000;
 }
 
-.address-change-result-ok {
+.address-change-result-ok,
+.account-change-result-ok {
   text-align: center;
   color: #18e418;
 }
 
-.address-change-result-false {
+.address-change-result-false,
+.account-change-result-false {
   text-align: center;
   color: #ff0000;
+}
+
+.account-change-result-false,
+.account-change-result-ok {
+  margin-top: 15px;
 }

@@ -203,6 +203,7 @@ export default class ProfileAddressBlock {
       isActive: false,
       parentElement: this.defaultBillingAddressLabel,
     });
+
     this.countryInput.value = getCountryFromISO(address.country);
     if (!address.postalCode) {
       this.postCodeInput.placeholder = 'Not added...';
@@ -260,22 +261,6 @@ export default class ProfileAddressBlock {
     );
     this.saveBtn.addEventListener('click', this.switchEditMode.bind(this));
     this.resetBtn.addEventListener('click', this.exitEditMode.bind(this));
-  }
-
-  public setCountry(value: string) {
-    this.countryInput.value = value;
-  }
-
-  public setPostalCode(value: string) {
-    this.postCodeInput.value = value;
-  }
-
-  public setCity(value: string) {
-    this.cityInput.value = value;
-  }
-
-  public setStreet(value: string) {
-    this.streetInput.value = value;
   }
 
   public getBlock() {

@@ -269,6 +269,45 @@ async function changeAddress(
     .execute();
 }
 
+async function changeEmail(email: string, userId: string) {
+  const user = await getUserById(userId);
+
+  await apiRoot
+    .withProjectKey({ projectKey })
+    .customers()
+    .withId({ ID: userId })
+    .post({
+      body: {
+        version: user.body.version,
+        actions: [
+          {
+            action: 'changeEmail',
+            email,
+          },
+        ],
+      },
+    })
+    .execute();
+}
+
+async function changePassword(curPwd: string, newPwd: string, userId: string) {
+  const user = await getUserById(userId);
+
+  await apiRoot
+    .withProjectKey({ projectKey })
+    .customers()
+    .password()
+    .post({
+      body: {
+        id: userId,
+        version: user.body.version,
+        currentPassword: curPwd,
+        newPassword: newPwd,
+      },
+    })
+    .execute();
+}
+
 export {
   getUser,
   registerUser,
@@ -283,4 +322,6 @@ export {
   setLastName,
   setDateOfBirth,
   changeAddress,
+  changeEmail,
+  changePassword,
 };

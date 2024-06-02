@@ -94,3 +94,20 @@ export function checkAllInputs(
   }
   return false;
 }
+
+export function validateEmail(value: string): boolean {
+  const template: RegExp = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+  if (!template.test(value.trim())) {
+    return false;
+  }
+  return true;
+}
+
+export function validatePassword(value: string): boolean {
+  const template: RegExp =
+    /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/;
+  if (!template.test(value) || value.trim() !== value) {
+    return false;
+  }
+  return true;
+}

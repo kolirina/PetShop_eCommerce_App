@@ -13,6 +13,7 @@ import Page from '../Page';
 import ProfileAddressBlock from './addressBlock';
 import ProfilePersonalBlock from './personalBlock';
 import styles from './profilePage.module.css';
+import ProfileAccountBlock from './accountInfoBlock';
 
 class ProfilePage extends Page {
   public asideBlock: HTMLDivElement;
@@ -38,6 +39,8 @@ class ProfilePage extends Page {
   public profilePersonalBlock?: ProfilePersonalBlock;
 
   public profileAddressBlock?: HTMLDivElement;
+
+  public profileAccountBlock?: ProfileAccountBlock;
 
   constructor(router: Router, parentElement: HTMLElement) {
     super(router, parentElement);
@@ -99,6 +102,9 @@ class ProfilePage extends Page {
     if (target === this.addressLink) {
       this.createAddressInfo();
     }
+    if (target === this.passwordLink) {
+      this.createAccountInfo();
+    }
   }
 
   private async createPersonalInfo() {
@@ -149,6 +155,18 @@ class ProfilePage extends Page {
       throw new Error('There is no such user');
     }
   }
-}
 
+  private async createAccountInfo() {
+    this.mainBlockForm.firstChild?.remove();
+    const userId = localStorage.getItem('id');
+
+    if (userId) {
+      const userInfo = await getUserById(userId);
+      this.profileAccountBlock = new ProfileAccountBlock(userInfo.body);
+      this.mainBlockForm.prepend(this.profileAccountBlock.getBlock());
+    } else {
+      throw new Error('There is no such user');
+    }
+  }
+}
 export default ProfilePage;
