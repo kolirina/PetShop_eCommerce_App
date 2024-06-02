@@ -29,10 +29,12 @@
 .productCard {
   display: flex;
   flex-direction: column;
+  justify-content: space-between;
   max-width: 200px;
   padding: 10px;
   border: 1px solid rgba(197, 190, 190, 0.384);
   border-radius: 5px;
+  cursor: pointer;
 }
 
 .productCard:hover {
