@@ -5,6 +5,8 @@
   --light-border-color: rgb(136, 139, 138);
   --disabled-bg-color: rgb(240, 235, 230);
   --disabled-border-color: rgb(150, 109, 91);
+  --invalid-input-color: #ff0000;
+  --valid-input-color: #18e418;
 }
 
 body {

@@ -65,7 +65,7 @@
   right: 5px;
   top: 18.5px;
   font-size: medium;
-  color: #ff0000;
+  color: var(--invalid-input-color);
 }
 
 .correct {
@@ -76,14 +76,14 @@
   right: 5px;
   top: 18.5px;
   font-size: medium;
-  color: #18e418;
+  color: var(--valid-input-color);
 }
 .invalid-input {
-  border-color: #ff0000;
+  border-color: var(--invalid-input-color);
 }
 
 .valid-input {
-  border-color: #18e418;
+  border-color: var(--valid-input-color);
 }
 
 .input {
@@ -164,7 +164,7 @@
 
 .delete-btn:hover {
   color: var(--main-bg-color);
-  background-color: #ff0000;
+  background-color: var(--invalid-input-color);
 
   border: 1px solid var(--accent-color);
 }
@@ -174,19 +174,19 @@
   left: 2;
   margin-top: 2px;
   font-size: 9px;
-  color: #ff0000;
+  color: var(--invalid-input-color);
 }
 
 .address-change-result-ok,
 .account-change-result-ok {
   text-align: center;
-  color: #18e418;
+  color: var(--valid-input-color);
 }
 
 .address-change-result-false,
 .account-change-result-false {
   text-align: center;
-  color: #ff0000;
+  color: var(--invalid-input-color);
 }
 
 .account-change-result-false,
