@@ -1,23 +1,23 @@
 export type FilteredProduct = {
   categories: Reference[];
-  categoryOrderHints?: Record<string, unknown> | undefined;
+  categoryOrderHints?: Record<string, unknown>;
   createdAt: string;
-  description?: LocalizedString | undefined;
-  hasStagedChanges?: boolean | undefined;
+  description?: LocalizedString;
+  hasStagedChanges?: boolean;
   id: string;
-  key?: string | undefined;
+  key?: string;
   lastModifiedAt: string;
   masterVariant: Variant;
 
   metaDescription?: LocalizedString;
   metaTitle?: LocalizedString;
   name: LocalizedString;
-  priceMode?: string | undefined;
+  priceMode?: string;
   productType: Reference;
-  published?: boolean | undefined;
-  searchKeywords?: Record<string, unknown> | undefined;
+  published?: boolean;
+  searchKeywords?: Record<string, unknown>;
   slug: LocalizedString;
-  taxCategory?: Reference | undefined;
+  taxCategory?: Reference;
   variants: Variant[];
   version: number;
 };
@@ -36,18 +36,18 @@ type LocalizedString =
 type Variant = {
   id: number;
   sku?: string;
-  key?: string | undefined;
-  prices?: Price[] | undefined;
-  images?: Image[] | undefined;
-  attributes?: Attribute[] | undefined;
-  assets?: Asset[] | undefined;
-  availability?: Availability | undefined;
+  key?: string;
+  prices?: Price[];
+  images?: Image[];
+  attributes?: Attribute[];
+  assets?: Asset[];
+  availability?: Availability;
 };
 
 type Price = {
   id: string;
   value: PriceValue;
-  key?: string | undefined;
+  key?: string;
   discounted?: DiscountedPrice;
 };
 
@@ -65,7 +65,7 @@ type DiscountedPrice = {
 
 type Image = {
   url: string;
-  label?: string | undefined;
+  label?: string;
   dimensions: Dimensions;
 };
 
@@ -84,7 +84,7 @@ type Asset = {
 };
 
 type Availability = {
-  channels?: ChannelAvailability | undefined;
+  channels?: ChannelAvailability;
 };
 
 type ChannelAvailability = {

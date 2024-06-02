@@ -7,9 +7,9 @@ export type Product = {
   lastModifiedAt: string;
   productType: Reference;
   masterData: MasterData;
-  key?: string | undefined;
-  taxCategory?: Reference | undefined;
-  priceMode?: string | undefined;
+  key?: string;
+  taxCategory?: Reference;
+  priceMode?: string;
   lastVariantId?: number;
 };
 
@@ -27,9 +27,9 @@ type MasterData = {
 
 type ProductData = {
   name: LocalizedString;
-  description?: LocalizedString | undefined;
+  description?: LocalizedString;
   categories: Reference[];
-  categoryOrderHints?: Record<string, unknown> | undefined;
+  categoryOrderHints?: Record<string, unknown>;
   slug: LocalizedString;
   metaTitle?: LocalizedString;
   metaDescription?: LocalizedString;
@@ -47,18 +47,18 @@ type LocalizedString =
 type Variant = {
   id: number;
   sku?: string;
-  key?: string | undefined;
-  prices?: Price[] | undefined;
-  images?: Image[] | undefined;
-  attributes?: Attribute[] | undefined;
-  assets?: Asset[] | undefined;
-  availability?: Availability | undefined;
+  key?: string;
+  prices?: Price[];
+  images?: Image[];
+  attributes?: Attribute[];
+  assets?: Asset[];
+  availability?: Availability;
 };
 
 type Price = {
   id: string;
   value: PriceValue;
-  key?: string | undefined;
+  key?: string;
   discounted?: DiscountedPrice;
 };
 
@@ -76,7 +76,7 @@ type DiscountedPrice = {
 
 type Image = {
   url: string;
-  label?: string | undefined;
+  label?: string;
   dimensions: Dimensions;
 };
 
@@ -91,7 +91,7 @@ type Attribute = {
 };
 
 type Availability = {
-  channels?: ChannelAvailability | undefined;
+  channels?: ChannelAvailability;
 };
 
 type ChannelAvailability = {
