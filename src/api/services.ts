@@ -157,7 +157,6 @@ const addNewUsersAddress = async (
         await setDefaultShippingAddress(userId);
       }
     }
-
     return currentAddress;
   } catch (error) {
     throw new Error("The new address hasn't been changed.");

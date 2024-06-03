@@ -118,7 +118,9 @@ export default class ProfileAddressBlock {
     };
     this.isNew = isNew;
     this.address = address;
-    this.addressId = address?.id ? address.id : generateAddressKey(userId);
+    this.addressId = address?.id
+      ? address.id
+      : `temp-${generateAddressKey(userId)}`;
     this.userId = userId;
     this.defaultShippingAddress = defaultShipping;
     this.defaultBillingAddress = defaultBilling;
@@ -480,7 +482,7 @@ export default class ProfileAddressBlock {
       isShippingDefault: this.defaultShippingAddressInput.checked,
       isBillingDefault: this.defaultBillingAddressInput.checked,
     };
-    if (this.addressId) {
+    if (!this.addressId.includes('temp-')) {
       changeUsersAddress(this.addressId, address, this.userId)
         .then(() => {
           this.blockWrapper.append(this.addressChangeResult);
@@ -531,9 +533,10 @@ export default class ProfileAddressBlock {
           this.addressChangeResult.remove();
           this.removeOutline();
         }, REMOVE_TIMEOUT);
-        if (resp?.key) {
-          this.addressId = resp?.key;
+        if (resp?.id) {
+          this.addressId = resp?.id;
         }
+        this.isNew = false;
         this.updateCheckboxes();
       })
       .catch(() => {
