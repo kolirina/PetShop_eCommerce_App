@@ -9,6 +9,7 @@ import postCodes from '../../assets/data/postal-codes';
 import {
   AddressToChange,
   PostalCodeObj,
+  UserAddress,
   ValidationObjAddresses,
 } from '../../types';
 import {
@@ -23,9 +24,10 @@ import {
   getCountryISOCode,
   getCountryFromISO,
 } from '../../utils/getCountryISO';
-import { changeUsersAddress } from '../../api/services';
+import { addNewUsersAddress, changeUsersAddress } from '../../api/services';
 import { NO_INFO, REMOVE_TIMEOUT } from './constants';
 import styles from './profilePage.module.css';
+import { getUserById } from '../../api/SDK';
 
 export default class ProfileAddressBlock {
   public address: Address | undefined | null;
@@ -327,8 +329,9 @@ export default class ProfileAddressBlock {
         this.exitEditMode();
         if (!this.isNew) {
           this.changeAddress();
+        } else {
+          this.addUsersAddress();
         }
-        this.addUsersAddress();
       }
     }
   }
@@ -510,23 +513,24 @@ export default class ProfileAddressBlock {
       });
   }
 
-  private addUsersAddress() {
-    const address: AddressToChange = {
-      country: getCountryISOCode(this.countryInput.value),
-      postalCode:
+  private async addUsersAddress() {
+    const address: UserAddress = {
+      countryISO: getCountryISOCode(this.countryInput.value),
+      postCode:
         this.postCodeInput.value !== 'no codes' ? this.postCodeInput.value : '',
       city: this.cityInput.value,
-      streetName: this.streetInput.value,
+      street: this.streetInput.value,
       streetNumber: this.streetNumberInput.value,
     };
+    const userInfo = await getUserById(this.userId);
 
-    changeUsersAddress(this.addressId, address, this.userId)
+    addNewUsersAddress(userInfo.body, address, this.userId)
       .then(() => {
         this.blockWrapper.append(this.addressChangeResult);
         this.addressChangeResult.classList.add(styles.changeResultOk);
         this.addressChangeResult.classList.remove(styles.changeResultFalse);
         this.addressChangeResult.textContent =
-          'The address has been changed successfully.';
+          'The address has been added successfully.';
         setTimeout(() => {
           this.addressChangeResult.remove();
         }, REMOVE_TIMEOUT);
@@ -535,8 +539,7 @@ export default class ProfileAddressBlock {
         this.blockWrapper.append(this.addressChangeResult);
         this.addressChangeResult.classList.remove(styles.changeResultOk);
         this.addressChangeResult.classList.add(styles.changeResultFalse);
-        this.addressChangeResult.textContent =
-          "The address hasn't been changed.";
+        this.addressChangeResult.textContent = "The address hasn't been added.";
         setTimeout(() => {
           this.addressChangeResult.remove();
         }, REMOVE_TIMEOUT);

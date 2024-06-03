@@ -1,4 +1,5 @@
-import { AddressToChange, AddressTypes, UserInfo } from '../types';
+import { MAX_CHAR_CODE, MIN_CHAR_CODE } from '../constants';
+import { AddressToChange, UserAddress, UserInfo } from '../types';
 import { apiRoot } from './ApiRoot';
 import {
   addAddress,
@@ -79,19 +80,32 @@ const signUpUser = async (
   }
 };
 
+const generateAddressId = (userId: string) => {
+  let result = '';
+  for (let i = 0; i < 5; i += 1) {
+    const randomNum =
+      Math.floor(Math.random() * (MAX_CHAR_CODE - MIN_CHAR_CODE + 1)) +
+      MIN_CHAR_CODE;
+    result += String.fromCharCode(randomNum);
+  }
+  return userId.slice(0, 6) + result;
+};
+
 const addAddresses = async (userInfo: UserInfo, userId: string) => {
   const token = await getToken(userInfo.email, userInfo.password);
   localStorage.setItem('token', token);
 
   try {
+    let addressKey = generateAddressId(userId);
+
     const addedShippingAddress = await addAddress(
       userInfo,
       userInfo.shippingAddress,
-      AddressTypes.SHIPPING,
+      addressKey,
       userId
     );
     const shippingAddressId = addedShippingAddress?.body.addresses.find(
-      (e) => e.key === AddressTypes.SHIPPING
+      (e) => e.key === addressKey
     )?.id;
     if (shippingAddressId) {
       await setShippingAddress(shippingAddressId, userId);
@@ -99,14 +113,15 @@ const addAddresses = async (userInfo: UserInfo, userId: string) => {
         await setDefaultShippingAddress(userId, shippingAddressId);
       }
     }
+    addressKey = generateAddressId(userId);
     const addedBillingAddress = await addAddress(
       userInfo,
       userInfo.billingAddress,
-      AddressTypes.BILLING,
+      addressKey,
       userId
     );
     const billingAddressId = addedBillingAddress?.body.addresses.find(
-      (e) => e.key === AddressTypes.BILLING
+      (e) => e.key === addressKey
     )?.id;
     if (billingAddressId) {
       await setBillingAddress(billingAddressId, userId);
@@ -117,11 +132,19 @@ const addAddresses = async (userInfo: UserInfo, userId: string) => {
   }
 };
 
-// const addNewUsersAddress = async (userInfo: UserInfo, address: Address,  userId: string) => {
-//   try {
-//     await addAddress(userInfo, address, )
-//   }
-// }
+const addNewUsersAddress = async (
+  userInfo: UserInfo,
+  address: UserAddress,
+  userId: string
+) => {
+  const addressKey = generateAddressId(userId);
+
+  try {
+    await addAddress(userInfo, address, addressKey, userId);
+  } catch (error) {
+    throw new Error("The new address hasn't been changed.");
+  }
+};
 
 const setUsersFirstName = async (value: string, id: string): Promise<void> => {
   try {
@@ -193,4 +216,5 @@ export {
   changeUsersAddress,
   changeUsersEmail,
   changeUsersPassword,
+  addNewUsersAddress,
 };

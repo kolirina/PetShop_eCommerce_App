@@ -1,6 +1,6 @@
 import { ApiRoot, ClientResponse } from '@commercetools/platform-sdk';
 import { apiRoot, projectKey } from './ApiRoot';
-import { AddressToChange, AddressTypes, UserAddress, UserInfo } from '../types';
+import { AddressToChange, UserAddress, UserInfo } from '../types';
 import { lang, MAX_NUMBER_OF_PRODUCTS_DISPLAYED } from '../constants';
 import SortBy from '../types/sortBy';
 
@@ -54,7 +54,7 @@ async function getUserById(id: string): Promise<ClientResponse> {
 async function addAddress(
   userInfo: UserInfo,
   addressToAdd: UserAddress,
-  addressType: AddressTypes,
+  addressKey: string,
   userId: string
 ) {
   const user = await getUserById(userId);
@@ -69,7 +69,7 @@ async function addAddress(
           {
             action: 'addAddress',
             address: {
-              key: addressType,
+              key: addressKey,
               firstName: userInfo.firstName,
               lastName: userInfo.lastName,
               country: addressToAdd.countryISO,
@@ -77,6 +77,7 @@ async function addAddress(
               postalCode: addressToAdd.postCode,
               city: addressToAdd.city,
               email: userInfo.email,
+              streetNumber: addressToAdd.streetNumber,
             },
           },
         ],
