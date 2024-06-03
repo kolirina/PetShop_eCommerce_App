@@ -4,7 +4,6 @@ import { AddressToChange, AddressTypes, UserAddress, UserInfo } from '../types';
 import { lang, MAX_NUMBER_OF_PRODUCTS_DISPLAYED } from '../constants';
 import SortBy from '../types/sortBy';
 
-
 async function getUser(
   email: string,
   password: string,
@@ -235,7 +234,7 @@ async function setDateOfBirth(value: string, id: string) {
     })
     .execute();
 }
-=======
+
 async function fetchProducts(sortBy: SortBy) {
   const resp = await apiRoot
     .withProjectKey({ projectKey })
