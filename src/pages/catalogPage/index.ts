@@ -19,8 +19,8 @@ import {
   getCategories,
 } from '../../api/SDK';
 import priceFormatter from '../../utils/priceFormatter';
-import './catalogPageStyles.css';
 import Pages from '../../router/pageNames';
+import './catalogPageStyles.css';
 
 class CatalogPage extends Page {
   public banner: HTMLDivElement;
