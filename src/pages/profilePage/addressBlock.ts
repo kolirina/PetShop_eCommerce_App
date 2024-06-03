@@ -29,9 +29,9 @@ import {
   generateAddressKey,
   removeUsersAddress,
 } from '../../api/services';
-import { NO_INFO, REMOVE_TIMEOUT } from './constants';
-import styles from './profilePage.module.css';
+import { NO_DATA, NO_INFO, REMOVE_TIMEOUT } from './constants';
 import { getUserById } from '../../api/SDK';
+import styles from './profilePage.module.css';
 
 export default class ProfileAddressBlock {
   public address: Address | undefined | null;
@@ -454,19 +454,17 @@ export default class ProfileAddressBlock {
       if (this.address) {
         this.countryInput.value = this.address.country
           ? getCountryFromISO(this.address.country)
-          : 'No data';
+          : NO_DATA;
         this.postCodeInput.value = this.address.postalCode
           ? this.address.postalCode
-          : 'No data';
-        this.cityInput.value = this.address.city
-          ? this.address.city
-          : 'No data';
+          : NO_DATA;
+        this.cityInput.value = this.address.city ? this.address.city : NO_DATA;
         this.streetInput.value = this.address.streetName
           ? this.address.streetName
-          : 'No data';
+          : NO_DATA;
         this.streetNumberInput.value = this.address.streetNumber
           ? this.address.streetNumber
-          : 'No data';
+          : NO_DATA;
       }
       this.countryInput.classList.value = styles.input;
       this.countryLabel.classList.value = styles.inputLabel;
@@ -507,7 +505,6 @@ export default class ProfileAddressBlock {
           setTimeout(() => {
             this.addressChangeResult.remove();
           }, REMOVE_TIMEOUT);
-          // this.parentClass.updateDefaultCheckboxes();
         })
         .catch(() => {
           this.blockWrapper.append(this.addressChangeResult);
@@ -545,7 +542,9 @@ export default class ProfileAddressBlock {
         setTimeout(() => {
           this.addressChangeResult.remove();
         }, REMOVE_TIMEOUT);
-        this.addressId = resp?.key ? resp.key : '';
+        if (resp?.key) {
+          this.addressId = resp?.key;
+        }
       })
       .catch(() => {
         this.blockWrapper.append(this.addressChangeResult);
@@ -560,6 +559,7 @@ export default class ProfileAddressBlock {
 
   private deleteAddress(e: Event) {
     e.preventDefault();
+
     if (this.address) {
       removeUsersAddress(this.addressId, this.userId).then(() => {
         if (this.blockWrapper.parentNode) {
