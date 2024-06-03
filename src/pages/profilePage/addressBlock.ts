@@ -23,16 +23,24 @@ import {
   getCountryISOCode,
   getCountryFromISO,
 } from '../../utils/getCountryISO';
-import { changeUsersAddress } from '../../api/services';
-import { NO_INFO, REMOVE_TIMEOUT } from './constants';
+import {
+  addNewUsersAddress,
+  changeUsersAddress,
+  generateAddressKey,
+  removeUsersAddress,
+} from '../../api/services';
+import { NO_DATA, NO_INFO, REMOVE_TIMEOUT } from './constants';
+import { getUserById } from '../../api/SDK';
 import styles from './profilePage.module.css';
 
 export default class ProfileAddressBlock {
-  public address: Address;
+  public address: Address | undefined | null;
 
   public addressId: string;
 
   public userId: string;
+
+  private isNew: boolean;
 
   public blockWrapper: HTMLDivElement;
 
@@ -95,10 +103,11 @@ export default class ProfileAddressBlock {
   public defaultBillingAddress: string;
 
   constructor(
-    address: Address,
-    defaultBilling: string,
+    userId: string,
     defaultShipping: string,
-    userId: string
+    defaultBilling: string,
+    isNew: boolean,
+    address?: Address | null
   ) {
     this.areAllInputsValid = {
       country: false,
@@ -107,8 +116,11 @@ export default class ProfileAddressBlock {
       street: false,
       streetNum: false,
     };
+    this.isNew = isNew;
     this.address = address;
-    this.addressId = address.id ? address.id : '';
+    this.addressId = address?.id
+      ? address.id
+      : `temp-${generateAddressKey(userId)}`;
     this.userId = userId;
     this.defaultShippingAddress = defaultShipping;
     this.defaultBillingAddress = defaultBilling;
@@ -125,9 +137,9 @@ export default class ProfileAddressBlock {
       isActive: false,
       parentElement: this.countryLabel,
     });
-    this.countryInput.setAttribute('list', 'countries');
+    this.countryInput.setAttribute('list', `countries-${this.addressId}`);
     this.countryDataList = document.createElement('datalist');
-    this.countryDataList.id = 'countries';
+    this.countryDataList.id = `countries-${this.addressId}`;
     this.countryLabel.append(this.countryDataList);
     this.countryErrorDiv = createDiv(styles.error, this.countryLabel);
 
@@ -187,7 +199,7 @@ export default class ProfileAddressBlock {
       this.checkboxWrapper
     );
     this.defaultShippingAddressInput = createInput({
-      className: styles.checkbox,
+      className: styles.checkboxShipping,
       type: 'checkbox',
       isActive: false,
       parentElement: this.defaultShippingAddressLabel,
@@ -199,39 +211,40 @@ export default class ProfileAddressBlock {
       this.checkboxWrapper
     );
     this.defaultBillingAddressInput = createInput({
-      className: styles.checkbox,
+      className: styles.checkboxBilling,
       type: 'checkbox',
       isActive: false,
       parentElement: this.defaultBillingAddressLabel,
     });
+    if (address) {
+      this.countryInput.value = getCountryFromISO(address.country);
+      if (!address.postalCode) {
+        this.postCodeInput.placeholder = NO_INFO;
+      } else {
+        this.postCodeInput.value = address.postalCode;
+      }
+      if (!address.city) {
+        this.cityInput.placeholder = NO_INFO;
+      } else {
+        this.cityInput.value = address.city;
+      }
+      if (!address.streetName) {
+        this.streetInput.placeholder = NO_INFO;
+      } else {
+        this.streetInput.value = address.streetName;
+      }
+      if (!address.streetNumber) {
+        this.streetNumberInput.placeholder = NO_INFO;
+      } else {
+        this.streetNumberInput.value = address.streetNumber;
+      }
 
-    this.countryInput.value = getCountryFromISO(address.country);
-    if (!address.postalCode) {
-      this.postCodeInput.placeholder = NO_INFO;
-    } else {
-      this.postCodeInput.value = address.postalCode;
-    }
-    if (!address.city) {
-      this.cityInput.placeholder = NO_INFO;
-    } else {
-      this.cityInput.value = address.city;
-    }
-    if (!address.streetName) {
-      this.streetInput.placeholder = NO_INFO;
-    } else {
-      this.streetInput.value = address.streetName;
-    }
-    if (!address.streetNumber) {
-      this.streetNumberInput.placeholder = NO_INFO;
-    } else {
-      this.streetNumberInput.value = address.streetNumber;
-    }
-
-    if (address.id === defaultShipping) {
-      this.defaultShippingAddressInput.checked = true;
-    }
-    if (address.id === defaultBilling) {
-      this.defaultBillingAddressInput.checked = true;
+      if (address.id === defaultShipping) {
+        this.defaultShippingAddressInput.checked = true;
+      }
+      if (address.id === defaultBilling) {
+        this.defaultBillingAddressInput.checked = true;
+      }
     }
 
     this.btnWrapper = createDiv(styles.profileBtnWrapper, this.blockWrapper);
@@ -250,6 +263,10 @@ export default class ProfileAddressBlock {
       this.blockWrapper
     );
 
+    if (isNew) {
+      this.switchEditMode();
+    }
+
     this.addressChangeResult = createDiv(styles.addressChangeResultOk);
 
     this.countryInput.addEventListener(
@@ -262,6 +279,7 @@ export default class ProfileAddressBlock {
     );
     this.saveBtn.addEventListener('click', this.switchEditMode.bind(this));
     this.resetBtn.addEventListener('click', this.exitEditMode.bind(this));
+    this.deleteBtn.addEventListener('click', this.deleteAddress.bind(this));
   }
 
   public getBlock() {
@@ -287,8 +305,8 @@ export default class ProfileAddressBlock {
     }
   }
 
-  private switchEditMode(e: Event): void {
-    e.preventDefault();
+  private switchEditMode(e?: Event): void {
+    e?.preventDefault();
 
     if (this.saveBtn.dataset.state === 'no-edit') {
       this.saveBtn.dataset.state = 'edit';
@@ -316,7 +334,11 @@ export default class ProfileAddressBlock {
         this.streetInput.disabled = true;
         this.streetNumberInput.disabled = true;
         this.exitEditMode();
-        this.changeAddress();
+        if (!this.isNew) {
+          this.changeAddress();
+        } else {
+          this.addUsersAddress();
+        }
       }
     }
   }
@@ -422,38 +444,26 @@ export default class ProfileAddressBlock {
     this.cityInput.disabled = true;
     this.streetInput.disabled = true;
     this.streetNumberInput.disabled = true;
-    this.countryErrorDiv.textContent = '';
-    this.postCodeErrorDiv.textContent = '';
-    this.cityErrorDiv.textContent = '';
-    this.streetErrorDiv.textContent = '';
-    this.streetNumErrorDiv.textContent = '';
     this.defaultBillingAddressInput.disabled = true;
     this.defaultShippingAddressInput.disabled = true;
 
     if (target === this.resetBtn) {
-      this.countryInput.value = this.address.country
-        ? getCountryFromISO(this.address.country)
-        : 'No data';
-      this.postCodeInput.value = this.address.postalCode
-        ? this.address.postalCode
-        : 'No data';
-      this.cityInput.value = this.address.city ? this.address.city : 'No data';
-      this.streetInput.value = this.address.streetName
-        ? this.address.streetName
-        : 'No data';
-      this.streetNumberInput.value = this.address.streetNumber
-        ? this.address.streetNumber
-        : 'No data';
-      this.countryInput.classList.value = styles.input;
-      this.countryLabel.classList.value = styles.inputLabel;
-      this.postCodeInput.classList.value = styles.input;
-      this.postCodeLabel.classList.value = styles.inputLabel;
-      this.cityInput.classList.value = styles.input;
-      this.cityLabel.classList.value = styles.inputLabel;
-      this.streetInput.classList.value = styles.input;
-      this.streetLabel.classList.value = styles.inputLabel;
-      this.streetNumberInput.classList.value = styles.input;
-      this.streetNumberLabel.classList.value = styles.inputLabel;
+      if (this.address) {
+        this.countryInput.value = this.address.country
+          ? getCountryFromISO(this.address.country)
+          : NO_DATA;
+        this.postCodeInput.value = this.address.postalCode
+          ? this.address.postalCode
+          : NO_DATA;
+        this.cityInput.value = this.address.city ? this.address.city : NO_DATA;
+        this.streetInput.value = this.address.streetName
+          ? this.address.streetName
+          : NO_DATA;
+        this.streetNumberInput.value = this.address.streetNumber
+          ? this.address.streetNumber
+          : NO_DATA;
+      }
+      this.removeOutline();
       this.defaultShippingAddressInput.checked =
         this.addressId === this.defaultShippingAddress;
       this.defaultBillingAddressInput.checked =
@@ -463,34 +473,137 @@ export default class ProfileAddressBlock {
 
   private changeAddress() {
     const address: AddressToChange = {
-      country: getCountryISOCode(this.countryInput.value),
-      postalCode:
+      countryISO: getCountryISOCode(this.countryInput.value),
+      postCode:
         this.postCodeInput.value !== 'no codes' ? this.postCodeInput.value : '',
       city: this.cityInput.value,
-      streetName: this.streetInput.value,
+      street: this.streetInput.value,
       streetNumber: this.streetNumberInput.value,
+      isShippingDefault: this.defaultShippingAddressInput.checked,
+      isBillingDefault: this.defaultBillingAddressInput.checked,
     };
+    if (!this.addressId.includes('temp-')) {
+      changeUsersAddress(this.addressId, address, this.userId)
+        .then(() => {
+          this.blockWrapper.append(this.addressChangeResult);
+          this.addressChangeResult.classList.add(styles.changeResultOk);
+          this.addressChangeResult.classList.remove(styles.changeResultFalse);
+          this.addressChangeResult.textContent =
+            'The address has been changed successfully.';
+          setTimeout(() => {
+            this.addressChangeResult.remove();
+            this.removeOutline();
+          }, REMOVE_TIMEOUT);
+          this.updateCheckboxes();
+        })
+        .catch(() => {
+          this.blockWrapper.append(this.addressChangeResult);
+          this.addressChangeResult.classList.remove(styles.changeResultOk);
+          this.addressChangeResult.classList.add(styles.changeResultFalse);
+          this.addressChangeResult.textContent =
+            "The address hasn't been changed.";
+          setTimeout(() => {
+            this.addressChangeResult.remove();
+          }, REMOVE_TIMEOUT);
+        });
+    }
+  }
 
-    changeUsersAddress(this.addressId, address, this.userId)
-      .then(() => {
+  private async addUsersAddress() {
+    const address: AddressToChange = {
+      countryISO: getCountryISOCode(this.countryInput.value),
+      postCode:
+        this.postCodeInput.value !== 'no codes' ? this.postCodeInput.value : '',
+      city: this.cityInput.value,
+      street: this.streetInput.value,
+      streetNumber: this.streetNumberInput.value,
+      isShippingDefault: this.defaultShippingAddressInput.checked,
+      isBillingDefault: this.defaultBillingAddressInput.checked,
+    };
+    const userInfo = await getUserById(this.userId);
+
+    addNewUsersAddress(userInfo.body, address, this.userId)
+      .then((resp) => {
         this.blockWrapper.append(this.addressChangeResult);
         this.addressChangeResult.classList.add(styles.changeResultOk);
         this.addressChangeResult.classList.remove(styles.changeResultFalse);
         this.addressChangeResult.textContent =
-          'The address has been changed successfully.';
+          'The address has been added successfully.';
         setTimeout(() => {
           this.addressChangeResult.remove();
+          this.removeOutline();
         }, REMOVE_TIMEOUT);
+        if (resp?.id) {
+          this.addressId = resp?.id;
+        }
+        this.isNew = false;
+        this.updateCheckboxes();
       })
       .catch(() => {
         this.blockWrapper.append(this.addressChangeResult);
         this.addressChangeResult.classList.remove(styles.changeResultOk);
         this.addressChangeResult.classList.add(styles.changeResultFalse);
-        this.addressChangeResult.textContent =
-          "The address hasn't been changed.";
+        this.addressChangeResult.textContent = "The address hasn't been added.";
         setTimeout(() => {
           this.addressChangeResult.remove();
         }, REMOVE_TIMEOUT);
       });
+  }
+
+  private deleteAddress(e: Event) {
+    e.preventDefault();
+
+    if (this.address) {
+      removeUsersAddress(this.addressId, this.userId).then(() => {
+        if (this.blockWrapper.parentNode) {
+          this.blockWrapper.parentNode.removeChild(this.blockWrapper);
+        }
+      });
+    } else {
+      this.blockWrapper?.parentNode?.removeChild(this.blockWrapper);
+    }
+  }
+
+  private updateCheckboxes() {
+    const defaultShippingCheckboxes = document.querySelectorAll(
+      `.${styles.inputsWrapper} .${styles.checkboxShipping}`
+    );
+    const defaultBillingCheckboxes = document.querySelectorAll(
+      `.${styles.inputsWrapper} .${styles.checkboxBilling}`
+    );
+    if (this.defaultShippingAddressInput.checked) {
+      defaultShippingCheckboxes.forEach((el) => {
+        if (el !== this.defaultShippingAddressInput) {
+          const elToChange: HTMLInputElement = el as HTMLInputElement;
+          (elToChange as HTMLInputElement).checked = false;
+        }
+      });
+    }
+    if (this.defaultBillingAddressInput.checked) {
+      defaultBillingCheckboxes.forEach((el) => {
+        if (el !== this.defaultBillingAddressInput) {
+          const elToChange: HTMLInputElement = el as HTMLInputElement;
+          (elToChange as HTMLInputElement).checked = false;
+        }
+      });
+    }
+  }
+
+  private removeOutline(): void {
+    this.countryErrorDiv.textContent = '';
+    this.postCodeErrorDiv.textContent = '';
+    this.cityErrorDiv.textContent = '';
+    this.streetErrorDiv.textContent = '';
+    this.streetNumErrorDiv.textContent = '';
+    this.countryInput.classList.value = styles.input;
+    this.countryLabel.classList.value = styles.inputLabel;
+    this.postCodeInput.classList.value = styles.input;
+    this.postCodeLabel.classList.value = styles.inputLabel;
+    this.cityInput.classList.value = styles.input;
+    this.cityLabel.classList.value = styles.inputLabel;
+    this.streetInput.classList.value = styles.input;
+    this.streetLabel.classList.value = styles.inputLabel;
+    this.streetNumberInput.classList.value = styles.input;
+    this.streetNumberLabel.classList.value = styles.inputLabel;
   }
 }

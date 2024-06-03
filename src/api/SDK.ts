@@ -1,9 +1,12 @@
-import { ApiRoot, ClientResponse } from '@commercetools/platform-sdk';
+import {
+  ApiRoot,
+  ClientResponse,
+  CustomerUpdate,
+} from '@commercetools/platform-sdk';
 import { apiRoot, projectKey } from './ApiRoot';
-import { AddressToChange, AddressTypes, UserAddress, UserInfo } from '../types';
+import { AddressToChange, UserAddress, UserInfo } from '../types';
 import { lang, MAX_NUMBER_OF_PRODUCTS_DISPLAYED } from '../constants';
 import SortBy from '../types/sortBy';
-
 
 async function getUser(
   email: string,
@@ -55,7 +58,7 @@ async function getUserById(id: string): Promise<ClientResponse> {
 async function addAddress(
   userInfo: UserInfo,
   addressToAdd: UserAddress,
-  addressType: AddressTypes,
+  addressKey: string,
   userId: string
 ) {
   const user = await getUserById(userId);
@@ -70,7 +73,7 @@ async function addAddress(
           {
             action: 'addAddress',
             address: {
-              key: addressType,
+              key: addressKey,
               firstName: userInfo.firstName,
               lastName: userInfo.lastName,
               country: addressToAdd.countryISO,
@@ -78,6 +81,7 @@ async function addAddress(
               postalCode: addressToAdd.postCode,
               city: addressToAdd.city,
               email: userInfo.email,
+              streetNumber: addressToAdd.streetNumber,
             },
           },
         ],
@@ -131,44 +135,45 @@ async function setBillingAddress(addressId: string, userId: string) {
   return resp;
 }
 
-async function setDefaultShippingAddress(userId: string, addressId: string) {
+async function setDefaultShippingAddress(userId: string, addressId?: string) {
   const user = await getUserById(userId);
+  const body: CustomerUpdate = {
+    version: user.body.version,
+    actions: [],
+  };
+  if (addressId) {
+    body.actions.push({ action: 'setDefaultShippingAddress', addressId });
+  } else {
+    body.actions.push({ action: 'setDefaultShippingAddress' });
+  }
 
   await apiRoot
     .withProjectKey({ projectKey })
     .customers()
     .withId({ ID: userId })
     .post({
-      body: {
-        version: user.body.version,
-        actions: [
-          {
-            action: 'setDefaultShippingAddress',
-            addressId,
-          },
-        ],
-      },
+      body,
     })
     .execute();
 }
 
-async function setDefaultBillingAddress(userId: string, addressId: string) {
+async function setDefaultBillingAddress(userId: string, addressId?: string) {
   const user = await getUserById(userId);
-
+  const body: CustomerUpdate = {
+    version: user.body.version,
+    actions: [],
+  };
+  if (addressId) {
+    body.actions.push({ action: 'setDefaultBillingAddress', addressId });
+  } else {
+    body.actions.push({ action: 'setDefaultBillingAddress' });
+  }
   await apiRoot
     .withProjectKey({ projectKey })
     .customers()
     .withId({ ID: userId })
     .post({
-      body: {
-        version: user.body.version,
-        actions: [
-          {
-            action: 'setDefaultBillingAddress',
-            addressId,
-          },
-        ],
-      },
+      body,
     })
     .execute();
 }
@@ -235,7 +240,7 @@ async function setDateOfBirth(value: string, id: string) {
     })
     .execute();
 }
-=======
+
 async function fetchProducts(sortBy: SortBy) {
   const resp = await apiRoot
     .withProjectKey({ projectKey })
@@ -269,7 +274,13 @@ async function changeAddress(
           {
             action: 'changeAddress',
             addressId,
-            address,
+            address: {
+              country: address.countryISO,
+              postalCode: address.postCode,
+              city: address.city,
+              streetName: address.street,
+              streetNumber: address.streetNumber,
+            },
           },
         ],
       },
@@ -397,6 +408,26 @@ async function getProduct(id: string) {
   return resp;
 }
 
+async function removeAddress(addressId: string, userId: string) {
+  const user = await getUserById(userId);
+
+  await apiRoot
+    .withProjectKey({ projectKey })
+    .customers()
+    .withId({ ID: userId })
+    .post({
+      body: {
+        version: user.body.version,
+        actions: [
+          {
+            action: 'removeAddress',
+            addressId,
+          },
+        ],
+      },
+    })
+    .execute();
+}
 async function getCategories() {
   const resp = await apiRoot
     .withProjectKey({ projectKey })
@@ -426,5 +457,6 @@ export {
   getSearchResult,
   fetchFilteredByPriceAndBrandAndSearch,
   getProduct,
+  removeAddress,
   getCategories,
 };

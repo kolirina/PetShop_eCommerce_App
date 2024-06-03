@@ -11,7 +11,7 @@ export enum ValidationErrors {
   POSTCODE_ERR = '* Invalid post code',
   STREET_ERR = '* Must contain more than 1 symbol',
   NO_COUNTRY = '* First enter a country',
-  STREET_NUM_ERR = '* Must contain digits and latin letter',
+  STREET_NUM_ERR = '* Must contain digits first and latin letter if needed',
 }
 
 export const MIN_AGE = 13;

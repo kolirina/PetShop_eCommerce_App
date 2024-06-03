@@ -1,4 +1,5 @@
-import { AddressToChange, AddressTypes, UserInfo } from '../types';
+import { MAX_CHAR_CODE, MIN_CHAR_CODE } from '../constants';
+import { AddressToChange, UserInfo } from '../types';
 import { apiRoot } from './ApiRoot';
 import {
   addAddress,
@@ -7,6 +8,7 @@ import {
   changePassword,
   getUser,
   registerUser,
+  removeAddress,
   setBillingAddress,
   setDateOfBirth,
   setDefaultBillingAddress,
@@ -79,19 +81,32 @@ const signUpUser = async (
   }
 };
 
+const generateAddressKey = (userId: string) => {
+  let result = '';
+  for (let i = 0; i < 5; i += 1) {
+    const randomNum =
+      Math.floor(Math.random() * (MAX_CHAR_CODE - MIN_CHAR_CODE + 1)) +
+      MIN_CHAR_CODE;
+    result += String.fromCharCode(randomNum);
+  }
+  return userId.slice(0, 6) + result;
+};
+
 const addAddresses = async (userInfo: UserInfo, userId: string) => {
   const token = await getToken(userInfo.email, userInfo.password);
   localStorage.setItem('token', token);
 
   try {
+    let addressKey = generateAddressKey(userId);
+
     const addedShippingAddress = await addAddress(
       userInfo,
       userInfo.shippingAddress,
-      AddressTypes.SHIPPING,
+      addressKey,
       userId
     );
     const shippingAddressId = addedShippingAddress?.body.addresses.find(
-      (e) => e.key === AddressTypes.SHIPPING
+      (e) => e.key === addressKey
     )?.id;
     if (shippingAddressId) {
       await setShippingAddress(shippingAddressId, userId);
@@ -99,14 +114,15 @@ const addAddresses = async (userInfo: UserInfo, userId: string) => {
         await setDefaultShippingAddress(userId, shippingAddressId);
       }
     }
+    addressKey = generateAddressKey(userId);
     const addedBillingAddress = await addAddress(
       userInfo,
       userInfo.billingAddress,
-      AddressTypes.BILLING,
+      addressKey,
       userId
     );
     const billingAddressId = addedBillingAddress?.body.addresses.find(
-      (e) => e.key === AddressTypes.BILLING
+      (e) => e.key === addressKey
     )?.id;
     if (billingAddressId) {
       await setBillingAddress(billingAddressId, userId);
@@ -114,6 +130,36 @@ const addAddresses = async (userInfo: UserInfo, userId: string) => {
     }
   } catch (err) {
     throw new Error('Unable to add the addresses.');
+  }
+};
+
+const addNewUsersAddress = async (
+  userInfo: UserInfo,
+  address: AddressToChange,
+  userId: string
+) => {
+  const addressKey = generateAddressKey(userId);
+
+  try {
+    const response = await addAddress(userInfo, address, addressKey, userId);
+    const currentAddress = response.body.addresses.find(
+      (e) => e.key === addressKey
+    );
+    if (currentAddress) {
+      if (address.isBillingDefault) {
+        await setDefaultBillingAddress(userId, currentAddress.id);
+      } else {
+        await setDefaultBillingAddress(userId);
+      }
+      if (address.isShippingDefault) {
+        await setDefaultShippingAddress(userId, currentAddress.id);
+      } else {
+        await setDefaultShippingAddress(userId);
+      }
+    }
+    return currentAddress;
+  } catch (error) {
+    throw new Error("The new address hasn't been changed.");
   }
 };
 
@@ -151,6 +197,16 @@ const changeUsersAddress = async (
 ) => {
   try {
     await changeAddress(addressId, address, userId);
+    if (address.isBillingDefault) {
+      await setDefaultBillingAddress(userId, addressId);
+    } else {
+      await setDefaultBillingAddress(userId);
+    }
+    if (address.isShippingDefault) {
+      await setDefaultShippingAddress(userId, addressId);
+    } else {
+      await setDefaultShippingAddress(userId);
+    }
   } catch (error) {
     throw new Error("Address wasn't changed");
   }
@@ -172,7 +228,15 @@ const changeUsersPassword = async (
   try {
     await changePassword(curPwd, newPwd, userId);
   } catch (error) {
-    throw new Error("Address wasn't changed");
+    throw new Error("Address hasn't been changed");
+  }
+};
+
+const removeUsersAddress = async (addressId: string, userId: string) => {
+  try {
+    await removeAddress(addressId, userId);
+  } catch (error) {
+    throw new Error("Address hasn't been deleted");
   }
 };
 
@@ -187,4 +251,7 @@ export {
   changeUsersAddress,
   changeUsersEmail,
   changeUsersPassword,
+  addNewUsersAddress,
+  removeUsersAddress,
+  generateAddressKey,
 };
