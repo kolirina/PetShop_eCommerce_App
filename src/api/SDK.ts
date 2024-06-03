@@ -408,7 +408,6 @@ async function getProduct(id: string) {
   return resp;
 }
 
-
 async function removeAddress(addressId: string, userId: string) {
   const user = await getUserById(userId);
 
@@ -428,7 +427,7 @@ async function removeAddress(addressId: string, userId: string) {
       },
     })
     .execute();
-
+}
 async function getCategories() {
   const resp = await apiRoot
     .withProjectKey({ projectKey })
@@ -437,7 +436,6 @@ async function getCategories() {
     .execute();
 
   return resp.body.results;
-
 }
 
 export {
