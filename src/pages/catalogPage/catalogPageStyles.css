@@ -274,6 +274,8 @@ input[type='number'] {
 
 .aside.visible {
   display: block;
+  min-width: 210px;
+  box-sizing: border-box;
 }
 
 @media screen and (max-width: 760px) {
@@ -282,7 +284,6 @@ input[type='number'] {
   }
   .aside {
     display: none;
-
     position: absolute;
     top: 390px;
     left: 0;
