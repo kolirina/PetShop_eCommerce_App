@@ -25,7 +25,6 @@
 }
 
 aside {
-  position: sticky;
   top: 200px;
   align-self: flex-start;
   width: 200px;
@@ -33,6 +32,17 @@ aside {
   background-color: #f4f4f4;
   overflow-y: auto;
   box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+}
+
+.category {
+  font-size: 15px;
+  font-weight: 550;
+  color: rgba(3, 14, 6, 0.699);
+  cursor: pointer;
+}
+
+.chosenCategory {
+  color: var(--accent-color);
 }
 
 .productsContainer {
@@ -160,6 +170,27 @@ input[type='number'] {
   border: 1px solid var(--accent-color);
 }
 
+.breadcrumb {
+  font-size: 14px;
+  font-weight: 600;
+  color: rgba(10, 10, 10, 0.5);
+  cursor: pointer;
+}
+
+.breadcrumb:hover {
+  color: var(--accent-color);
+}
+
+.breadcrumbsContainer {
+  height: 20px;
+  padding: 10px;
+  padding-left: 20px;
+  font-size: 14px;
+  font-weight: 600;
+  color: rgba(10, 10, 10, 0.5);
+  cursor: pointer;
+}
+
 .label {
   display: flex;
   flex-direction: row-reverse;
@@ -209,8 +240,8 @@ input[type='number'] {
   justify-content: center;
   align-items: center;
   gap: 20px;
-  margin-top: 10px;
   padding: 10px;
+  padding-top: 0;
 }
 
 .catalogSelect {
@@ -240,15 +271,20 @@ input[type='number'] {
   border-radius: 25px;
 }
 
+.aside.visible {
+  display: block;
+  min-width: 210px;
+  box-sizing: border-box;
+}
+
 @media screen and (max-width: 760px) {
   .showFiltersButton {
     display: block;
   }
   .aside {
     display: none;
-
     position: absolute;
-    top: 370px;
+    top: 390px;
     left: 0;
     width: 100%;
     height: 100%;
@@ -260,6 +296,8 @@ input[type='number'] {
   }
 }
 
-.aside.visible {
-  display: block;
+@media screen and (max-width: 400px) {
+  .breadcrumbsContainer {
+    padding-left: 7px;
+  }
 }
