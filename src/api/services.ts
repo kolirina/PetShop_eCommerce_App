@@ -117,6 +117,12 @@ const addAddresses = async (userInfo: UserInfo, userId: string) => {
   }
 };
 
+// const addNewUsersAddress = async (userInfo: UserInfo, address: Address,  userId: string) => {
+//   try {
+//     await addAddress(userInfo, address, )
+//   }
+// }
+
 const setUsersFirstName = async (value: string, id: string): Promise<void> => {
   try {
     await setFirstName(value, id);

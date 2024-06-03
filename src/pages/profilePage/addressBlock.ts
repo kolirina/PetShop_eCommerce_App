@@ -28,11 +28,13 @@ import { NO_INFO, REMOVE_TIMEOUT } from './constants';
 import styles from './profilePage.module.css';
 
 export default class ProfileAddressBlock {
-  public address: Address;
+  public address: Address | undefined | null;
 
   public addressId: string;
 
   public userId: string;
+
+  private isNew: boolean;
 
   public blockWrapper: HTMLDivElement;
 
@@ -95,10 +97,11 @@ export default class ProfileAddressBlock {
   public defaultBillingAddress: string;
 
   constructor(
-    address: Address,
-    defaultBilling: string,
+    userId: string,
     defaultShipping: string,
-    userId: string
+    defaultBilling: string,
+    isNew: boolean,
+    address?: Address | null
   ) {
     this.areAllInputsValid = {
       country: false,
@@ -107,8 +110,9 @@ export default class ProfileAddressBlock {
       street: false,
       streetNum: false,
     };
+    this.isNew = isNew;
     this.address = address;
-    this.addressId = address.id ? address.id : '';
+    this.addressId = address?.id ? address.id : '';
     this.userId = userId;
     this.defaultShippingAddress = defaultShipping;
     this.defaultBillingAddress = defaultBilling;
@@ -204,34 +208,35 @@ export default class ProfileAddressBlock {
       isActive: false,
       parentElement: this.defaultBillingAddressLabel,
     });
+    if (address) {
+      this.countryInput.value = getCountryFromISO(address.country);
+      if (!address.postalCode) {
+        this.postCodeInput.placeholder = NO_INFO;
+      } else {
+        this.postCodeInput.value = address.postalCode;
+      }
+      if (!address.city) {
+        this.cityInput.placeholder = NO_INFO;
+      } else {
+        this.cityInput.value = address.city;
+      }
+      if (!address.streetName) {
+        this.streetInput.placeholder = NO_INFO;
+      } else {
+        this.streetInput.value = address.streetName;
+      }
+      if (!address.streetNumber) {
+        this.streetNumberInput.placeholder = NO_INFO;
+      } else {
+        this.streetNumberInput.value = address.streetNumber;
+      }
 
-    this.countryInput.value = getCountryFromISO(address.country);
-    if (!address.postalCode) {
-      this.postCodeInput.placeholder = NO_INFO;
-    } else {
-      this.postCodeInput.value = address.postalCode;
-    }
-    if (!address.city) {
-      this.cityInput.placeholder = NO_INFO;
-    } else {
-      this.cityInput.value = address.city;
-    }
-    if (!address.streetName) {
-      this.streetInput.placeholder = NO_INFO;
-    } else {
-      this.streetInput.value = address.streetName;
-    }
-    if (!address.streetNumber) {
-      this.streetNumberInput.placeholder = NO_INFO;
-    } else {
-      this.streetNumberInput.value = address.streetNumber;
-    }
-
-    if (address.id === defaultShipping) {
-      this.defaultShippingAddressInput.checked = true;
-    }
-    if (address.id === defaultBilling) {
-      this.defaultBillingAddressInput.checked = true;
+      if (address.id === defaultShipping) {
+        this.defaultShippingAddressInput.checked = true;
+      }
+      if (address.id === defaultBilling) {
+        this.defaultBillingAddressInput.checked = true;
+      }
     }
 
     this.btnWrapper = createDiv(styles.profileBtnWrapper, this.blockWrapper);
@@ -249,6 +254,10 @@ export default class ProfileAddressBlock {
       'Delete address',
       this.blockWrapper
     );
+
+    if (isNew) {
+      this.switchEditMode();
+    }
 
     this.addressChangeResult = createDiv(styles.addressChangeResultOk);
 
@@ -287,8 +296,8 @@ export default class ProfileAddressBlock {
     }
   }
 
-  private switchEditMode(e: Event): void {
-    e.preventDefault();
+  private switchEditMode(e?: Event): void {
+    e?.preventDefault();
 
     if (this.saveBtn.dataset.state === 'no-edit') {
       this.saveBtn.dataset.state = 'edit';
@@ -316,7 +325,10 @@ export default class ProfileAddressBlock {
         this.streetInput.disabled = true;
         this.streetNumberInput.disabled = true;
         this.exitEditMode();
-        this.changeAddress();
+        if (!this.isNew) {
+          this.changeAddress();
+        }
+        this.addUsersAddress();
       }
     }
   }
@@ -431,19 +443,23 @@ export default class ProfileAddressBlock {
     this.defaultShippingAddressInput.disabled = true;
 
     if (target === this.resetBtn) {
-      this.countryInput.value = this.address.country
-        ? getCountryFromISO(this.address.country)
-        : 'No data';
-      this.postCodeInput.value = this.address.postalCode
-        ? this.address.postalCode
-        : 'No data';
-      this.cityInput.value = this.address.city ? this.address.city : 'No data';
-      this.streetInput.value = this.address.streetName
-        ? this.address.streetName
-        : 'No data';
-      this.streetNumberInput.value = this.address.streetNumber
-        ? this.address.streetNumber
-        : 'No data';
+      if (this.address) {
+        this.countryInput.value = this.address.country
+          ? getCountryFromISO(this.address.country)
+          : 'No data';
+        this.postCodeInput.value = this.address.postalCode
+          ? this.address.postalCode
+          : 'No data';
+        this.cityInput.value = this.address.city
+          ? this.address.city
+          : 'No data';
+        this.streetInput.value = this.address.streetName
+          ? this.address.streetName
+          : 'No data';
+        this.streetNumberInput.value = this.address.streetNumber
+          ? this.address.streetNumber
+          : 'No data';
+      }
       this.countryInput.classList.value = styles.input;
       this.countryLabel.classList.value = styles.inputLabel;
       this.postCodeInput.classList.value = styles.input;
@@ -462,6 +478,39 @@ export default class ProfileAddressBlock {
   }
 
   private changeAddress() {
+    const address: AddressToChange = {
+      country: getCountryISOCode(this.countryInput.value),
+      postalCode:
+        this.postCodeInput.value !== 'no codes' ? this.postCodeInput.value : '',
+      city: this.cityInput.value,
+      streetName: this.streetInput.value,
+      streetNumber: this.streetNumberInput.value,
+    };
+
+    changeUsersAddress(this.addressId, address, this.userId)
+      .then(() => {
+        this.blockWrapper.append(this.addressChangeResult);
+        this.addressChangeResult.classList.add(styles.changeResultOk);
+        this.addressChangeResult.classList.remove(styles.changeResultFalse);
+        this.addressChangeResult.textContent =
+          'The address has been changed successfully.';
+        setTimeout(() => {
+          this.addressChangeResult.remove();
+        }, REMOVE_TIMEOUT);
+      })
+      .catch(() => {
+        this.blockWrapper.append(this.addressChangeResult);
+        this.addressChangeResult.classList.remove(styles.changeResultOk);
+        this.addressChangeResult.classList.add(styles.changeResultFalse);
+        this.addressChangeResult.textContent =
+          "The address hasn't been changed.";
+        setTimeout(() => {
+          this.addressChangeResult.remove();
+        }, REMOVE_TIMEOUT);
+      });
+  }
+
+  private addUsersAddress() {
     const address: AddressToChange = {
       country: getCountryISOCode(this.countryInput.value),
       postalCode:

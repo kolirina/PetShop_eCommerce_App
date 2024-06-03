@@ -1,7 +1,8 @@
-import { Address } from '@commercetools/platform-sdk';
+import { Address, ClientResponse } from '@commercetools/platform-sdk';
 import { getUserById } from '../../api/SDK';
 import Router from '../../router';
 import {
+  createBtn,
   createDiv,
   createForm,
   createH3,
@@ -41,6 +42,8 @@ class ProfilePage extends Page {
   public profileAddressBlock?: HTMLDivElement;
 
   public profileAccountBlock?: ProfileAccountBlock;
+
+  public newAddressButton?: HTMLButtonElement;
 
   constructor(router: Router, parentElement: HTMLElement) {
     super(router, parentElement);
@@ -86,6 +89,13 @@ class ProfilePage extends Page {
       styles.mainBlockForm,
       this.profileMainBlock
     );
+
+    this.newAddressButton = createBtn(
+      styles.newAddressButton,
+      'Add a new address',
+      this.profileAddressBlock
+    );
+
     this.optionList.addEventListener(
       'click',
       this.handleOptionClick.bind(this)
@@ -130,7 +140,7 @@ class ProfilePage extends Page {
 
     if (userId) {
       const userInfo = await getUserById(userId);
-      const addressesWrapper = createDiv(
+      this.profileAddressBlock = createDiv(
         styles.addressesWrapper,
         this.mainBlockForm
       );
@@ -138,22 +148,45 @@ class ProfilePage extends Page {
         styles.addressesHeading,
         'Registered addresses'
       );
-      addressesWrapper.append(addressesHeading);
+      this.profileAddressBlock?.append(addressesHeading);
 
       userInfo.body.addresses.forEach((e: Address) => {
         const block = new ProfileAddressBlock(
-          e,
-          userInfo.body.defaultBillingAddressId,
+          userInfo.body.id,
           userInfo.body.defaultShippingAddressId,
-          userInfo.body.id
+          userInfo.body.defaultBillingAddressId,
+          false,
+          e
         );
-        addressesWrapper.append(block.getBlock());
+        this.profileAddressBlock?.append(block.getBlock());
       });
-      this.profileAddressBlock = addressesWrapper;
+      if (this.newAddressButton) {
+        this.profileAddressBlock?.append(this.newAddressButton);
+      }
       this.mainBlockForm.prepend(this.profileAddressBlock);
+
+      this.newAddressButton?.addEventListener('click', (e) => {
+        const newAddress = this.addNewAddress.bind(this, e, userInfo);
+        newAddress();
+      });
     } else {
       throw new Error('There is no such user');
     }
+  }
+
+  private addNewAddress(e: Event, UserInfo: ClientResponse) {
+    e.preventDefault();
+
+    const newBlock = new ProfileAddressBlock(
+      UserInfo.body.id,
+      UserInfo.body.defaultShippingAddressId,
+      UserInfo.body.defaultBillingAddressId,
+      true
+    );
+    this.newAddressButton?.insertAdjacentElement(
+      'beforebegin',
+      newBlock.getBlock()
+    );
   }
 
   private async createAccountInfo() {
