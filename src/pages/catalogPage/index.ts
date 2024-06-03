@@ -576,6 +576,7 @@ class CatalogPage extends Page {
       categoryElem.addEventListener('click', async (event) => {
         if (this.categoryId === category.id) {
           event.stopPropagation();
+          this.breadcrumbsContainer.innerHTML = 'HOME';
           categoryElem.classList.remove('chosenCategory');
           this.productsContainer.innerHTML = '';
           this.categoryId = '';
@@ -587,7 +588,6 @@ class CatalogPage extends Page {
             this.sortBy,
             this.categoryId
           );
-          this.buildBreadcrumb(category);
           this.getInfoFilteredProducts(filteredProducts);
           this.filterByBrandDiv.innerHTML = '';
           this.getBrandsOfFilteredProducts(filteredProducts);
