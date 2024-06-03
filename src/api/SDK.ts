@@ -393,6 +393,27 @@ async function getProduct(id: string) {
   return resp;
 }
 
+async function removeAddress(addressId: string, userId: string) {
+  const user = await getUserById(userId);
+
+  await apiRoot
+    .withProjectKey({ projectKey })
+    .customers()
+    .withId({ ID: userId })
+    .post({
+      body: {
+        version: user.body.version,
+        actions: [
+          {
+            action: 'removeAddress',
+            addressId,
+          },
+        ],
+      },
+    })
+    .execute();
+}
+
 export {
   getUser,
   registerUser,
@@ -412,4 +433,5 @@ export {
   getSearchResult,
   fetchFilteredByPriceAndBrandAndSearch,
   getProduct,
+  removeAddress,
 };

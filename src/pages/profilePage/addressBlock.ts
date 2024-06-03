@@ -24,7 +24,12 @@ import {
   getCountryISOCode,
   getCountryFromISO,
 } from '../../utils/getCountryISO';
-import { addNewUsersAddress, changeUsersAddress } from '../../api/services';
+import {
+  addNewUsersAddress,
+  changeUsersAddress,
+  generateAddressKey,
+  removeUsersAddress,
+} from '../../api/services';
 import { NO_INFO, REMOVE_TIMEOUT } from './constants';
 import styles from './profilePage.module.css';
 import { getUserById } from '../../api/SDK';
@@ -114,7 +119,7 @@ export default class ProfileAddressBlock {
     };
     this.isNew = isNew;
     this.address = address;
-    this.addressId = address?.id ? address.id : '';
+    this.addressId = address?.id ? address.id : generateAddressKey(userId);
     this.userId = userId;
     this.defaultShippingAddress = defaultShipping;
     this.defaultBillingAddress = defaultBilling;
@@ -131,9 +136,9 @@ export default class ProfileAddressBlock {
       isActive: false,
       parentElement: this.countryLabel,
     });
-    this.countryInput.setAttribute('list', 'countries');
+    this.countryInput.setAttribute('list', `countries-${this.addressId}`);
     this.countryDataList = document.createElement('datalist');
-    this.countryDataList.id = 'countries';
+    this.countryDataList.id = `countries-${this.addressId}`;
     this.countryLabel.append(this.countryDataList);
     this.countryErrorDiv = createDiv(styles.error, this.countryLabel);
 
@@ -273,6 +278,7 @@ export default class ProfileAddressBlock {
     );
     this.saveBtn.addEventListener('click', this.switchEditMode.bind(this));
     this.resetBtn.addEventListener('click', this.exitEditMode.bind(this));
+    this.deleteBtn.addEventListener('click', this.deleteAddress.bind(this));
   }
 
   public getBlock() {
@@ -489,28 +495,29 @@ export default class ProfileAddressBlock {
       streetName: this.streetInput.value,
       streetNumber: this.streetNumberInput.value,
     };
-
-    changeUsersAddress(this.addressId, address, this.userId)
-      .then(() => {
-        this.blockWrapper.append(this.addressChangeResult);
-        this.addressChangeResult.classList.add(styles.changeResultOk);
-        this.addressChangeResult.classList.remove(styles.changeResultFalse);
-        this.addressChangeResult.textContent =
-          'The address has been changed successfully.';
-        setTimeout(() => {
-          this.addressChangeResult.remove();
-        }, REMOVE_TIMEOUT);
-      })
-      .catch(() => {
-        this.blockWrapper.append(this.addressChangeResult);
-        this.addressChangeResult.classList.remove(styles.changeResultOk);
-        this.addressChangeResult.classList.add(styles.changeResultFalse);
-        this.addressChangeResult.textContent =
-          "The address hasn't been changed.";
-        setTimeout(() => {
-          this.addressChangeResult.remove();
-        }, REMOVE_TIMEOUT);
-      });
+    if (this.addressId) {
+      changeUsersAddress(this.addressId, address, this.userId)
+        .then(() => {
+          this.blockWrapper.append(this.addressChangeResult);
+          this.addressChangeResult.classList.add(styles.changeResultOk);
+          this.addressChangeResult.classList.remove(styles.changeResultFalse);
+          this.addressChangeResult.textContent =
+            'The address has been changed successfully.';
+          setTimeout(() => {
+            this.addressChangeResult.remove();
+          }, REMOVE_TIMEOUT);
+        })
+        .catch(() => {
+          this.blockWrapper.append(this.addressChangeResult);
+          this.addressChangeResult.classList.remove(styles.changeResultOk);
+          this.addressChangeResult.classList.add(styles.changeResultFalse);
+          this.addressChangeResult.textContent =
+            "The address hasn't been changed.";
+          setTimeout(() => {
+            this.addressChangeResult.remove();
+          }, REMOVE_TIMEOUT);
+        });
+    }
   }
 
   private async addUsersAddress() {
@@ -525,7 +532,7 @@ export default class ProfileAddressBlock {
     const userInfo = await getUserById(this.userId);
 
     addNewUsersAddress(userInfo.body, address, this.userId)
-      .then(() => {
+      .then((resp) => {
         this.blockWrapper.append(this.addressChangeResult);
         this.addressChangeResult.classList.add(styles.changeResultOk);
         this.addressChangeResult.classList.remove(styles.changeResultFalse);
@@ -534,6 +541,7 @@ export default class ProfileAddressBlock {
         setTimeout(() => {
           this.addressChangeResult.remove();
         }, REMOVE_TIMEOUT);
+        this.addressId = resp?.key ? resp.key : '';
       })
       .catch(() => {
         this.blockWrapper.append(this.addressChangeResult);
@@ -544,5 +552,18 @@ export default class ProfileAddressBlock {
           this.addressChangeResult.remove();
         }, REMOVE_TIMEOUT);
       });
+  }
+
+  private deleteAddress(e: Event) {
+    e.preventDefault();
+    if (this.address) {
+      removeUsersAddress(this.addressId, this.userId).then(() => {
+        if (this.blockWrapper.parentNode) {
+          this.blockWrapper.parentNode.removeChild(this.blockWrapper);
+        }
+      });
+    } else {
+      this.blockWrapper?.parentNode?.removeChild(this.blockWrapper);
+    }
   }
 }
