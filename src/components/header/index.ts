@@ -3,7 +3,6 @@ import Pages from '../../router/pageNames';
 import {
   createBtn,
   createDiv,
-  createLocalLink,
   createParagraph,
   createSpan,
 } from '../../utils/elementCreator';
@@ -31,22 +30,6 @@ export default class Header {
     logoImage.addEventListener('click', () => router.navigateTo(Pages.MAIN));
     logoContainer.append(logoImage);
 
-    const links = createDiv(styles.linksContainer, this.container);
-    createLocalLink(
-      styles.link,
-      'Home',
-      Pages.MAIN,
-      () => router.navigateTo(Pages.MAIN),
-      links
-    );
-    createLocalLink(
-      styles.link,
-      'Catalog',
-      Pages.CATALOG,
-      () => router.navigateTo(Pages.CATALOG),
-      links
-    );
-
     this.userControls = createDiv(styles.userControls, this.container);
     this.burgerMenu = createDiv(styles.burgerMenu, this.container);
     this.updateHeader();
@@ -61,7 +44,14 @@ export default class Header {
 
   updateHeader() {
     this.userControls.innerHTML = '';
-
+    const catalogButton = createBtn(
+      styles.button,
+      'Catalog',
+      this.userControls
+    );
+    catalogButton.addEventListener('click', () =>
+      this.router.navigateTo(Pages.CATALOG)
+    );
     if (isLoggedIn()) {
       const profileButton = createBtn(
         styles.button,
