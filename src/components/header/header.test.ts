@@ -4,6 +4,11 @@ import Router from '../../router';
 import Pages from '../../router/pageNames';
 import Header from './index';
 import styles from './header.module.css';
+import isLoggedIn from '../../utils/checkFunctions';
+
+vi.mock('../../utils/checkFunctions', () => ({
+  default: vi.fn(),
+}));
 
 describe('Header', () => {
   let dom: JSDOM;
@@ -23,6 +28,9 @@ describe('Header', () => {
 
     container = document.createElement('div');
     document.body.appendChild(container);
+
+    // Reset mock implementation before each test
+    vi.mocked(isLoggedIn).mockReset();
   });
 
   it('should render the Header with correct elements', () => {
@@ -35,14 +43,6 @@ describe('Header', () => {
     expect(logoContainer).not.toBeNull();
     const logoImage = logoContainer!.querySelector('img');
     expect(logoImage).not.toBeNull();
-
-    const linksContainer = header
-      .getHeaderElement()
-      .querySelector(`.${styles.linksContainer}`);
-    expect(linksContainer).not.toBeNull();
-    const homeLink = linksContainer!.querySelector(`.${styles.link}`);
-    expect(homeLink).not.toBeNull();
-    expect(homeLink!.textContent).toBe('Home');
 
     const userControls = header
       .getHeaderElement()
@@ -73,22 +73,29 @@ describe('Header', () => {
   });
 
   it('should update the header and show Logout button when user is logged in', () => {
-    localStorage.setItem('id', '123');
-    localStorage.setItem('token', 'abc');
+    vi.mocked(isLoggedIn).mockReturnValue(true);
 
     const header = new Header(router);
     container.appendChild(header.getHeaderElement());
 
     header.updateHeader();
 
-    const logoutButton = header
+    const profileButton = header
       .getHeaderElement()
       .querySelector(`.${styles.userControls} .${styles.button}:nth-child(2)`);
+    expect(profileButton).not.toBeNull();
+    expect(profileButton!.textContent).toBe('Profile');
+
+    const logoutButton = header
+      .getHeaderElement()
+      .querySelector(`.${styles.userControls} .${styles.button}:nth-child(3)`);
     expect(logoutButton).not.toBeNull();
     expect(logoutButton!.textContent).toBe('Logout');
   });
 
   it('should navigate to login page when Login button is clicked', () => {
+    vi.mocked(isLoggedIn).mockReturnValue(false);
+
     const header = new Header(router);
     container.appendChild(header.getHeaderElement());
 
@@ -97,7 +104,7 @@ describe('Header', () => {
     const loginButton = header
       .getHeaderElement()
       .querySelector(
-        `.${styles.userControls} .${styles.button}:first-child`
+        `.${styles.userControls} .${styles.button}:nth-child(2)`
       ) as HTMLElement;
     loginButton.click();
 
@@ -105,6 +112,8 @@ describe('Header', () => {
   });
 
   it('should navigate to registration page when Register button is clicked', () => {
+    vi.mocked(isLoggedIn).mockReturnValue(false);
+
     const header = new Header(router);
     container.appendChild(header.getHeaderElement());
 
@@ -113,7 +122,7 @@ describe('Header', () => {
     const registerButton = header
       .getHeaderElement()
       .querySelector(
-        `.${styles.userControls} .${styles.button}:nth-child(2)`
+        `.${styles.userControls} .${styles.button}:nth-child(3)`
       ) as HTMLElement;
     registerButton.click();
 
@@ -121,6 +130,7 @@ describe('Header', () => {
   });
 
   it('should log out the user and update the header when Logout button is clicked', () => {
+    vi.mocked(isLoggedIn).mockReturnValue(true);
     localStorage.setItem('id', '123');
     localStorage.setItem('token', 'abc');
 
@@ -132,7 +142,7 @@ describe('Header', () => {
     const logoutButton = header
       .getHeaderElement()
       .querySelector(
-        `.${styles.userControls} .${styles.button}:nth-child(2)`
+        `.${styles.userControls} .${styles.button}:nth-child(3)`
       ) as HTMLElement;
     logoutButton.click();
 
