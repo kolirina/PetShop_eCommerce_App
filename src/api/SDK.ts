@@ -1,8 +1,9 @@
 import { ApiRoot, ClientResponse } from '@commercetools/platform-sdk';
 import { apiRoot, projectKey } from './ApiRoot';
-import { AddressTypes, UserAddress, UserInfo } from '../types';
+import { AddressToChange, AddressTypes, UserAddress, UserInfo } from '../types';
 import { lang, MAX_NUMBER_OF_PRODUCTS_DISPLAYED } from '../constants';
 import SortBy from '../types/sortBy';
+
 
 async function getUser(
   email: string,
@@ -34,6 +35,7 @@ async function registerUser(userInfo: UserInfo) {
         firstName: userInfo.firstName,
         lastName: userInfo.lastName,
         password: userInfo.password,
+        dateOfBirth: userInfo.dateOfBirth,
       },
     })
     .execute();
@@ -171,6 +173,69 @@ async function setDefaultBillingAddress(userId: string, addressId: string) {
     .execute();
 }
 
+async function setFirstName(value: string, id: string) {
+  const user = await getUserById(id);
+
+  await apiRoot
+    .withProjectKey({ projectKey })
+    .customers()
+    .withId({ ID: id })
+    .post({
+      body: {
+        version: user.body.version,
+        actions: [
+          {
+            action: 'setFirstName',
+            firstName: value,
+          },
+        ],
+      },
+    })
+    .execute();
+}
+
+async function setLastName(value: string, id: string) {
+  const user = await getUserById(id);
+
+  await apiRoot
+    .withProjectKey({ projectKey })
+    .customers()
+    .withId({ ID: id })
+    .post({
+      body: {
+        version: user.body.version,
+        actions: [
+          {
+            action: 'setLastName',
+            lastName: value,
+          },
+        ],
+      },
+    })
+    .execute();
+}
+
+async function setDateOfBirth(value: string, id: string) {
+  const user = await getUserById(id);
+
+  await apiRoot
+    .withProjectKey({ projectKey })
+    .customers()
+    .withId({ ID: id })
+    .post({
+      body: {
+        version: user.body.version,
+        actions: [
+          {
+            action: 'setDateOfBirth',
+            dateOfBirth: value,
+          },
+        ],
+      },
+    })
+    .execute();
+}
+=======
 async function fetchProducts(sortBy: SortBy) {
   const resp = await apiRoot
     .withProjectKey({ projectKey })
@@ -184,6 +249,71 @@ async function fetchProducts(sortBy: SortBy) {
     })
     .execute();
   return resp.body.results;
+}
+
+async function changeAddress(
+  addressId: string,
+  address: AddressToChange,
+  userId: string
+) {
+  const user = await getUserById(userId);
+
+  await apiRoot
+    .withProjectKey({ projectKey })
+    .customers()
+    .withId({ ID: userId })
+    .post({
+      body: {
+        version: user.body.version,
+        actions: [
+          {
+            action: 'changeAddress',
+            addressId,
+            address,
+          },
+        ],
+      },
+    })
+    .execute();
+}
+
+async function changeEmail(email: string, userId: string) {
+  const user = await getUserById(userId);
+
+  await apiRoot
+    .withProjectKey({ projectKey })
+    .customers()
+    .withId({ ID: userId })
+    .post({
+      body: {
+        version: user.body.version,
+        actions: [
+          {
+            action: 'changeEmail',
+            email,
+          },
+        ],
+      },
+    })
+    .execute();
+}
+
+async function changePassword(curPwd: string, newPwd: string, userId: string) {
+  const user = await getUserById(userId);
+
+  await apiRoot
+    .withProjectKey({ projectKey })
+    .customers()
+    .password()
+    .post({
+      body: {
+        id: userId,
+        version: user.body.version,
+        currentPassword: curPwd,
+        newPassword: newPwd,
+      },
+    })
+    .execute();
 }
 
 async function fetchFilteredByPriceAndBrandAndSearch(
@@ -272,6 +402,13 @@ export {
   setDefaultShippingAddress,
   setDefaultBillingAddress,
   fetchProducts,
+  getUserById,
+  setFirstName,
+  setLastName,
+  setDateOfBirth,
+  changeAddress,
+  changeEmail,
+  changePassword,
   getSearchResult,
   fetchFilteredByPriceAndBrandAndSearch,
   getProduct,

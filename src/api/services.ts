@@ -1,12 +1,18 @@
-import { AddressTypes, UserInfo } from '../types';
+import { AddressToChange, AddressTypes, UserInfo } from '../types';
 import { apiRoot } from './ApiRoot';
 import {
   addAddress,
+  changeAddress,
+  changeEmail,
+  changePassword,
   getUser,
   registerUser,
   setBillingAddress,
+  setDateOfBirth,
   setDefaultBillingAddress,
   setDefaultShippingAddress,
+  setFirstName,
+  setLastName,
   setShippingAddress,
 } from './SDK';
 
@@ -111,4 +117,74 @@ const addAddresses = async (userInfo: UserInfo, userId: string) => {
   }
 };
 
-export { getToken, loginUser, signUpUser, addAddresses };
+const setUsersFirstName = async (value: string, id: string): Promise<void> => {
+  try {
+    await setFirstName(value, id);
+  } catch (error) {
+    throw new Error("First name hasn't been changed.");
+  }
+};
+
+const setUsersLastName = async (value: string, id: string): Promise<void> => {
+  try {
+    await setLastName(value, id);
+  } catch (error) {
+    throw new Error("Last name hasn't been changed.");
+  }
+};
+
+const setUsersDateOfBirth = async (
+  value: string,
+  id: string
+): Promise<void> => {
+  try {
+    await setDateOfBirth(value, id);
+  } catch (error) {
+    throw new Error("Date of birth hasn't been changed.");
+  }
+};
+
+const changeUsersAddress = async (
+  addressId: string,
+  address: AddressToChange,
+  userId: string
+) => {
+  try {
+    await changeAddress(addressId, address, userId);
+  } catch (error) {
+    throw new Error("Address wasn't changed");
+  }
+};
+
+const changeUsersEmail = async (email: string, userId: string) => {
+  try {
+    await changeEmail(email, userId);
+  } catch (error) {
+    throw new Error("Address wasn't changed");
+  }
+};
+
+const changeUsersPassword = async (
+  curPwd: string,
+  newPwd: string,
+  userId: string
+) => {
+  try {
+    await changePassword(curPwd, newPwd, userId);
+  } catch (error) {
+    throw new Error("Address wasn't changed");
+  }
+};
+
+export {
+  getToken,
+  loginUser,
+  signUpUser,
+  addAddresses,
+  setUsersFirstName,
+  setUsersLastName,
+  setUsersDateOfBirth,
+  changeUsersAddress,
+  changeUsersEmail,
+  changeUsersPassword,
+};

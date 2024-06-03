@@ -99,7 +99,7 @@
   position: absolute;
   right: 5px;
   top: 2px;
-  color: #ff0000;
+  color: var(--invalid-input-color);
 }
 
 .correct {
@@ -110,7 +110,7 @@
   position: absolute;
   right: 5px;
   top: 2px;
-  color: #18e418;
+  color: var(--valid-input-color);
 }
 
 .cross:has(.password)::after,
@@ -126,7 +126,7 @@
   left: 0;
   margin-top: 2px;
   font-size: 9px;
-  color: #ff0000;
+  color: var(--invalid-input-color);
 }
 
 .first-name,
@@ -198,14 +198,14 @@
 }
 
 .invalid-input {
-  outline: 2px solid #ff0000;
-  border-color: #ff0000;
+  outline: 2px solid var(--invalid-input-color);
+  border-color: var(--invalid-input-color);
   border-radius: 4px;
 }
 
 .valid-input {
-  outline: 2px solid #18e418;
-  border-color: #18e418;
+  outline: 2px solid var(--valid-input-color);
+  border-color: var(--valid-input-color);
   border-radius: 4px;
 }
 
