@@ -24,9 +24,16 @@ class MainPage extends Page {
     );
     createLocalLink(
       styles.link,
-      'Home',
-      Pages.MAIN,
-      () => router.navigateTo(Pages.MAIN),
+      'Profile',
+      Pages.PROFILE,
+      () => router.navigateTo(Pages.PROFILE),
+      this.container
+    );
+    createLocalLink(
+      styles.link,
+      'Catalog',
+      Pages.CATALOG,
+      () => router.navigateTo(Pages.CATALOG),
       this.container
     );
   }
