@@ -127,6 +127,11 @@ class CatalogPage extends Page {
         this.chosenBrands = [];
         this.minPrice = 0;
         this.maxPrice = 0;
+        this.categoryId = '';
+        this.breadcrumbsContainer.innerHTML = 'HOME';
+        document.querySelectorAll('.chosenCategory').forEach((el) => {
+          el.classList.remove('chosenCategory');
+        });
         const searchResult = await getSearchResult(
           this.searchInput.value,
           this.sortBy
