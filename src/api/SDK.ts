@@ -1,4 +1,8 @@
-import { ApiRoot, ClientResponse } from '@commercetools/platform-sdk';
+import {
+  ApiRoot,
+  ClientResponse,
+  CustomerUpdate,
+} from '@commercetools/platform-sdk';
 import { apiRoot, projectKey } from './ApiRoot';
 import { AddressToChange, UserAddress, UserInfo } from '../types';
 import { lang, MAX_NUMBER_OF_PRODUCTS_DISPLAYED } from '../constants';
@@ -131,44 +135,45 @@ async function setBillingAddress(addressId: string, userId: string) {
   return resp;
 }
 
-async function setDefaultShippingAddress(userId: string, addressId: string) {
+async function setDefaultShippingAddress(userId: string, addressId?: string) {
   const user = await getUserById(userId);
+  const body: CustomerUpdate = {
+    version: user.body.version,
+    actions: [],
+  };
+  if (addressId) {
+    body.actions.push({ action: 'setDefaultShippingAddress', addressId });
+  } else {
+    body.actions.push({ action: 'setDefaultShippingAddress' });
+  }
 
   await apiRoot
     .withProjectKey({ projectKey })
     .customers()
     .withId({ ID: userId })
     .post({
-      body: {
-        version: user.body.version,
-        actions: [
-          {
-            action: 'setDefaultShippingAddress',
-            addressId,
-          },
-        ],
-      },
+      body,
     })
     .execute();
 }
 
-async function setDefaultBillingAddress(userId: string, addressId: string) {
+async function setDefaultBillingAddress(userId: string, addressId?: string) {
   const user = await getUserById(userId);
-
+  const body: CustomerUpdate = {
+    version: user.body.version,
+    actions: [],
+  };
+  if (addressId) {
+    body.actions.push({ action: 'setDefaultBillingAddress', addressId });
+  } else {
+    body.actions.push({ action: 'setDefaultBillingAddress' });
+  }
   await apiRoot
     .withProjectKey({ projectKey })
     .customers()
     .withId({ ID: userId })
     .post({
-      body: {
-        version: user.body.version,
-        actions: [
-          {
-            action: 'setDefaultBillingAddress',
-            addressId,
-          },
-        ],
-      },
+      body,
     })
     .execute();
 }
@@ -269,7 +274,13 @@ async function changeAddress(
           {
             action: 'changeAddress',
             addressId,
-            address,
+            address: {
+              country: address.countryISO,
+              postalCode: address.postCode,
+              city: address.city,
+              streetName: address.street,
+              streetNumber: address.streetNumber,
+            },
           },
         ],
       },

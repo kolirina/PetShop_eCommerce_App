@@ -45,6 +45,8 @@ class ProfilePage extends Page {
 
   public newAddressButton?: HTMLButtonElement;
 
+  public addressBlocksArr: ProfileAddressBlock[];
+
   constructor(router: Router, parentElement: HTMLElement) {
     super(router, parentElement);
     this.container.classList.add(styles.container);
@@ -95,6 +97,8 @@ class ProfilePage extends Page {
       'Add a new address',
       this.profileAddressBlock
     );
+
+    this.addressBlocksArr = [];
 
     this.optionList.addEventListener(
       'click',
@@ -159,6 +163,7 @@ class ProfilePage extends Page {
           e
         );
         this.profileAddressBlock?.append(block.getBlock());
+        this.addressBlocksArr.push(block);
       });
       if (this.newAddressButton) {
         this.profileAddressBlock?.append(this.newAddressButton);

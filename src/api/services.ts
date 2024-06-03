@@ -1,5 +1,5 @@
 import { MAX_CHAR_CODE, MIN_CHAR_CODE } from '../constants';
-import { AddressToChange, UserAddress, UserInfo } from '../types';
+import { AddressToChange, UserInfo } from '../types';
 import { apiRoot } from './ApiRoot';
 import {
   addAddress,
@@ -135,7 +135,7 @@ const addAddresses = async (userInfo: UserInfo, userId: string) => {
 
 const addNewUsersAddress = async (
   userInfo: UserInfo,
-  address: UserAddress,
+  address: AddressToChange,
   userId: string
 ) => {
   const addressKey = generateAddressKey(userId);
@@ -145,6 +145,19 @@ const addNewUsersAddress = async (
     const currentAddress = response.body.addresses.find(
       (e) => e.key === addressKey
     );
+    if (currentAddress) {
+      if (address.isBillingDefault) {
+        await setDefaultBillingAddress(userId, currentAddress.id);
+      } else {
+        await setDefaultBillingAddress(userId);
+      }
+      if (address.isShippingDefault) {
+        await setDefaultShippingAddress(userId, currentAddress.id);
+      } else {
+        await setDefaultShippingAddress(userId);
+      }
+    }
+
     return currentAddress;
   } catch (error) {
     throw new Error("The new address hasn't been changed.");
@@ -185,6 +198,16 @@ const changeUsersAddress = async (
 ) => {
   try {
     await changeAddress(addressId, address, userId);
+    if (address.isBillingDefault) {
+      await setDefaultBillingAddress(userId, addressId);
+    } else {
+      await setDefaultBillingAddress(userId);
+    }
+    if (address.isShippingDefault) {
+      await setDefaultShippingAddress(userId, addressId);
+    } else {
+      await setDefaultShippingAddress(userId);
+    }
   } catch (error) {
     throw new Error("Address wasn't changed");
   }

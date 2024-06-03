@@ -9,7 +9,6 @@ import postCodes from '../../assets/data/postal-codes';
 import {
   AddressToChange,
   PostalCodeObj,
-  UserAddress,
   ValidationObjAddresses,
 } from '../../types';
 import {
@@ -488,12 +487,14 @@ export default class ProfileAddressBlock {
 
   private changeAddress() {
     const address: AddressToChange = {
-      country: getCountryISOCode(this.countryInput.value),
-      postalCode:
+      countryISO: getCountryISOCode(this.countryInput.value),
+      postCode:
         this.postCodeInput.value !== 'no codes' ? this.postCodeInput.value : '',
       city: this.cityInput.value,
-      streetName: this.streetInput.value,
+      street: this.streetInput.value,
       streetNumber: this.streetNumberInput.value,
+      isShippingDefault: this.defaultShippingAddressInput.checked,
+      isBillingDefault: this.defaultBillingAddressInput.checked,
     };
     if (this.addressId) {
       changeUsersAddress(this.addressId, address, this.userId)
@@ -506,6 +507,7 @@ export default class ProfileAddressBlock {
           setTimeout(() => {
             this.addressChangeResult.remove();
           }, REMOVE_TIMEOUT);
+          // this.parentClass.updateDefaultCheckboxes();
         })
         .catch(() => {
           this.blockWrapper.append(this.addressChangeResult);
@@ -521,13 +523,15 @@ export default class ProfileAddressBlock {
   }
 
   private async addUsersAddress() {
-    const address: UserAddress = {
+    const address: AddressToChange = {
       countryISO: getCountryISOCode(this.countryInput.value),
       postCode:
         this.postCodeInput.value !== 'no codes' ? this.postCodeInput.value : '',
       city: this.cityInput.value,
       street: this.streetInput.value,
       streetNumber: this.streetNumberInput.value,
+      isShippingDefault: this.defaultShippingAddressInput.checked,
+      isBillingDefault: this.defaultBillingAddressInput.checked,
     };
     const userInfo = await getUserById(this.userId);
 

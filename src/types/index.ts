@@ -51,12 +51,13 @@ export type UserAddress = {
 };
 
 export type AddressToChange = {
-  country: string;
-  postalCode: string;
+  countryISO: string;
+  postCode: string;
   city: string;
-  streetName: string;
+  street: string;
   streetNumber?: string;
-  isDefault?: boolean;
+  isShippingDefault: boolean;
+  isBillingDefault: boolean;
 };
 
 export type UserInfo = {
