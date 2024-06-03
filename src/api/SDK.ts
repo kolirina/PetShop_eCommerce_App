@@ -1,7 +1,9 @@
 import { ApiRoot, ClientResponse } from '@commercetools/platform-sdk';
 import { apiRoot, projectKey } from './ApiRoot';
 import { AddressToChange, AddressTypes, UserAddress, UserInfo } from '../types';
-import { MAX_NUMBER_OF_PRODUCTS_DISPLAYED } from '../pages/catalogPage/constants';
+import { lang, MAX_NUMBER_OF_PRODUCTS_DISPLAYED } from '../constants';
+import SortBy from '../types/sortBy';
+
 
 async function getUser(
   email: string,
@@ -233,12 +235,18 @@ async function setDateOfBirth(value: string, id: string) {
     })
     .execute();
 }
-
-async function fetchProducts() {
+=======
+async function fetchProducts(sortBy: SortBy) {
   const resp = await apiRoot
     .withProjectKey({ projectKey })
-    .products()
-    .get({ queryArgs: { limit: MAX_NUMBER_OF_PRODUCTS_DISPLAYED } })
+    .productProjections()
+    .search()
+    .get({
+      queryArgs: {
+        limit: MAX_NUMBER_OF_PRODUCTS_DISPLAYED,
+        sort: [`${sortBy}`],
+      },
+    })
     .execute();
   return resp.body.results;
 }
@@ -308,6 +316,83 @@ async function changePassword(curPwd: string, newPwd: string, userId: string) {
     .execute();
 }
 
+async function fetchFilteredByPriceAndBrandAndSearch(
+  minPrice: number,
+  maxPrice: number,
+  brands: string[],
+  searchWord: string,
+  sortBy: SortBy
+) {
+  const filterQueries = [];
+  if (maxPrice && minPrice) {
+    filterQueries.push(
+      `variants.price.centAmount:range(${minPrice} to ${maxPrice})`
+    );
+  }
+  if (!(brands.length === 0)) {
+    filterQueries.push(`variants.attributes.brand:"${brands.join('", "')}"`);
+  }
+  if (searchWord) {
+    const resp = await apiRoot
+      .withProjectKey({ projectKey })
+      .productProjections()
+      .search()
+      .get({
+        queryArgs: {
+          'filter.query': filterQueries,
+          [`text.${lang}`]: `"${searchWord}"`,
+          limit: MAX_NUMBER_OF_PRODUCTS_DISPLAYED,
+          fuzzy: true,
+          staged: true,
+          sort: `${sortBy}`,
+        },
+      })
+      .execute();
+    return resp.body.results;
+  }
+  const resp = await apiRoot
+    .withProjectKey({ projectKey })
+    .productProjections()
+    .search()
+    .get({
+      queryArgs: {
+        'filter.query': filterQueries,
+        limit: MAX_NUMBER_OF_PRODUCTS_DISPLAYED,
+        sort: `${sortBy}`,
+      },
+    })
+    .execute();
+  return resp.body.results;
+}
+
+async function getSearchResult(word: string, sortBy: SortBy) {
+  const resp = await apiRoot
+    .withProjectKey({ projectKey })
+    .productProjections()
+    .search()
+    .get({
+      queryArgs: {
+        staged: true,
+        limit: MAX_NUMBER_OF_PRODUCTS_DISPLAYED,
+        [`text.${lang}`]: `"${word}"`,
+        fuzzy: true,
+        sort: `${sortBy}`,
+      },
+    })
+    .execute();
+  return resp.body.results;
+}
+
+async function getProduct(id: string) {
+  const resp = await apiRoot
+    .withProjectKey({ projectKey })
+    .products()
+    .withId({ ID: id })
+    .get()
+    .execute();
+  return resp;
+}
+
 export {
   getUser,
   registerUser,
@@ -324,4 +409,7 @@ export {
   changeAddress,
   changeEmail,
   changePassword,
+  getSearchResult,
+  fetchFilteredByPriceAndBrandAndSearch,
+  getProduct,
 };

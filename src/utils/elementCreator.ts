@@ -195,3 +195,13 @@ export function createImg(
   appendToParent(element, parentElement);
   return element;
 }
+
+export function createAside(
+  className: string,
+  parentElement: HTMLElement
+): HTMLElement {
+  const element = document.createElement('aside');
+  element.classList.add(className);
+  appendToParent(element, parentElement);
+  return element;
+}
