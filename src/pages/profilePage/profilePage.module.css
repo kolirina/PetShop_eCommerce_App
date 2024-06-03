@@ -107,7 +107,8 @@
 .checkbox-label {
   display: flex;
 }
-.checkbox {
+.checkbox-shipping,
+.checkbox-billing {
 }
 .addresses-heading {
   margin: 0;
@@ -127,7 +128,8 @@
 .profile-btn-wrapper-pwd {
   margin-top: 30px;
 }
-.profile-btn {
+.profile-btn,
+.new-address-button {
   width: 115px;
   height: 30px;
   font-weight: 600;
@@ -139,7 +141,12 @@
   transition: 0.2s ease-in-out;
 }
 
-.profile-btn:hover {
+.new-address-button {
+  width: 100%;
+}
+
+.profile-btn:hover,
+.new-address-button:hover {
   font-weight: 400;
   color: var(--main-bg-color);
   background-color: var(--accent-color);

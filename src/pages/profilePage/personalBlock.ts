@@ -177,12 +177,7 @@ export default class ProfilePersonalBlock {
       this.birthDateInput.value = this.userInfo.dateOfBirth
         ? this.userInfo.dateOfBirth
         : NO_DATA;
-      this.firstNameInput.classList.value = styles.input;
-      this.firstNameLabel.classList.value = styles.inputLabel;
-      this.lastNameInput.classList.value = styles.input;
-      this.lastNameLabel.classList.value = styles.inputLabel;
-      this.birthDateInput.classList.value = styles.input;
-      this.birthDateLabel.classList.value = styles.inputLabel;
+      this.removeOutlineAndErrors();
     }
   }
 
@@ -252,6 +247,7 @@ export default class ProfilePersonalBlock {
               'The personal info has been changed successfully.';
             setTimeout(() => {
               this.personalChangeResult.remove();
+              this.removeOutlineAndErrors();
             }, REMOVE_TIMEOUT);
           })
           .catch(() => {
@@ -262,9 +258,22 @@ export default class ProfilePersonalBlock {
               "The personal info hasn't been changed.";
             setTimeout(() => {
               this.personalChangeResult.remove();
+              this.removeOutlineAndErrors();
             }, REMOVE_TIMEOUT);
           })
       )
     );
+  }
+
+  private removeOutlineAndErrors() {
+    this.firstNameErrorDiv.textContent = '';
+    this.lastNameErrorDiv.textContent = '';
+    this.dateOfBirthErrorDiv.textContent = '';
+    this.firstNameInput.classList.value = styles.input;
+    this.firstNameLabel.classList.value = styles.inputLabel;
+    this.lastNameInput.classList.value = styles.input;
+    this.lastNameLabel.classList.value = styles.inputLabel;
+    this.birthDateInput.classList.value = styles.input;
+    this.birthDateLabel.classList.value = styles.inputLabel;
   }
 }

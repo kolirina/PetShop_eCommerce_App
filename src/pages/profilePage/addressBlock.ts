@@ -197,7 +197,7 @@ export default class ProfileAddressBlock {
       this.checkboxWrapper
     );
     this.defaultShippingAddressInput = createInput({
-      className: styles.checkbox,
+      className: styles.checkboxShipping,
       type: 'checkbox',
       isActive: false,
       parentElement: this.defaultShippingAddressLabel,
@@ -209,7 +209,7 @@ export default class ProfileAddressBlock {
       this.checkboxWrapper
     );
     this.defaultBillingAddressInput = createInput({
-      className: styles.checkbox,
+      className: styles.checkboxBilling,
       type: 'checkbox',
       isActive: false,
       parentElement: this.defaultBillingAddressLabel,
@@ -442,11 +442,6 @@ export default class ProfileAddressBlock {
     this.cityInput.disabled = true;
     this.streetInput.disabled = true;
     this.streetNumberInput.disabled = true;
-    this.countryErrorDiv.textContent = '';
-    this.postCodeErrorDiv.textContent = '';
-    this.cityErrorDiv.textContent = '';
-    this.streetErrorDiv.textContent = '';
-    this.streetNumErrorDiv.textContent = '';
     this.defaultBillingAddressInput.disabled = true;
     this.defaultShippingAddressInput.disabled = true;
 
@@ -466,16 +461,7 @@ export default class ProfileAddressBlock {
           ? this.address.streetNumber
           : NO_DATA;
       }
-      this.countryInput.classList.value = styles.input;
-      this.countryLabel.classList.value = styles.inputLabel;
-      this.postCodeInput.classList.value = styles.input;
-      this.postCodeLabel.classList.value = styles.inputLabel;
-      this.cityInput.classList.value = styles.input;
-      this.cityLabel.classList.value = styles.inputLabel;
-      this.streetInput.classList.value = styles.input;
-      this.streetLabel.classList.value = styles.inputLabel;
-      this.streetNumberInput.classList.value = styles.input;
-      this.streetNumberLabel.classList.value = styles.inputLabel;
+      this.removeOutline();
       this.defaultShippingAddressInput.checked =
         this.addressId === this.defaultShippingAddress;
       this.defaultBillingAddressInput.checked =
@@ -504,7 +490,9 @@ export default class ProfileAddressBlock {
             'The address has been changed successfully.';
           setTimeout(() => {
             this.addressChangeResult.remove();
+            this.removeOutline();
           }, REMOVE_TIMEOUT);
+          this.updateCheckboxes();
         })
         .catch(() => {
           this.blockWrapper.append(this.addressChangeResult);
@@ -541,10 +529,12 @@ export default class ProfileAddressBlock {
           'The address has been added successfully.';
         setTimeout(() => {
           this.addressChangeResult.remove();
+          this.removeOutline();
         }, REMOVE_TIMEOUT);
         if (resp?.key) {
           this.addressId = resp?.key;
         }
+        this.updateCheckboxes();
       })
       .catch(() => {
         this.blockWrapper.append(this.addressChangeResult);
@@ -569,5 +559,48 @@ export default class ProfileAddressBlock {
     } else {
       this.blockWrapper?.parentNode?.removeChild(this.blockWrapper);
     }
+  }
+
+  private updateCheckboxes() {
+    const defaultShippingCheckboxes = document.querySelectorAll(
+      `.${styles.inputsWrapper} .${styles.checkboxShipping}`
+    );
+    const defaultBillingCheckboxes = document.querySelectorAll(
+      `.${styles.inputsWrapper} .${styles.checkboxBilling}`
+    );
+    if (this.defaultShippingAddressInput.checked) {
+      defaultShippingCheckboxes.forEach((el) => {
+        if (el !== this.defaultShippingAddressInput) {
+          const elToChange: HTMLInputElement = el as HTMLInputElement;
+          (elToChange as HTMLInputElement).checked = false;
+        }
+      });
+    }
+    if (this.defaultBillingAddressInput.checked) {
+      defaultBillingCheckboxes.forEach((el) => {
+        if (el !== this.defaultBillingAddressInput) {
+          const elToChange: HTMLInputElement = el as HTMLInputElement;
+          (elToChange as HTMLInputElement).checked = false;
+        }
+      });
+    }
+  }
+
+  private removeOutline(): void {
+    this.countryErrorDiv.textContent = '';
+    this.postCodeErrorDiv.textContent = '';
+    this.cityErrorDiv.textContent = '';
+    this.streetErrorDiv.textContent = '';
+    this.streetNumErrorDiv.textContent = '';
+    this.countryInput.classList.value = styles.input;
+    this.countryLabel.classList.value = styles.inputLabel;
+    this.postCodeInput.classList.value = styles.input;
+    this.postCodeLabel.classList.value = styles.inputLabel;
+    this.cityInput.classList.value = styles.input;
+    this.cityLabel.classList.value = styles.inputLabel;
+    this.streetInput.classList.value = styles.input;
+    this.streetLabel.classList.value = styles.inputLabel;
+    this.streetNumberInput.classList.value = styles.input;
+    this.streetNumberLabel.classList.value = styles.inputLabel;
   }
 }
