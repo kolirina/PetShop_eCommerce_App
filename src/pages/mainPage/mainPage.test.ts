@@ -41,11 +41,17 @@ describe('MainPage', () => {
     expect(registerLink).not.toBeNull();
     expect(registerLink!.textContent).toBe('Register');
 
-    const homeLink = mainPage.container.querySelector(
+    const profileLink = mainPage.container.querySelector(
       `.${styles.link}:nth-child(3)`
     );
-    expect(homeLink).not.toBeNull();
-    expect(homeLink!.textContent).toBe('Home');
+    expect(profileLink).not.toBeNull();
+    expect(profileLink!.textContent).toBe('Profile');
+
+    const catalogLink = mainPage.container.querySelector(
+      `.${styles.link}:nth-child(4)`
+    );
+    expect(catalogLink).not.toBeNull();
+    expect(catalogLink!.textContent).toBe('Catalog');
   });
 
   it('should navigate to the login page when the "Login" link is clicked', () => {
@@ -72,15 +78,27 @@ describe('MainPage', () => {
     expect(navigateToSpy).toHaveBeenCalledWith(Pages.REGISTRATION);
   });
 
-  it('should navigate to the main page when the "Home" link is clicked', () => {
+  it('should navigate to the profile page when the "Profile" link is clicked', () => {
     const navigateToSpy = vi.spyOn(router, 'navigateTo');
     const mainPage = new MainPage(router, container);
 
-    const homeLink = mainPage.container.querySelector(
+    const profileLink = mainPage.container.querySelector(
       `.${styles.link}:nth-child(3)`
     ) as HTMLElement;
-    homeLink.click();
+    profileLink.click();
 
-    expect(navigateToSpy).toHaveBeenCalledWith(Pages.MAIN);
+    expect(navigateToSpy).toHaveBeenCalledWith(Pages.PROFILE);
+  });
+
+  it('should navigate to the catalog page when the "Catalog" link is clicked', () => {
+    const navigateToSpy = vi.spyOn(router, 'navigateTo');
+    const mainPage = new MainPage(router, container);
+
+    const catalogLink = mainPage.container.querySelector(
+      `.${styles.link}:nth-child(4)`
+    ) as HTMLElement;
+    catalogLink.click();
+
+    expect(navigateToSpy).toHaveBeenCalledWith(Pages.CATALOG);
   });
 });

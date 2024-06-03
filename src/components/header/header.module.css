@@ -12,32 +12,17 @@
   cursor: pointer;
 }
 
-.links-container {
-  display: flex;
-  align-items: center;
-  gap: 20px;
-}
-
-.link {
-  color: black;
-  font-size: large;
-  cursor: pointer;
-}
-
-.link:hover {
-  color: var(--accent-color);
-}
-
 .user-controls {
-  width: 224px;
   display: flex;
   align-items: center;
   justify-content: space-around;
+  gap: 40px;
 }
 
 .button {
-  height: 30px;
-  width: 70px;
+  height: 35px;
+  width: 80px;
+  font-size: 16px;
   font-weight: 600;
   color: var(--accent-color);
   background-color: var(--main-bg-color);

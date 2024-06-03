@@ -158,6 +158,7 @@ class ProductPage extends Page {
     modal.addEventListener('click', (e) => {
       if (e.target === modal) closeModal();
     });
+    window.addEventListener('popstate', closeModal);
     const modalContent = createDiv(styles.modalContent, modal);
     const modalCarousel = createDiv(styles.modalCarousel, modalContent);
     images.forEach((image) => {

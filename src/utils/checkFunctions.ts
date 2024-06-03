@@ -1,4 +1,4 @@
-function isLoggedIn() {
-  return localStorage.getItem('token') && localStorage.getItem('id');
+function isLoggedIn(): boolean {
+  return Boolean(localStorage.getItem('token') && localStorage.getItem('id'));
 }
 export default isLoggedIn;
