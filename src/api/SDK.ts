@@ -191,7 +191,8 @@ async function fetchFilteredByPriceAndBrandAndSearch(
   maxPrice: number,
   brands: string[],
   searchWord: string,
-  sortBy: SortBy
+  sortBy: SortBy,
+  categoryId: string
 ) {
   const filterQueries = [];
   if (maxPrice && minPrice) {
@@ -201,6 +202,9 @@ async function fetchFilteredByPriceAndBrandAndSearch(
   }
   if (!(brands.length === 0)) {
     filterQueries.push(`variants.attributes.brand:"${brands.join('", "')}"`);
+  }
+  if (categoryId) {
+    filterQueries.push(`categories.id:subtree("${categoryId}")`);
   }
   if (searchWord) {
     const resp = await apiRoot
@@ -263,6 +267,16 @@ async function getProduct(id: string) {
   return resp;
 }
 
+async function getCategories() {
+  const resp = await apiRoot
+    .withProjectKey({ projectKey })
+    .categories()
+    .get()
+    .execute();
+
+  return resp.body.results;
+}
+
 export {
   getUser,
   registerUser,
@@ -275,4 +289,5 @@ export {
   getSearchResult,
   fetchFilteredByPriceAndBrandAndSearch,
   getProduct,
+  getCategories,
 };

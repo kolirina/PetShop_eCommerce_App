@@ -1,6 +1,7 @@
 import Router from '../../router';
 import Page from '../Page';
 import SortBy from '../../types/sortBy';
+import Category from '../../types/category';
 import { FilteredProduct, FilteredProducts } from '../../types/filterProducts';
 import { lang } from '../../constants';
 import {
@@ -15,6 +16,7 @@ import {
   fetchProducts,
   fetchFilteredByPriceAndBrandAndSearch,
   getSearchResult,
+  getCategories,
 } from '../../api/SDK';
 import priceFormatter from '../../utils/priceFormatter';
 import './catalogPageStyles.css';
@@ -26,6 +28,8 @@ class CatalogPage extends Page {
   public categoryBanner: HTMLDivElement;
 
   public sortSearchPanel: HTMLDivElement;
+
+  public breadcrumbsContainer: HTMLDivElement;
 
   public showFiltersButton: HTMLButtonElement;
 
@@ -57,6 +61,8 @@ class CatalogPage extends Page {
 
   public productsDisplayed: FilteredProducts = [];
 
+  public categoriesDiv: HTMLDivElement;
+
   public minPrice: number = 0;
 
   public maxPrice: number = 0;
@@ -65,12 +71,15 @@ class CatalogPage extends Page {
 
   public searchWord: string = '';
 
+  public categoryId: string = '';
+
   public sortBy: SortBy = SortBy.PRICE_ASC;
 
   constructor(router: Router, parentElement: HTMLElement) {
     super(router, parentElement);
     this.container = createDiv('catalogContainer', document.body);
     this.banner = createDiv('banner', this.container);
+    this.categoryBanner = createDiv('categoryBanner', this.container);
     this.sortSearchPanel = createDiv('sortSearchPanel', this.container);
     this.showFiltersButton = createBtn(
       'catalogButton',
@@ -86,6 +95,16 @@ class CatalogPage extends Page {
         this.showFiltersButton.textContent = 'Show Filters';
       }
     });
+
+    this.productsContainerPlusAside = createDiv(
+      'productsContainerPlusAside',
+      this.container
+    );
+    this.breadcrumbsContainer = createDiv(
+      'breadcrumbsContainer',
+      this.categoryBanner
+    );
+    this.breadcrumbsContainer.innerHTML = 'Home';
     this.searchDiv = createDiv('searchDiv', this.sortSearchPanel);
     this.searchInput = createInput({
       className: 'searchInput',
@@ -150,18 +169,14 @@ class CatalogPage extends Page {
         this.maxPrice,
         this.chosenBrands,
         this.searchWord,
-        this.sortBy
+        this.sortBy,
+        this.categoryId
       );
       this.getInfoFilteredProducts(filteredProducts);
       this.filterByBrandDiv.innerHTML = '';
       this.getBrandsOfFilteredProducts(filteredProducts);
     });
 
-    this.categoryBanner = createDiv('categoryBanner', this.container);
-    this.productsContainerPlusAside = createDiv(
-      'productsContainerPlusAside',
-      this.container
-    );
     this.aside = createAside('aside', this.productsContainerPlusAside);
     this.productsContainer = createDiv(
       'productsContainer',
@@ -169,6 +184,8 @@ class CatalogPage extends Page {
     );
 
     this.createAsideContent(this.aside);
+
+    this.categoriesDiv = createDiv('categoriesDiv', this.aside);
     this.filterByPrice = createDiv('filterByPrice', this.aside);
 
     this.filterByPriceTitle = createDiv(
@@ -223,7 +240,8 @@ class CatalogPage extends Page {
         this.maxPrice,
         this.chosenBrands,
         this.searchWord,
-        this.sortBy
+        this.sortBy,
+        this.categoryId
       );
       this.filterByBrandDiv.innerHTML = '';
       this.getInfoFilteredProducts(filteredProducts);
@@ -234,6 +252,7 @@ class CatalogPage extends Page {
     this.filterByBrandDiv = createDiv('filterByBrandDiv', this.aside);
 
     this.fetchProducts();
+    this.getCategories();
   }
 
   public createAsideContent(asideElement: HTMLElement): void {
@@ -243,14 +262,15 @@ class CatalogPage extends Page {
       this.aside
     );
     resetBtn.addEventListener('click', () => this.reset());
-    const categoriesDiv = createDiv('CatalogAsideTitle', asideElement);
-    categoriesDiv.innerHTML = 'Categories';
+    const categoriesDivTitle = createDiv('CatalogAsideTitle', asideElement);
+    categoriesDivTitle.innerHTML = 'Categories';
   }
 
   async fetchProducts(): Promise<void> {
     const productsData = await fetchProducts(this.sortBy);
     this.getInfoFilteredProducts(productsData);
     this.getBrandsOfFilteredProducts(productsData);
+    this.breadcrumbsContainer.innerHTML = 'HOME';
   }
 
   public getInfoFilteredProducts(filteredProducts: FilteredProducts) {
@@ -375,7 +395,8 @@ class CatalogPage extends Page {
             this.maxPrice,
             this.chosenBrands,
             this.searchWord,
-            this.sortBy
+            this.sortBy,
+            this.categoryId
           );
           this.getInfoFilteredProducts(filteredProducts);
           this.filterByBrandDiv.innerHTML = '';
@@ -396,7 +417,8 @@ class CatalogPage extends Page {
             this.maxPrice,
             this.chosenBrands,
             this.searchWord,
-            this.sortBy
+            this.sortBy,
+            this.categoryId
           );
           this.getInfoFilteredProducts(filteredProducts);
         } catch (error) {
@@ -444,6 +466,211 @@ class CatalogPage extends Page {
     );
   }
 
+  public async buildBreadcrumb(category: Category) {
+    this.breadcrumbsContainer.innerHTML = '';
+    this.productsContainer.innerHTML = '';
+    const categories = await getCategories();
+    const homeBreadcrumb = document.createElement('span');
+    homeBreadcrumb.classList.add('breadcrumb');
+    homeBreadcrumb.textContent = 'HOME';
+    this.breadcrumbsContainer.appendChild(homeBreadcrumb);
+    homeBreadcrumb.addEventListener('click', async () => {
+      this.categoryId = '';
+      const filteredProducts = await fetchFilteredByPriceAndBrandAndSearch(
+        this.minPrice,
+        this.maxPrice,
+        this.chosenBrands,
+        this.searchWord,
+        this.sortBy,
+        this.categoryId
+      );
+      this.breadcrumbsContainer.innerHTML = 'HOME';
+      this.productsContainer.innerHTML = '';
+      this.filterByBrandDiv.innerHTML = '';
+      this.getInfoFilteredProducts(filteredProducts);
+      this.getBrandsOfFilteredProducts(filteredProducts);
+      this.getCategories();
+    });
+
+    const buildBreadcrumbRecursive = (cat: Category) => {
+      if (!cat) return;
+
+      if (cat.parent) {
+        const parentCategory = categories.find(
+          (parent) => parent.id === cat.parent!.id
+        );
+        if (parentCategory) {
+          buildBreadcrumbRecursive(parentCategory);
+        } else {
+          return;
+        }
+      }
+
+      const breadcrumb = document.createElement('span');
+      breadcrumb.classList.add('breadcrumb');
+      if (cat.name) {
+        breadcrumb.textContent = ` - ${cat.name[lang].toUpperCase()}` || 'HOME';
+      }
+
+      this.breadcrumbsContainer.appendChild(breadcrumb);
+      breadcrumb.addEventListener('click', async () => {
+        this.categoryId = cat.id;
+
+        const filteredProducts = await fetchFilteredByPriceAndBrandAndSearch(
+          this.minPrice,
+          this.maxPrice,
+          this.chosenBrands,
+          this.searchWord,
+          this.sortBy,
+          this.categoryId
+        );
+        this.buildBreadcrumb(cat);
+        this.getInfoFilteredProducts(filteredProducts);
+        this.filterByBrandDiv.innerHTML = '';
+        this.getBrandsOfFilteredProducts(filteredProducts);
+        this.getCategories();
+      });
+    };
+
+    buildBreadcrumbRecursive(category);
+  }
+
+  public async getCategories() {
+    const categories = await getCategories();
+    this.buildHierarchy(categories);
+  }
+
+  public async buildHierarchy(
+    categories: Category[],
+    parentElement: HTMLElement | null = null,
+    processedCategories: Set<string> = new Set(),
+    level: number = 0
+  ) {
+    this.categoriesDiv.innerHTML = '';
+    const addCategoryToParent = (
+      category: Category,
+      parentElem: HTMLElement | null,
+      lvl: number
+    ): HTMLElement => {
+      let marginLeft = `${lvl * 20}px`;
+
+      if (category.ancestors && category.ancestors.length > 0) {
+        marginLeft = `${(category.ancestors.length + 1) * 9}px`;
+      }
+
+      const categoryElem = createDiv('category');
+      categoryElem.textContent = category.name![lang];
+      categoryElem.style.marginLeft = marginLeft;
+      categoryElem.setAttribute('data-category-id', category.id);
+
+      if (category.id === this.categoryId) {
+        categoryElem.classList.add('chosenCategory');
+      }
+
+      if (parentElem) {
+        parentElem.appendChild(categoryElem);
+      } else {
+        this.categoriesDiv.appendChild(categoryElem);
+      }
+
+      categoryElem.addEventListener('click', async (event) => {
+        if (this.categoryId === category.id) {
+          event.stopPropagation();
+          categoryElem.classList.remove('chosenCategory');
+          this.productsContainer.innerHTML = '';
+          this.categoryId = '';
+          const filteredProducts = await fetchFilteredByPriceAndBrandAndSearch(
+            this.minPrice,
+            this.maxPrice,
+            this.chosenBrands,
+            this.searchWord,
+            this.sortBy,
+            this.categoryId
+          );
+          this.buildBreadcrumb(category);
+          this.getInfoFilteredProducts(filteredProducts);
+          this.filterByBrandDiv.innerHTML = '';
+          this.getBrandsOfFilteredProducts(filteredProducts);
+        } else {
+          event.stopPropagation();
+          this.productsContainer.innerHTML = '';
+          document.querySelectorAll('.chosenCategory').forEach((el) => {
+            el.classList.remove('chosenCategory');
+          });
+          categoryElem.classList.add('chosenCategory');
+          this.categoryId = category.id;
+          const filteredProducts = await fetchFilteredByPriceAndBrandAndSearch(
+            this.minPrice,
+            this.maxPrice,
+            this.chosenBrands,
+            this.searchWord,
+            this.sortBy,
+            this.categoryId
+          );
+          this.buildBreadcrumb(category);
+          this.getInfoFilteredProducts(filteredProducts);
+          this.filterByBrandDiv.innerHTML = '';
+          this.getBrandsOfFilteredProducts(filteredProducts);
+        }
+      });
+
+      return categoryElem;
+    };
+
+    const buildSubcategories = (
+      parentCategory: Category,
+      parentElem: HTMLElement,
+      lvl: number
+    ) => {
+      categories.forEach((category) => {
+        if (!processedCategories.has(category.id)) {
+          const isDirectChild = category.parent?.id === parentCategory.id;
+
+          if (isDirectChild) {
+            const childElem = addCategoryToParent(
+              category,
+              parentElem,
+              lvl + 1
+            );
+            processedCategories.add(category.id);
+            buildSubcategories(category, childElem, lvl + 1);
+          }
+        }
+      });
+    };
+    categories.forEach((category) => {
+      if (!processedCategories.has(category.id)) {
+        const isTopLevelCategory =
+          !category.parent &&
+          (!category.ancestors || category.ancestors.length === 0);
+        if (isTopLevelCategory) {
+          const topElem = addCategoryToParent(category, parentElement, level);
+          processedCategories.add(category.id);
+          buildSubcategories(category, topElem, level + 1);
+        }
+      }
+    });
+    categories.forEach((category) => {
+      if (!processedCategories.has(category.id)) {
+        if (category.parent) {
+          const parentId = category.parent.id;
+          const parentElem = document.querySelector(
+            `[data-category-id="${parentId}"]`
+          ) as HTMLElement;
+          if (parentElem) {
+            const childElem = addCategoryToParent(
+              category,
+              parentElem,
+              level + 1
+            );
+            processedCategories.add(category.id);
+            buildSubcategories(category, childElem, level + 1);
+          }
+        }
+      }
+    });
+  }
+
   public reset() {
     this.productsContainer.innerHTML = '';
     this.fetchProducts();
@@ -457,6 +684,10 @@ class CatalogPage extends Page {
     this.maxPrice = 0;
     this.searchInput.value = '';
     this.searchWord = '';
+    document.querySelectorAll('.chosenCategory').forEach((el) => {
+      el.classList.remove('chosenCategory');
+    });
+    this.categoryId = '';
   }
 }
 
