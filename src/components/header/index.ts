@@ -3,12 +3,12 @@ import Pages from '../../router/pageNames';
 import {
   createBtn,
   createDiv,
-  createLocalLink,
   createParagraph,
   createSpan,
 } from '../../utils/elementCreator';
 import styles from './header.module.css';
 import logo from '../../assets/logo.png';
+import isLoggedIn from '../../utils/checkFunctions';
 
 export default class Header {
   private container: HTMLElement;
@@ -30,15 +30,6 @@ export default class Header {
     logoImage.addEventListener('click', () => router.navigateTo(Pages.MAIN));
     logoContainer.append(logoImage);
 
-    const links = createDiv(styles.linksContainer, this.container);
-    createLocalLink(
-      styles.link,
-      'Home',
-      Pages.MAIN,
-      () => router.navigateTo(Pages.MAIN),
-      links
-    );
-
     this.userControls = createDiv(styles.userControls, this.container);
     this.burgerMenu = createDiv(styles.burgerMenu, this.container);
     this.updateHeader();
@@ -53,8 +44,23 @@ export default class Header {
 
   updateHeader() {
     this.userControls.innerHTML = '';
-
-    if (localStorage.getItem('id') && localStorage.getItem('token')) {
+    const catalogButton = createBtn(
+      styles.button,
+      'Catalog',
+      this.userControls
+    );
+    catalogButton.addEventListener('click', () =>
+      this.router.navigateTo(Pages.CATALOG)
+    );
+    if (isLoggedIn()) {
+      const profileButton = createBtn(
+        styles.button,
+        'Profile',
+        this.userControls
+      );
+      profileButton.addEventListener('click', () =>
+        this.router.navigateTo(Pages.PROFILE)
+      );
       const logoutButton = createBtn(
         styles.button,
         'Logout',
@@ -84,7 +90,9 @@ export default class Header {
     this.burgerMenu.innerHTML = '';
 
     this.addMenuItem('Home', () => this.router.navigateTo(Pages.MAIN));
-    if (localStorage.getItem('id') && localStorage.getItem('token')) {
+    this.addMenuItem('Catalog', () => this.router.navigateTo(Pages.CATALOG));
+    if (isLoggedIn()) {
+      this.addMenuItem('Profile', () => this.router.navigateTo(Pages.PROFILE));
       this.addMenuItem('Logout', () => {
         localStorage.removeItem('id');
         localStorage.removeItem('token');

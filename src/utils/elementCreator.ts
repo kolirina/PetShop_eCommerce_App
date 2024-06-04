@@ -160,3 +160,48 @@ export function createParagraph(
   appendToParent(element, parentElement);
   return element;
 }
+
+export function createList(
+  className: string,
+  parentElement?: HTMLElement
+): HTMLUListElement {
+  const element: HTMLUListElement = document.createElement('ul');
+  element.classList.add(className);
+  appendToParent(element, parentElement);
+  return element;
+}
+
+export function createListElement(
+  className: string,
+  text: string,
+  parentElement?: HTMLElement
+): HTMLLIElement {
+  const element: HTMLLIElement = document.createElement('li');
+  element.classList.add(className);
+  element.textContent = text;
+  appendToParent(element, parentElement);
+  return element;
+}
+export function createImg(
+  className: string,
+  src: string,
+  alt: string,
+  parentElement: HTMLElement
+): HTMLImageElement {
+  const element = document.createElement('img');
+  element.classList.add(className);
+  element.src = src;
+  element.alt = alt;
+  appendToParent(element, parentElement);
+  return element;
+}
+
+export function createAside(
+  className: string,
+  parentElement: HTMLElement
+): HTMLElement {
+  const element = document.createElement('aside');
+  element.classList.add(className);
+  appendToParent(element, parentElement);
+  return element;
+}

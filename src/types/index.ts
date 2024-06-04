@@ -16,6 +16,20 @@ export type ValidationObj = {
   bi_street: boolean;
 };
 
+export type ValidationObjPersonal = {
+  firstName: boolean;
+  lastName: boolean;
+  birthDate: boolean;
+};
+
+export type ValidationObjAddresses = {
+  country: boolean;
+  postalCode: boolean;
+  city: boolean;
+  street: boolean;
+  streetNum: boolean;
+};
+
 export type CountryArr = string[];
 
 export type PostalCodeObj = {
@@ -27,12 +41,23 @@ export type PostalCodeObj = {
 };
 
 export type UserAddress = {
-  country: string;
+  country?: string;
   countryISO: string;
   postCode: string;
   city: string;
   street: string;
-  isDefault: boolean;
+  streetNumber?: string;
+  isDefault?: boolean;
+};
+
+export type AddressToChange = {
+  countryISO: string;
+  postCode: string;
+  city: string;
+  street: string;
+  streetNumber?: string;
+  isShippingDefault: boolean;
+  isBillingDefault: boolean;
 };
 
 export type UserInfo = {
@@ -40,6 +65,7 @@ export type UserInfo = {
   firstName: string;
   lastName: string;
   password: string;
+  dateOfBirth: string;
   shippingAddress: UserAddress;
   billingAddress: UserAddress;
 };
