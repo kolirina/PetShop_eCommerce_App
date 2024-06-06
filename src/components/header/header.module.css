@@ -44,7 +44,7 @@
 }
 
 .mobile-buttons {
-  display: flex;
+  display: none;
   gap: 20px;
 }
 
@@ -146,6 +146,7 @@
     display: none;
   }
 
+  .mobile-buttons,
   .burger-button,
   .burger-menu {
     display: flex;
