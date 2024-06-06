@@ -82,13 +82,13 @@ describe('Header', () => {
 
     const profileButton = header
       .getHeaderElement()
-      .querySelector(`.${styles.userControls} .${styles.button}:nth-child(2)`);
+      .querySelector(`.${styles.userControls} .${styles.button}:nth-child(4)`);
     expect(profileButton).not.toBeNull();
     expect(profileButton!.textContent).toBe('Profile');
 
     const logoutButton = header
       .getHeaderElement()
-      .querySelector(`.${styles.userControls} .${styles.button}:nth-child(3)`);
+      .querySelector(`.${styles.userControls} .${styles.button}:nth-child(5)`);
     expect(logoutButton).not.toBeNull();
     expect(logoutButton!.textContent).toBe('Logout');
   });
@@ -104,7 +104,7 @@ describe('Header', () => {
     const loginButton = header
       .getHeaderElement()
       .querySelector(
-        `.${styles.userControls} .${styles.button}:nth-child(2)`
+        `.${styles.userControls} .${styles.button}:nth-child(4)`
       ) as HTMLElement;
     loginButton.click();
 
@@ -122,7 +122,7 @@ describe('Header', () => {
     const registerButton = header
       .getHeaderElement()
       .querySelector(
-        `.${styles.userControls} .${styles.button}:nth-child(3)`
+        `.${styles.userControls} .${styles.button}:nth-child(5)`
       ) as HTMLElement;
     registerButton.click();
 
@@ -142,7 +142,7 @@ describe('Header', () => {
     const logoutButton = header
       .getHeaderElement()
       .querySelector(
-        `.${styles.userControls} .${styles.button}:nth-child(3)`
+        `.${styles.userControls} .${styles.button}:nth-child(5)`
       ) as HTMLElement;
     logoutButton.click();
 
