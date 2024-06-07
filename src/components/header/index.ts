@@ -3,12 +3,14 @@ import Pages from '../../router/pageNames';
 import {
   createBtn,
   createDiv,
+  createImg,
   createParagraph,
   createSpan,
 } from '../../utils/elementCreator';
-import styles from './header.module.css';
-import logo from '../../assets/logo.png';
 import isLoggedIn from '../../utils/checkFunctions';
+import logo from '../../assets/logo.png';
+import cart from '../../assets/cart.png';
+import styles from './header.module.css';
 
 export default class Header {
   private container: HTMLElement;
@@ -34,7 +36,17 @@ export default class Header {
     this.burgerMenu = createDiv(styles.burgerMenu, this.container);
     this.updateHeader();
 
-    const burgerButton = createBtn(styles.burgerButton, '', this.container);
+    const mobileButtons = createDiv(styles.mobileButtons, this.container);
+    const basketButton = createImg(
+      styles.basketButton,
+      cart,
+      'basket',
+      mobileButtons
+    );
+    basketButton.addEventListener('click', () =>
+      this.router.navigateTo(Pages.BASKET)
+    );
+    const burgerButton = createBtn(styles.burgerButton, '', mobileButtons);
     createSpan(styles.burgerIcon, '', burgerButton);
     burgerButton.addEventListener('click', () => {
       this.burgerMenu.classList.toggle(styles.burgerMenuOpen);
@@ -44,6 +56,15 @@ export default class Header {
 
   updateHeader() {
     this.userControls.innerHTML = '';
+    const basketButton = createImg(
+      styles.basketButton,
+      cart,
+      'basket',
+      this.userControls
+    );
+    basketButton.addEventListener('click', () =>
+      this.router.navigateTo(Pages.BASKET)
+    );
     const catalogButton = createBtn(
       styles.button,
       'Catalog',
@@ -51,6 +72,10 @@ export default class Header {
     );
     catalogButton.addEventListener('click', () =>
       this.router.navigateTo(Pages.CATALOG)
+    );
+    const aboutButton = createBtn(styles.button, 'About Us', this.userControls);
+    aboutButton.addEventListener('click', () =>
+      this.router.navigateTo(Pages.ABOUT_US)
     );
     if (isLoggedIn()) {
       const profileButton = createBtn(
@@ -91,6 +116,7 @@ export default class Header {
 
     this.addMenuItem('Home', () => this.router.navigateTo(Pages.MAIN));
     this.addMenuItem('Catalog', () => this.router.navigateTo(Pages.CATALOG));
+    this.addMenuItem('About Us', () => this.router.navigateTo(Pages.ABOUT_US));
     if (isLoggedIn()) {
       this.addMenuItem('Profile', () => this.router.navigateTo(Pages.PROFILE));
       this.addMenuItem('Logout', () => {

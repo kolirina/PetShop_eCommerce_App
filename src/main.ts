@@ -9,6 +9,8 @@ import TemplatePage from './pages/templatePage';
 import ProfilePage from './pages/profilePage';
 import CatalogPage from './pages/catalogPage';
 import ProductPage from './pages/productPage';
+import BasketPage from './pages/basketPage';
+import AboutPage from './pages/aboutPage';
 
 const router = new Router();
 
@@ -22,6 +24,10 @@ router.addRoutes({
     new CatalogPage(router, templatePage.getMainElement()).render(),
   [Pages.PRODUCT]: () =>
     new ProductPage(router, templatePage.getMainElement()).render(),
+  [Pages.BASKET]: () =>
+    new BasketPage(router, templatePage.getMainElement()).render(),
+  [Pages.ABOUT_US]: () =>
+    new AboutPage(router, templatePage.getMainElement()).render(),
   [Pages.LOGIN]: () => new LoginPage(router, templatePage).render(),
   [Pages.REGISTRATION]: () =>
     new RegistrationPage(router, templatePage).render(),
