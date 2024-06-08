@@ -457,7 +457,8 @@ class CatalogPage extends Page {
     const productInfoBriefText =
       description || 'Sorry, no description available.';
     productInfoBrief.innerHTML = productInfoBriefText;
-    const priceDiv = createDiv('priceDiv', productCard);
+    const priceAndAddToCart = createDiv('priceAndAddToCart', productCard);
+    const priceDiv = createDiv('priceDiv', priceAndAddToCart);
     const regularPriceDiv = createDiv('regularPrice', priceDiv);
     regularPriceDiv.innerHTML = `${priceFormatter(regularPrice)}`;
 
@@ -466,6 +467,13 @@ class CatalogPage extends Page {
       const discountPriceDiv = createDiv('discountPrice', priceDiv);
       discountPriceDiv.innerHTML = `Now ${priceFormatter(discountedPrice)}`;
     }
+
+    const addToCartButton = createBtn(
+      'catalogButton',
+      'ADD TO CART',
+      priceAndAddToCart
+    );
+    addToCartButton.classList.add('addToCartButton');
     productCard.addEventListener('click', () =>
       this.router.navigateTo(Pages.PRODUCT, { id })
     );
