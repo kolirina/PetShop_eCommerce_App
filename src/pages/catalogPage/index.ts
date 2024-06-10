@@ -4,6 +4,7 @@ import SortBy from '../../types/sortBy';
 import Category from '../../types/category';
 import { FilteredProduct, FilteredProducts } from '../../types/filterProducts';
 import { lang } from '../../constants';
+import { createAnonymousUser } from '../../api/services';
 import {
   createDiv,
   createImg,
@@ -17,6 +18,10 @@ import {
   fetchFilteredByPriceAndBrandAndSearch,
   getSearchResult,
   getCategories,
+  createAnonymousCart,
+  createCart,
+  addToCart,
+  getCartByCartId,
 } from '../../api/SDK';
 import priceFormatter from '../../utils/priceFormatter';
 import Pages from '../../router/pageNames';
@@ -74,6 +79,8 @@ class CatalogPage extends Page {
   public categoryId: string = '';
 
   public sortBy: SortBy = SortBy.PRICE_ASC;
+
+  public productsInCartIds: string[] = [];
 
   constructor(router: Router, parentElement: HTMLElement) {
     super(router, parentElement);
@@ -278,12 +285,31 @@ class CatalogPage extends Page {
     this.breadcrumbsContainer.innerHTML = 'HOME';
   }
 
-  public getInfoFilteredProducts(filteredProducts: FilteredProducts) {
+  public async getInfoFilteredProducts(filteredProducts: FilteredProducts) {
     if (filteredProducts.length === 0) {
       this.productsContainer.innerHTML =
         'It seems that no product matches your request. Please try again.';
     }
     this.productsDisplayed = filteredProducts;
+    let cartId = '';
+    if (localStorage.getItem('registered_user_cart_id')) {
+      cartId = localStorage.getItem('registered_user_cart_id')!;
+    }
+    if (
+      !localStorage.getItem('registered_user_cart_id') &&
+      localStorage.getItem('anonymous_cart_id')
+    ) {
+      cartId = localStorage.getItem('anonymous_cart_id')!;
+    }
+    const cart = await getCartByCartId(cartId);
+    const productsInCart = cart.body.lineItems;
+    this.productsInCartIds = [];
+    if (productsInCart) {
+      productsInCart.forEach((product) =>
+        this.productsInCartIds.push(product.productId)
+      );
+    }
+
     filteredProducts.forEach((product: FilteredProduct) => {
       const { id } = { id: product.id };
 
@@ -477,6 +503,55 @@ class CatalogPage extends Page {
     productCard.addEventListener('click', () =>
       this.router.navigateTo(Pages.PRODUCT, { id })
     );
+    if (this.productsInCartIds.includes(id)) {
+      addToCartButton.classList.add('alreadyInCart');
+      addToCartButton.disabled = true;
+      addToCartButton.innerText = 'ALREADY IN CART';
+    }
+    addToCartButton.addEventListener('click', async (event) => {
+      event.stopPropagation();
+      addToCartButton.classList.add('alreadyInCart');
+      addToCartButton.disabled = true;
+      addToCartButton.innerText = 'ALREADY IN CART';
+
+      if (
+        !localStorage.getItem('token') &&
+        !localStorage.getItem('id') &&
+        !localStorage.getItem('anonymous_token')
+      ) {
+        await createAnonymousUser();
+        await createAnonymousCart();
+      }
+      if (
+        !localStorage.getItem('registered_user_cart_id') &&
+        localStorage.getItem('id')
+      ) {
+        const customerId = localStorage.getItem('id');
+        if (customerId) {
+          await createCart(customerId);
+        }
+      }
+      let cartVersion = '';
+      if (localStorage.getItem('registered_user_cart_version')) {
+        cartVersion = localStorage.getItem('registered_user_cart_version')!;
+      } else {
+        cartVersion = localStorage.getItem('anonymous_cart_version')!;
+      }
+      await addToCart(id, 1, JSON.parse(cartVersion));
+      try {
+        const filteredProducts = await fetchFilteredByPriceAndBrandAndSearch(
+          this.minPrice,
+          this.maxPrice,
+          this.chosenBrands,
+          this.searchWord,
+          this.sortBy,
+          this.categoryId
+        );
+        this.getInfoFilteredProducts(filteredProducts);
+      } catch (error) {
+        throw new Error('Error fetching filtered products');
+      }
+    });
   }
 
   public async buildBreadcrumb(category: Category) {

@@ -92,8 +92,7 @@ export default class Header {
         this.userControls
       );
       logoutButton.addEventListener('click', () => {
-        localStorage.removeItem('id');
-        localStorage.removeItem('token');
+        localStorage.clear();
         this.updateHeader();
         this.router.navigateTo(Pages.MAIN);
       });

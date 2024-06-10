@@ -43,11 +43,26 @@ export const httpMiddlewareOptions = {
   fetch,
 };
 
-const client = new ClientBuilder()
-  .withProjectKey(CTP_PROJECT_KEY)
-  .withMiddleware(createAuthForClientCredentialsFlow(authMiddlewareOptions))
-  .withMiddleware(createHttpClient(httpMiddlewareOptions))
-  .withUserAgentMiddleware()
-  .build();
+let client;
+
+if (localStorage.getItem('anonymous_token')) {
+  client = new ClientBuilder()
+    .withProjectKey(CTP_PROJECT_KEY)
+    .withMiddleware(createAuthForClientCredentialsFlow(authMiddlewareOptions))
+    .withMiddleware(createHttpClient(httpMiddlewareOptions))
+    .withUserAgentMiddleware()
+    .withExistingTokenFlow(localStorage.getItem('anonymous_token') ?? '', {
+      force: true,
+    })
+    .build();
+  localStorage.removeItem('anonymous_token');
+} else {
+  client = new ClientBuilder()
+    .withProjectKey(CTP_PROJECT_KEY)
+    .withMiddleware(createAuthForClientCredentialsFlow(authMiddlewareOptions))
+    .withMiddleware(createHttpClient(httpMiddlewareOptions))
+    .withUserAgentMiddleware()
+    .build();
+}
 
 export const apiRoot: ApiRoot = createApiBuilderFromCtpClient(client);

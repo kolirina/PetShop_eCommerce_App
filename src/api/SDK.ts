@@ -1,19 +1,12 @@
-import {
-  ApiRoot,
-  ClientResponse,
-  CustomerUpdate,
-} from '@commercetools/platform-sdk';
+import { ClientResponse, CustomerUpdate } from '@commercetools/platform-sdk';
 import { apiRoot, projectKey } from './ApiRoot';
 import { AddressToChange, UserAddress, UserInfo } from '../types';
+import { ByProjectKeyMeCartsPost, CartInfo } from '../types/cart';
 import { lang, MAX_NUMBER_OF_PRODUCTS_DISPLAYED } from '../constants';
 import SortBy from '../types/sortBy';
 
-async function getUser(
-  email: string,
-  password: string,
-  passwordApiRoot: ApiRoot
-) {
-  const resp = await passwordApiRoot
+async function getUser(email: string, password: string) {
+  const resp = await apiRoot
     .withProjectKey({ projectKey })
     .me()
     .login()
@@ -53,6 +46,20 @@ async function getUserById(id: string): Promise<ClientResponse> {
     .get()
     .execute();
   return resp;
+}
+
+async function getCartByUserId(id: string): Promise<CartInfo> {
+  const resp: ClientResponse = await apiRoot
+    .withProjectKey({ projectKey })
+    .carts()
+    .get({
+      queryArgs: {
+        where: `customerId="${id}"`,
+      },
+    })
+    .execute();
+  const cart = resp.body.results[0].id;
+  return { id: cart.id, version: cart.version };
 }
 
 async function addAddress(
@@ -428,6 +435,7 @@ async function removeAddress(addressId: string, userId: string) {
     })
     .execute();
 }
+
 async function getCategories() {
   const resp = await apiRoot
     .withProjectKey({ projectKey })
@@ -436,6 +444,111 @@ async function getCategories() {
     .execute();
 
   return resp.body.results;
+}
+
+async function createAnonymousCart() {
+  const clientBuilder = apiRoot.withProjectKey({ projectKey });
+  const cartDraft: ByProjectKeyMeCartsPost = {
+    currency: 'EUR',
+  };
+  try {
+    const response = await clientBuilder
+      .carts()
+      .post({ body: cartDraft })
+      .execute();
+    localStorage.setItem('anonymous_cart_id', response.body.id);
+    localStorage.setItem(
+      'anonymous_cart_version',
+      JSON.stringify(response.body.version)
+    );
+  } catch (error) {
+    throw new Error('Error creating cart');
+  }
+}
+
+async function createCart(customerId: string) {
+  const clientBuilder = apiRoot.withProjectKey({ projectKey });
+  const cartDraft: ByProjectKeyMeCartsPost = {
+    currency: 'EUR',
+    customerId,
+  };
+  await clientBuilder
+    .carts()
+    .post({ body: cartDraft })
+    .execute()
+    .then((response) => {
+      localStorage.setItem('registered_user_cart_id', response.body.id);
+      localStorage.setItem(
+        'registered_user_cart_version',
+        JSON.stringify(response.body.version)
+      );
+    })
+    .catch(() => {
+      throw new Error('Error creating cart');
+    });
+}
+
+async function addToCart(
+  productId: string,
+  quantity: number,
+  cartVers: number
+) {
+  let cartId: string | null = '';
+  let cartVersion: string | null = '';
+  if (localStorage.getItem('registered_user_cart_id')) {
+    cartId = localStorage.getItem('registered_user_cart_id');
+    cartVersion = localStorage.getItem('registered_user_cart_version');
+  }
+  if (
+    !localStorage.getItem('registered_user_cart_id') &&
+    localStorage.getItem('anonymous_cart_id')
+  ) {
+    cartId = localStorage.getItem('anonymous_cart_id');
+    cartVersion = localStorage.getItem('anonymous_cart_version');
+  }
+  if (!cartId || !cartVersion) {
+    throw new Error('Cart ID or version is missing');
+    return;
+  }
+  const resp = await apiRoot
+    .withProjectKey({ projectKey })
+    .carts()
+    .withId({ ID: cartId! })
+    .post({
+      body: {
+        version: cartVers,
+        actions: [
+          {
+            action: 'addLineItem',
+            productId,
+            variantId: 1,
+            quantity,
+          },
+        ],
+      },
+    })
+    .execute();
+  if (cartId === localStorage.getItem('anonymous_cart_id')) {
+    localStorage.setItem(
+      'anonymous_cart_version',
+      JSON.stringify(resp.body.version)
+    );
+  } else {
+    localStorage.setItem(
+      'registered_user_cart_version',
+      JSON.stringify(resp.body.version)
+    );
+  }
+}
+
+async function getCartByCartId(cartId: string) {
+  const resp = await apiRoot
+    .withProjectKey({ projectKey })
+    .carts()
+    .withId({ ID: cartId })
+    .get()
+    .execute();
+  return resp;
 }
 
 export {
@@ -459,4 +572,9 @@ export {
   getProduct,
   removeAddress,
   getCategories,
+  createAnonymousCart,
+  createCart,
+  getCartByUserId,
+  addToCart,
+  getCartByCartId,
 };
