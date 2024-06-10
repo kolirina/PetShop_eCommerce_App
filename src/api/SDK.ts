@@ -508,7 +508,6 @@ async function addToCart(
   }
   if (!cartId || !cartVersion) {
     throw new Error('Cart ID or version is missing');
-    return;
   }
   const resp = await apiRoot
     .withProjectKey({ projectKey })
