@@ -547,6 +547,7 @@ class CatalogPage extends Page {
           this.sortBy,
           this.categoryId
         );
+        this.productsContainer.innerHTML = '';
         this.getInfoFilteredProducts(filteredProducts);
       } catch (error) {
         throw new Error('Error fetching filtered products');
