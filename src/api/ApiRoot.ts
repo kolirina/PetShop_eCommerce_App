@@ -48,9 +48,6 @@ const client = new ClientBuilder()
   .withMiddleware(createAuthForClientCredentialsFlow(authMiddlewareOptions))
   .withMiddleware(createHttpClient(httpMiddlewareOptions))
   .withUserAgentMiddleware()
-  .withExistingTokenFlow(localStorage.getItem('anonymous_token') ?? '', {
-    force: true,
-  })
   .build();
 
 export const apiRoot: ApiRoot = createApiBuilderFromCtpClient(client);
