@@ -85,32 +85,3 @@ export type LineItem = {
   };
   taxedPricePortions: MethodTaxRate[]; // Мы не знаем структуру этих данных
 };
-
-// export type LineItem = {
-//   readonly id: string;
-//   readonly key?: string;
-//   readonly productId: string;
-//   readonly productKey?: string;
-//   readonly name: LocalizedString;
-//   readonly productSlug?: LocalizedString;
-//   readonly productType: ProductTypeReference;
-//   readonly variant: ProductVariant;
-//   readonly price: Price;
-//   readonly quantity: number;
-//   readonly totalPrice: CentPrecisionMoney;
-//   readonly discountedPricePerQuantity: DiscountedLineItemPriceForQuantity[];
-//   readonly taxedPrice?: TaxedItemPrice;
-//   readonly taxedPricePortions: MethodTaxedPrice[];
-//   readonly state: ItemState[];
-//   readonly taxRate?: TaxRate;
-//   readonly perMethodTaxRate: MethodTaxRate[];
-//   readonly supplyChannel?: ChannelReference;
-//   readonly distributionChannel?: ChannelReference;
-//   readonly priceMode: LineItemPriceMode;
-//   readonly lineItemMode: LineItemMode;
-//   readonly inventoryMode?: InventoryMode;
-//   readonly shippingDetails?: ItemShippingDetails;
-//   readonly custom?: CustomFields;
-//   readonly addedAt?: string;
-//   readonly lastModifiedAt?: string;
-// };
