@@ -438,6 +438,22 @@ async function getCategories() {
   return resp.body.results;
 }
 
+async function getCartById(cartId: string) {
+  try {
+    const resp = await apiRoot
+      .withProjectKey({ projectKey })
+      .me()
+      .carts()
+      .withId({ ID: cartId })
+      .get()
+      .execute();
+    return resp;
+  } catch (err) {
+    // console.log(err);
+    return err;
+  }
+}
+
 export {
   getUser,
   registerUser,
@@ -459,4 +475,5 @@ export {
   getProduct,
   removeAddress,
   getCategories,
+  getCartById,
 };

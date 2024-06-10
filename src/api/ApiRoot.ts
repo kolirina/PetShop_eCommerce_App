@@ -34,7 +34,7 @@ export const authMiddlewareOptions = {
     clientId: CTP_CLIENT_ID,
     clientSecret: CTP_CLIENT_SECRET,
   },
-  scopes: [`manage_project:${CTP_PROJECT_KEY}`],
+  scopes: [CTP_SCOPES],
   fetch,
 };
 
