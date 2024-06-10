@@ -1,6 +1,6 @@
 import { MAX_CHAR_CODE, MIN_CHAR_CODE } from '../constants';
 import { AddressToChange, UserInfo } from '../types';
-import { apiRoot } from './ApiRoot';
+import { LineItem } from '../types/cart';
 import {
   addAddress,
   changeAddress,
@@ -16,6 +16,9 @@ import {
   setFirstName,
   setLastName,
   setShippingAddress,
+  getCartById,
+  addToCart,
+  createCart,
 } from './SDK';
 
 async function getToken(email: string, password: string): Promise<string> {
@@ -34,20 +37,69 @@ async function getToken(email: string, password: string): Promise<string> {
       },
     }
   );
+  if (!response.ok) {
+    throw new Error(`An error occurred: ${response.statusText}`);
+  }
+  const data = await response.json();
+  return data.access_token;
+}
+
+async function createAnonymousUser() {
+  const CTP_AUTH_URL = import.meta.env.VITE_CTP_AUTH_URL;
+  const CTP_CLIENT_ID = import.meta.env.VITE_CTP_CLIENT_ID;
+  const CTP_CLIENT_SECRET = import.meta.env.VITE_CTP_CLIENT_SECRET;
+  const CTP_CLIENT_PROJECT_KEY = import.meta.env.VITE_CTP_PROJECT_KEY;
+
+  const response = await fetch(
+    `${CTP_AUTH_URL}/oauth/${CTP_CLIENT_PROJECT_KEY}/anonymous/token?grant_type=client_credentials`,
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        Authorization: `Basic ${btoa(`${CTP_CLIENT_ID}:${CTP_CLIENT_SECRET}`)}`,
+      },
+    }
+  );
 
   if (!response.ok) {
     throw new Error(`An error occurred: ${response.statusText}`);
   }
 
   const data = await response.json();
+  localStorage.setItem('anonymous_token', data.access_token);
   return data.access_token;
 }
 
+async function addItemsFromAnonymousCart() {
+  const anonymousCartId = localStorage.getItem('anonymous_cart_id');
+  if (!anonymousCartId) {
+    return;
+  }
+  const anonymousCart = await getCartById(anonymousCartId);
+  const items = anonymousCart.body.lineItems;
+
+  async function addItemsRecursively(lineItems: LineItem[], index: number = 0) {
+    if (index >= lineItems.length) {
+      return;
+    }
+
+    const { productId } = items[index];
+    const { quantity } = items[index];
+    const cartVersion = JSON.parse(
+      localStorage.getItem('registered_user_cart_version') || '0'
+    );
+    await addToCart(productId, quantity, cartVersion);
+    await addItemsRecursively(lineItems, index + 1);
+  }
+  await addItemsRecursively(items);
+  localStorage.removeItem('anonymous_cart_id');
+  localStorage.removeItem('anonymous_cart_version');
+}
+
 const loginUser = async (email: string, password: string): Promise<string> => {
+  const response = await getUser(email, password);
   const token = await getToken(email, password);
   localStorage.setItem('token', token);
-
-  const response = await getUser(email, password, apiRoot);
 
   if (response.statusCode === 400) {
     throw new Error('Invalid email or password');
@@ -55,6 +107,16 @@ const loginUser = async (email: string, password: string): Promise<string> => {
 
   const { id } = response.body.customer;
   localStorage.setItem('id', id);
+  if (response.body.cart) {
+    localStorage.setItem('registered_user_cart_id', response.body.cart!.id);
+    localStorage.setItem(
+      'registered_user_cart_version',
+      JSON.stringify(response.body.cart!.version)
+    );
+    if (localStorage.getItem('anonymous_cart_id')) {
+      addItemsFromAnonymousCart();
+    }
+  }
   return id;
 };
 
@@ -65,6 +127,11 @@ const signUpUser = async (
     const response = await registerUser(userInfo);
     const { id } = response.body.customer;
     localStorage.setItem('id', id);
+
+    if (localStorage.getItem('anonymous_cart_id')) {
+      await createCart(id);
+      addItemsFromAnonymousCart();
+    }
 
     try {
       const token = await getToken(userInfo.email, userInfo.password);
@@ -254,4 +321,5 @@ export {
   addNewUsersAddress,
   removeUsersAddress,
   generateAddressKey,
+  createAnonymousUser,
 };

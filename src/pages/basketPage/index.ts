@@ -1,4 +1,5 @@
-import { getCartById } from '../../api/SDK';
+import { Cart } from '@commercetools/typescript-sdk';
+// import { getCartById } from '../../api/SDK';
 import Router from '../../router';
 import Pages from '../../router/pageNames';
 import {
@@ -8,21 +9,19 @@ import {
 } from '../../utils/elementCreator';
 import Page from '../Page';
 import styles from './backetPage.module.css';
-import Product from './productBuilder';
+// import Product from './productBuilder';
 
 class BasketPage extends Page {
-  // public router: Router;
   public productsWrapper: HTMLDivElement;
 
   public noProductsMessage: HTMLParagraphElement;
 
   public goToCatalogBtn: HTMLButtonElement;
 
-  // private cartInfo:
+  private cartInfo: Cart | unknown;
 
   constructor(router: Router, parentElement: HTMLElement) {
     super(router, parentElement);
-    // this.router = router
     this.container.classList.add(styles.container);
     this.productsWrapper = createDiv(
       styles.basketProductsWrapper,
@@ -49,18 +48,20 @@ class BasketPage extends Page {
   }
 
   private async fillCart() {
-    // const cartLocalStorage = localStorage.getItem('');
-    // if (cartLocalStorage) {
-    // const cartId = JSON.parse(cartLocalStorage);
-    const cartInfo = await getCartById('asdasd');
-    this.paintProduct();
-    return { 1: cartInfo, 2: this.goToCatalogBtn };
+    const cartLocalStorage = localStorage.getItem('registered_user_cart_id')
+      ? localStorage.getItem('registered_user_cart_id')
+      : localStorage.getItem('anonymous_cart_id');
+    if (cartLocalStorage) {
+      // const result = await getCartById(cartLocalStorage);
+      // console.log(cartLocalStorage);
+    }
+    return this.cartInfo;
   }
 
-  private paintProduct() {
-    const product: HTMLDivElement = new Product().getProduct();
-    this.productsWrapper.append(product);
-  }
+  // private paintProduct() {
+  //   const product: HTMLDivElement = new Product().getProduct();
+  //   this.productsWrapper.append(product);
+  // }
 }
 
 export default BasketPage;
