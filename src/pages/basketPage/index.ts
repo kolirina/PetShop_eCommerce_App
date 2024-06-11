@@ -5,11 +5,14 @@ import Pages from '../../router/pageNames';
 import {
   createBtn,
   createDiv,
+  createH3,
   createParagraph,
 } from '../../utils/elementCreator';
 import Page from '../Page';
 import styles from './basketPage.module.css';
 import Product from './productBuilder';
+import priceFormatter from '../../utils/priceFormatter';
+import { TOTAL_PRICE_TEXT } from './constants';
 
 class BasketPage extends Page {
   public productsWrapper: HTMLDivElement;
@@ -19,6 +22,8 @@ class BasketPage extends Page {
   public goToCatalogBtn: HTMLButtonElement;
 
   private cartInfo?: Cart;
+
+  public totalPrice: HTMLHeadingElement;
 
   constructor(router: Router, parentElement: HTMLElement) {
     super(router, parentElement);
@@ -44,6 +49,8 @@ class BasketPage extends Page {
       router.navigateTo(Pages.CATALOG);
     });
 
+    this.totalPrice = createH3(styles.totalPrice, 'Total price: ');
+
     this.fillCart();
   }
 
@@ -55,10 +62,6 @@ class BasketPage extends Page {
       try {
         const result = await getCartById(cartLocalStorage);
         this.cartInfo = await result.body;
-        if (this.cartInfo && this.cartInfo.lineItems.length > 0) {
-          this.goToCatalogBtn.remove();
-          this.noProductsMessage.remove();
-        }
         result.body.lineItems.forEach((el: LineItem) => {
           const item = new Product(el);
           this.productsWrapper.append(item.getProduct());
@@ -66,6 +69,12 @@ class BasketPage extends Page {
             this.deleteHandler(item)
           );
         });
+        if (this.cartInfo && this.cartInfo.lineItems.length > 0) {
+          this.goToCatalogBtn.remove();
+          this.noProductsMessage.remove();
+          this.totalPrice.textContent = `${TOTAL_PRICE_TEXT}${priceFormatter(this.cartInfo.totalPrice.centAmount)}`;
+          this.productsWrapper.append(this.totalPrice);
+        }
       } catch (err) {
         // console.error((err as Error).message);
       }
@@ -95,7 +104,9 @@ class BasketPage extends Page {
         `${cartStatus}_version`,
         String(this.cartInfo.version)
       );
+      this.totalPrice.textContent = `${TOTAL_PRICE_TEXT}${priceFormatter(this.cartInfo.totalPrice.centAmount)}`;
       if (this.cartInfo.lineItems.length === 0) {
+        this.totalPrice.remove();
         this.productsWrapper.append(this.noProductsMessage);
         this.productsWrapper.append(this.goToCatalogBtn);
       }
