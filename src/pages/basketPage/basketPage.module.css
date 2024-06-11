@@ -20,6 +20,7 @@
 .no-products {
   margin: 20px auto;
   color: gray;
+  text-align: center;
 }
 .go-to-catalog-btn {
   width: 200px;
