@@ -1,19 +1,16 @@
-import {
-  ApiRoot,
-  ClientResponse,
-  CustomerUpdate,
-} from '@commercetools/platform-sdk';
+import { ClientResponse, CustomerUpdate } from '@commercetools/platform-sdk';
 import { apiRoot, projectKey } from './ApiRoot';
 import { AddressToChange, UserAddress, UserInfo } from '../types';
-import { lang, MAX_NUMBER_OF_PRODUCTS_DISPLAYED } from '../constants';
+import { ByProjectKeyMeCartsPost, CartInfo } from '../types/cart';
+import {
+  lang,
+  MAX_NUMBER_OF_PRODUCTS_DISPLAYED,
+  MS_IN_SEC,
+} from '../constants';
 import SortBy from '../types/sortBy';
 
-async function getUser(
-  email: string,
-  password: string,
-  passwordApiRoot: ApiRoot
-) {
-  const resp = await passwordApiRoot
+async function getUser(email: string, password: string) {
+  const resp = await apiRoot
     .withProjectKey({ projectKey })
     .me()
     .login()
@@ -53,6 +50,20 @@ async function getUserById(id: string): Promise<ClientResponse> {
     .get()
     .execute();
   return resp;
+}
+
+async function getCartByUserId(id: string): Promise<CartInfo> {
+  const resp: ClientResponse = await apiRoot
+    .withProjectKey({ projectKey })
+    .carts()
+    .get({
+      queryArgs: {
+        where: `customerId="${id}"`,
+      },
+    })
+    .execute();
+  const cart = resp.body.results[0].id;
+  return { id: cart.id, version: cart.version };
 }
 
 async function addAddress(
@@ -428,6 +439,7 @@ async function removeAddress(addressId: string, userId: string) {
     })
     .execute();
 }
+
 async function getCategories() {
   const resp = await apiRoot
     .withProjectKey({ projectKey })
@@ -436,6 +448,196 @@ async function getCategories() {
     .execute();
 
   return resp.body.results;
+}
+
+async function getCartById(cartId: string): Promise<ClientResponse> {
+  const token = localStorage.getItem('token')
+    ? localStorage.getItem('token')
+    : localStorage.getItem('anonymous_token');
+
+  try {
+    const resp = await apiRoot
+      .withProjectKey({ projectKey })
+      .me()
+      .carts()
+      .withId({ ID: cartId })
+      .get({
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+      .execute();
+
+    return resp;
+  } catch (err: unknown) {
+    throw new Error(`${(err as Error).message}`);
+  }
+}
+
+async function getAnonymousCartById(cartId: string): Promise<ClientResponse> {
+  const token = localStorage.getItem('anonymous_token');
+
+  try {
+    const resp = await apiRoot
+      .withProjectKey({ projectKey })
+      .me()
+      .carts()
+      .withId({ ID: cartId })
+      .get({
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+      .execute();
+
+    return resp;
+  } catch (err: unknown) {
+    throw new Error(`${(err as Error).message}`);
+  }
+}
+
+async function createAnonymousCart() {
+  const token = localStorage.getItem('anonymous_token');
+  const cartDraft: ByProjectKeyMeCartsPost = {
+    currency: 'EUR',
+  };
+  try {
+    const response = await apiRoot
+      .withProjectKey({ projectKey })
+      .me()
+      .carts()
+      .post({
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        body: cartDraft,
+      })
+      .execute();
+    localStorage.setItem('anonymous_cart_id', response.body.id);
+    localStorage.setItem(
+      'anonymous_cart_version',
+      JSON.stringify(response.body.version)
+    );
+  } catch (error) {
+    throw new Error('Error creating cart');
+  }
+}
+
+async function createCart(customerId: string) {
+  const token = localStorage.getItem('token');
+  const cartDraft: ByProjectKeyMeCartsPost = {
+    currency: 'EUR',
+    customerId,
+  };
+  await apiRoot
+    .withProjectKey({ projectKey })
+    .me()
+    .carts()
+    .post({
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      body: cartDraft,
+    })
+    .execute()
+    .then((response) => {
+      localStorage.setItem('registered_user_cart_id', response.body.id);
+      localStorage.setItem(
+        'registered_user_cart_version',
+        JSON.stringify(response.body.version)
+      );
+    })
+    .catch(() => {
+      throw new Error('Error creating cart');
+    });
+}
+
+async function addToCart(
+  productId: string,
+  quantity: number,
+  cartVers: number
+) {
+  const token = localStorage.getItem('token')
+    ? localStorage.getItem('token')
+    : localStorage.getItem('anonymous_token');
+  let cartId: string | null = '';
+  let cartVersion: string | null = '';
+  if (localStorage.getItem('registered_user_cart_id')) {
+    cartId = localStorage.getItem('registered_user_cart_id');
+    cartVersion = localStorage.getItem('registered_user_cart_version');
+  }
+  if (
+    !localStorage.getItem('registered_user_cart_id') &&
+    localStorage.getItem('anonymous_cart_id')
+  ) {
+    cartId = localStorage.getItem('anonymous_cart_id');
+    cartVersion = localStorage.getItem('anonymous_cart_version');
+  }
+  if (!cartId || !cartVersion) {
+    throw new Error('Cart ID or version is missing');
+    return;
+  }
+  const resp = await apiRoot
+    .withProjectKey({ projectKey })
+    .me()
+    .carts()
+    .withId({ ID: cartId! })
+    .post({
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      body: {
+        version: cartVers,
+        actions: [
+          {
+            action: 'addLineItem',
+            productId,
+            variantId: 1,
+            quantity,
+          },
+        ],
+      },
+    })
+    .execute();
+  if (cartId === localStorage.getItem('anonymous_cart_id')) {
+    localStorage.setItem(
+      'anonymous_cart_version',
+      JSON.stringify(resp.body.version)
+    );
+  } else {
+    localStorage.setItem(
+      'registered_user_cart_version',
+      JSON.stringify(resp.body.version)
+    );
+  }
+}
+
+async function refreshAnonymousToken(): Promise<void> {
+  const CTP_CLIENT_ID = import.meta.env.VITE_CTP_CLIENT_ID;
+  const CTP_CLIENT_SECRET = import.meta.env.VITE_CTP_CLIENT_SECRET;
+  const CTP_AUTH_URL = import.meta.env.VITE_CTP_AUTH_URL;
+  const CTP_PROJECT_KEY = import.meta.env.VITE_CTP_PROJECT_KEY;
+  const anonRefreshToken = localStorage.getItem('anonymous_refresh_token');
+
+  const response = await fetch(
+    `${CTP_AUTH_URL}/oauth/${CTP_PROJECT_KEY}/customers/token`,
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        Authorization: `Basic ${btoa(`${CTP_CLIENT_ID}:${CTP_CLIENT_SECRET}`)}`,
+      },
+      body: `grant_type=refresh_token&refresh_token=${anonRefreshToken}`,
+    }
+  );
+
+  const data = await response.json();
+  const tokenTimeInMs = data.expires_in * MS_IN_SEC;
+  localStorage.setItem('anonymous_token', data.access_token);
+  localStorage.setItem(
+    'anonymous_token_time',
+    String(Date.now() + tokenTimeInMs)
+  );
 }
 
 export {
@@ -459,4 +661,11 @@ export {
   getProduct,
   removeAddress,
   getCategories,
+  getCartById,
+  createAnonymousCart,
+  createCart,
+  getCartByUserId,
+  addToCart,
+  refreshAnonymousToken,
+  getAnonymousCartById,
 };

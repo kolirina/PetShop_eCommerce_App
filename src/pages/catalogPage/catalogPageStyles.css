@@ -120,10 +120,37 @@ aside {
 }
 
 .catalogButton:hover {
-  font-weight: 600;
   color: var(--main-bg-color);
   background-color: var(--accent-color);
   border: 1px solid var(--accent-color);
+}
+
+.addToCartButton {
+  color: var(--main-bg-color);
+  background-color: var(--accent-color);
+  border: 1px solid var(--accent-color);
+}
+
+.addToCartButton:hover {
+  color: var(--accent-color);
+  background-color: var(--main-bg-color);
+  border: 1px solid var(--accent-color);
+}
+
+.alreadyInCart,
+.alreadyInCart:hover {
+  opacity: 0.5;
+  cursor: none;
+  color: var(--main-bg-color);
+  background-color: var(--accent-color);
+  border: 1px solid var(--accent-color);
+}
+
+.priceAndAddToCart {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 10px;
 }
 
 .catalogInput {
