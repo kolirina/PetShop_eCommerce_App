@@ -590,7 +590,7 @@ async function addToCart(
   }
 }
 
-async function refreshAnonymousToken(): Promise<void> {
+async function refreshAnonymousToken() {
   const CTP_CLIENT_ID = import.meta.env.VITE_CTP_CLIENT_ID;
   const CTP_CLIENT_SECRET = import.meta.env.VITE_CTP_CLIENT_SECRET;
   const CTP_AUTH_URL = import.meta.env.VITE_CTP_AUTH_URL;
@@ -618,15 +618,37 @@ async function refreshAnonymousToken(): Promise<void> {
   );
 }
 
-// async function getCartByCartId(cartId: string) {
-//   const resp = await apiRoot
-//     .withProjectKey({ projectKey })
-//     .carts()
-//     .withId({ ID: cartId })
-//     .get()
-//     .execute();
-//   return resp;
-// }
+async function deleteProductFromCart(
+  cartId: string,
+  productId: string,
+  cartVersion: number
+) {
+  const token = localStorage.getItem('token')
+    ? localStorage.getItem('token')
+    : localStorage.getItem('anonymous_token');
+  const response = await apiRoot
+    .withProjectKey({ projectKey })
+    .me()
+    .carts()
+    .withId({ ID: cartId })
+    .post({
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      body: {
+        version: cartVersion,
+        actions: [
+          {
+            action: 'removeLineItem',
+            lineItemId: productId,
+          },
+        ],
+      },
+    })
+    .execute();
+  const data = response.body;
+  return data;
+}
 
 export {
   getUser,
@@ -655,4 +677,5 @@ export {
   getCartByUserId,
   addToCart,
   refreshAnonymousToken,
+  deleteProductFromCart,
 };

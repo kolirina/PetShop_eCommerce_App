@@ -1,4 +1,4 @@
-import { LineItem } from '@commercetools/typescript-sdk';
+import { LineItem } from '@commercetools/platform-sdk';
 import {
   createBtn,
   createDiv,
@@ -7,11 +7,12 @@ import {
   createInput,
   createSpan,
 } from '../../utils/elementCreator';
-import styles from './basketPage.module.css';
 import { FIRST_PIC } from './constants';
 import noImage from '../../assets/no-image.png';
 import { lang } from '../../constants';
 import priceFormatter from '../../utils/priceFormatter';
+import { deleteProductFromCart } from '../../api/SDK';
+import styles from './basketPage.module.css';
 
 class Product {
   public productWrapper: HTMLDivElement;
@@ -121,7 +122,6 @@ class Product {
       'click',
       this.minusOne.bind(this)
     );
-    // console.log(item);
   }
 
   private getImgUrl(): string {
@@ -147,6 +147,20 @@ class Product {
     if (this.productAmountInput.value === '1') {
       this.productAmountInput.disabled = true;
     }
+  }
+
+  public async deleteProduct(cartId: string, cartVersion: number) {
+    const response = deleteProductFromCart(
+      cartId,
+      this.productInfo.id,
+      cartVersion
+    );
+    if (await response) {
+      if (this.productWrapper && this.productWrapper.parentNode) {
+        this.productWrapper.parentNode.removeChild(this.productWrapper);
+      }
+    }
+    return response;
   }
 
   public getProduct(): HTMLDivElement {

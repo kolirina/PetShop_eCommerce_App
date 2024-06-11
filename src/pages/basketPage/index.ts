@@ -1,4 +1,4 @@
-import { LineItem } from '@commercetools/typescript-sdk';
+import { Cart, LineItem } from '@commercetools/platform-sdk';
 import { getCartById } from '../../api/SDK';
 import Router from '../../router';
 import Pages from '../../router/pageNames';
@@ -17,6 +17,8 @@ class BasketPage extends Page {
   public noProductsMessage: HTMLParagraphElement;
 
   public goToCatalogBtn: HTMLButtonElement;
+
+  private cartInfo?: Cart;
 
   constructor(router: Router, parentElement: HTMLElement) {
     super(router, parentElement);
@@ -50,26 +52,55 @@ class BasketPage extends Page {
       ? localStorage.getItem('registered_user_cart_id')
       : localStorage.getItem('anonymous_cart_id');
     if (cartLocalStorage) {
-      this.goToCatalogBtn.remove();
-      this.noProductsMessage.remove();
       try {
         const result = await getCartById(cartLocalStorage);
+        this.cartInfo = await result.body;
+        if (this.cartInfo && this.cartInfo.lineItems.length > 0) {
+          this.goToCatalogBtn.remove();
+          this.noProductsMessage.remove();
+        }
         result.body.lineItems.forEach((el: LineItem) => {
           const item = new Product(el);
           this.productsWrapper.append(item.getProduct());
+          item.productDeleteBtn.addEventListener('click', () =>
+            this.deleteHandler(item)
+          );
         });
-        // console.log(result);
       } catch (err) {
         // console.error((err as Error).message);
       }
     }
-    // return this.cartInfo;
   }
 
-  // private paintProduct() {
-  //   const product: HTMLDivElement = new Product().getProduct();
-  //   this.productsWrapper.append(product);
-  // }
+  private async deleteHandler(item: Product) {
+    if (this.cartInfo) {
+      const deleteResult = await item.deleteProduct.bind(
+        item,
+        this.cartInfo.id,
+        this.cartInfo.version
+      )();
+      if (deleteResult) {
+        this.cartInfo = deleteResult;
+        this.updateFields();
+      }
+    }
+  }
+
+  private updateFields() {
+    if (this.cartInfo) {
+      const cartStatus = localStorage.getItem('anonymous_cart_id')
+        ? 'anonymous_cart'
+        : 'cart';
+      localStorage.setItem(
+        `${cartStatus}_version`,
+        String(this.cartInfo.version)
+      );
+      if (this.cartInfo.lineItems.length === 0) {
+        this.productsWrapper.append(this.noProductsMessage);
+        this.productsWrapper.append(this.goToCatalogBtn);
+      }
+    }
+  }
 }
 
 export default BasketPage;
