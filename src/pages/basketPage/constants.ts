@@ -1,0 +1,5 @@
+const FIRST_PIC = 0;
+
+const BRAND_ATTRIBUTE = 2;
+
+export { FIRST_PIC, BRAND_ATTRIBUTE };

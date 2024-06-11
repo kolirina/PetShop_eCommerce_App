@@ -450,8 +450,7 @@ async function getCartById(cartId: string): Promise<ClientResponse> {
   const token = localStorage.getItem('token')
     ? localStorage.getItem('token')
     : localStorage.getItem('anonymous_token');
-  // console.log(token);
-  // console.log(cartId);
+
   try {
     const resp = await apiRoot
       .withProjectKey({ projectKey })
@@ -467,7 +466,7 @@ async function getCartById(cartId: string): Promise<ClientResponse> {
 
     return resp;
   } catch (err: unknown) {
-    throw new Error(`${err}`);
+    throw new Error(`${(err as Error).message}`);
   }
 }
 

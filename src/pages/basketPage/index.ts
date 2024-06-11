@@ -1,5 +1,5 @@
-import { Cart } from '@commercetools/typescript-sdk';
-// import { getCartById } from '../../api/SDK';
+import { LineItem } from '@commercetools/typescript-sdk';
+import { getCartById } from '../../api/SDK';
 import Router from '../../router';
 import Pages from '../../router/pageNames';
 import {
@@ -8,8 +8,8 @@ import {
   createParagraph,
 } from '../../utils/elementCreator';
 import Page from '../Page';
-import styles from './backetPage.module.css';
-// import Product from './productBuilder';
+import styles from './basketPage.module.css';
+import Product from './productBuilder';
 
 class BasketPage extends Page {
   public productsWrapper: HTMLDivElement;
@@ -17,8 +17,6 @@ class BasketPage extends Page {
   public noProductsMessage: HTMLParagraphElement;
 
   public goToCatalogBtn: HTMLButtonElement;
-
-  private cartInfo: Cart | unknown;
 
   constructor(router: Router, parentElement: HTMLElement) {
     super(router, parentElement);
@@ -47,15 +45,25 @@ class BasketPage extends Page {
     this.fillCart();
   }
 
-  private async fillCart() {
+  private async fillCart(): Promise<void> {
     const cartLocalStorage = localStorage.getItem('registered_user_cart_id')
       ? localStorage.getItem('registered_user_cart_id')
       : localStorage.getItem('anonymous_cart_id');
     if (cartLocalStorage) {
-      // const result = await getCartById(cartLocalStorage);
-      // console.log(cartLocalStorage);
+      this.goToCatalogBtn.remove();
+      this.noProductsMessage.remove();
+      try {
+        const result = await getCartById(cartLocalStorage);
+        result.body.lineItems.forEach((el: LineItem) => {
+          const item = new Product(el);
+          this.productsWrapper.append(item.getProduct());
+        });
+        // console.log(result);
+      } catch (err) {
+        // console.error((err as Error).message);
+      }
     }
-    return this.cartInfo;
+    // return this.cartInfo;
   }
 
   // private paintProduct() {

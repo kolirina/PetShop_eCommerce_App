@@ -67,6 +67,7 @@ async function createAnonymousUser() {
 
   const data = await response.json();
   localStorage.setItem('anonymous_token', data.access_token);
+  // console.log(data);
   return data.access_token;
 }
 
