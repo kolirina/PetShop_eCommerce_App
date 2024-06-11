@@ -2,7 +2,7 @@ import { ClientResponse, CustomerUpdate } from '@commercetools/platform-sdk';
 import { apiRoot, projectKey } from './ApiRoot';
 import { AddressToChange, UserAddress, UserInfo } from '../types';
 import { ByProjectKeyMeCartsPost, CartInfo } from '../types/cart';
-import { lang, MAX_NUMBER_OF_PRODUCTS_DISPLAYED } from '../constants';
+import { lang, MAX_NUMBER_OF_PRODUCTS_DISPLAYED, CURRENCY } from '../constants';
 import SortBy from '../types/sortBy';
 
 async function getUser(email: string, password: string) {
@@ -449,7 +449,7 @@ async function getCategories() {
 async function createAnonymousCart() {
   const clientBuilder = apiRoot.withProjectKey({ projectKey });
   const cartDraft: ByProjectKeyMeCartsPost = {
-    currency: 'EUR',
+    currency: CURRENCY,
   };
   try {
     const response = await clientBuilder
@@ -469,7 +469,7 @@ async function createAnonymousCart() {
 async function createCart(customerId: string) {
   const clientBuilder = apiRoot.withProjectKey({ projectKey });
   const cartDraft: ByProjectKeyMeCartsPost = {
-    currency: 'EUR',
+    currency: CURRENCY,
     customerId,
   };
   await clientBuilder
