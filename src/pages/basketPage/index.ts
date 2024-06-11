@@ -90,7 +90,7 @@ class BasketPage extends Page {
     if (this.cartInfo) {
       const cartStatus = localStorage.getItem('anonymous_cart_id')
         ? 'anonymous_cart'
-        : 'cart';
+        : 'registered_user_cart';
       localStorage.setItem(
         `${cartStatus}_version`,
         String(this.cartInfo.version)

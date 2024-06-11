@@ -16,9 +16,9 @@ import {
   setFirstName,
   setLastName,
   setShippingAddress,
-  getCartById,
   addToCart,
   createCart,
+  getAnonymousCartById,
 } from './SDK';
 
 async function getToken(email: string, password: string): Promise<string> {
@@ -78,7 +78,7 @@ async function addItemsFromAnonymousCart() {
   if (!anonymousCartId) {
     return;
   }
-  const anonymousCart = await getCartById(anonymousCartId);
+  const anonymousCart = await getAnonymousCartById(anonymousCartId);
   const items = anonymousCart.body.lineItems;
 
   async function addItemsRecursively(lineItems: LineItem[], index: number = 0) {
@@ -131,15 +131,13 @@ const signUpUser = async (
     const { id } = response.body.customer;
     localStorage.setItem('id', id);
 
-    if (localStorage.getItem('anonymous_cart_id')) {
-      await createCart(id);
-      addItemsFromAnonymousCart();
-    }
-
     try {
       const token = await getToken(userInfo.email, userInfo.password);
       localStorage.setItem('token', token);
-
+      if (localStorage.getItem('anonymous_cart_id')) {
+        await createCart(id);
+        addItemsFromAnonymousCart();
+      }
       return { id, token };
     } catch (tokenError) {
       throw new Error('Failed to retrieve authentication token.');

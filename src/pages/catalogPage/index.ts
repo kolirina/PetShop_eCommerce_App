@@ -543,20 +543,6 @@ class CatalogPage extends Page {
         cartVersion = localStorage.getItem('anonymous_cart_version')!;
       }
       await addToCart(id, 1, JSON.parse(cartVersion));
-      try {
-        const filteredProducts = await fetchFilteredByPriceAndBrandAndSearch(
-          this.minPrice,
-          this.maxPrice,
-          this.chosenBrands,
-          this.searchWord,
-          this.sortBy,
-          this.categoryId
-        );
-        this.productsContainer.innerHTML = '';
-        this.getInfoFilteredProducts(filteredProducts);
-      } catch (error) {
-        throw new Error('Error fetching filtered products');
-      }
     });
   }
 
