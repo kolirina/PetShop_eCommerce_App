@@ -27,6 +27,7 @@ import {
 import priceFormatter from '../../utils/priceFormatter';
 import Pages from '../../router/pageNames';
 import './catalogPageStyles.css';
+import checkAnonymousToken from '../../utils/checkAnonymousToken';
 
 class CatalogPage extends Page {
   public banner: HTMLDivElement;
@@ -264,6 +265,7 @@ class CatalogPage extends Page {
     });
     this.filterByBrandDiv = createDiv('filterByBrandDiv', this.aside);
 
+    checkAnonymousToken();
     this.fetchProducts();
     this.getCategories();
   }

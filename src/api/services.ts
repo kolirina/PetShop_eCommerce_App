@@ -1,4 +1,4 @@
-import { MAX_CHAR_CODE, MIN_CHAR_CODE } from '../constants';
+import { MAX_CHAR_CODE, MIN_CHAR_CODE, MS_IN_SEC } from '../constants';
 import { AddressToChange, UserInfo } from '../types';
 import { LineItem } from '../types/cart';
 import {
@@ -66,8 +66,10 @@ async function createAnonymousUser() {
   }
 
   const data = await response.json();
+  const expiryTime = data.expires_in * MS_IN_SEC;
   localStorage.setItem('anonymous_token', data.access_token);
-  // console.log(data);
+  localStorage.setItem('anonymous_token_time', String(Date.now() + expiryTime));
+  localStorage.setItem('anonymous_refresh_token', data.refresh_token);
   return data.access_token;
 }
 

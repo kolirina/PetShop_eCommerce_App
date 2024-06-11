@@ -2,7 +2,11 @@ import { ClientResponse, CustomerUpdate } from '@commercetools/platform-sdk';
 import { apiRoot, projectKey } from './ApiRoot';
 import { AddressToChange, UserAddress, UserInfo } from '../types';
 import { ByProjectKeyMeCartsPost, CartInfo } from '../types/cart';
-import { lang, MAX_NUMBER_OF_PRODUCTS_DISPLAYED } from '../constants';
+import {
+  lang,
+  MAX_NUMBER_OF_PRODUCTS_DISPLAYED,
+  MS_IN_SEC,
+} from '../constants';
 import SortBy from '../types/sortBy';
 
 async function getUser(email: string, password: string) {
@@ -586,6 +590,34 @@ async function addToCart(
   }
 }
 
+async function refreshAnonymousToken(): Promise<void> {
+  const CTP_CLIENT_ID = import.meta.env.VITE_CTP_CLIENT_ID;
+  const CTP_CLIENT_SECRET = import.meta.env.VITE_CTP_CLIENT_SECRET;
+  const CTP_AUTH_URL = import.meta.env.VITE_CTP_AUTH_URL;
+  const CTP_PROJECT_KEY = import.meta.env.VITE_CTP_PROJECT_KEY;
+  const anonRefreshToken = localStorage.getItem('anonymous_refresh_token');
+
+  const response = await fetch(
+    `${CTP_AUTH_URL}/oauth/${CTP_PROJECT_KEY}/customers/token`,
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        Authorization: `Basic ${btoa(`${CTP_CLIENT_ID}:${CTP_CLIENT_SECRET}`)}`,
+      },
+      body: `grant_type=refresh_token&refresh_token=${anonRefreshToken}`,
+    }
+  );
+
+  const data = await response.json();
+  const tokenTimeInMs = data.expires_in * MS_IN_SEC;
+  localStorage.setItem('anonymous_token', data.access_token);
+  localStorage.setItem(
+    'anonymous_token_time',
+    String(Date.now() + tokenTimeInMs)
+  );
+}
+
 // async function getCartByCartId(cartId: string) {
 //   const resp = await apiRoot
 //     .withProjectKey({ projectKey })
@@ -622,4 +654,5 @@ export {
   createCart,
   getCartByUserId,
   addToCart,
+  refreshAnonymousToken,
 };
