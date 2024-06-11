@@ -2,7 +2,11 @@ import { ClientResponse, CustomerUpdate } from '@commercetools/platform-sdk';
 import { apiRoot, projectKey } from './ApiRoot';
 import { AddressToChange, UserAddress, UserInfo } from '../types';
 import { ByProjectKeyMeCartsPost, CartInfo } from '../types/cart';
-import { lang, MAX_NUMBER_OF_PRODUCTS_DISPLAYED, CURRENCY } from '../constants';
+import {
+  lang,
+  MAX_NUMBER_OF_PRODUCTS_DISPLAYED,
+  MS_IN_SEC,
+} from '../constants';
 import SortBy from '../types/sortBy';
 
 async function getUser(email: string, password: string) {
@@ -446,15 +450,68 @@ async function getCategories() {
   return resp.body.results;
 }
 
+async function getCartById(cartId: string): Promise<ClientResponse> {
+  const token = localStorage.getItem('token')
+    ? localStorage.getItem('token')
+    : localStorage.getItem('anonymous_token');
+
+  try {
+    const resp = await apiRoot
+      .withProjectKey({ projectKey })
+      .me()
+      .carts()
+      .withId({ ID: cartId })
+      .get({
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+      .execute();
+
+    return resp;
+  } catch (err: unknown) {
+    throw new Error(`${(err as Error).message}`);
+  }
+}
+
+async function getAnonymousCartById(cartId: string): Promise<ClientResponse> {
+  const token = localStorage.getItem('anonymous_token');
+
+  try {
+    const resp = await apiRoot
+      .withProjectKey({ projectKey })
+      .me()
+      .carts()
+      .withId({ ID: cartId })
+      .get({
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+      .execute();
+
+    return resp;
+  } catch (err: unknown) {
+    throw new Error(`${(err as Error).message}`);
+  }
+}
+
 async function createAnonymousCart() {
-  const clientBuilder = apiRoot.withProjectKey({ projectKey });
+  const token = localStorage.getItem('anonymous_token');
   const cartDraft: ByProjectKeyMeCartsPost = {
-    currency: CURRENCY,
+    currency: 'EUR',
   };
   try {
-    const response = await clientBuilder
+    const response = await apiRoot
+      .withProjectKey({ projectKey })
+      .me()
       .carts()
-      .post({ body: cartDraft })
+      .post({
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        body: cartDraft,
+      })
       .execute();
     localStorage.setItem('anonymous_cart_id', response.body.id);
     localStorage.setItem(
@@ -467,14 +524,21 @@ async function createAnonymousCart() {
 }
 
 async function createCart(customerId: string) {
-  const clientBuilder = apiRoot.withProjectKey({ projectKey });
+  const token = localStorage.getItem('token');
   const cartDraft: ByProjectKeyMeCartsPost = {
-    currency: CURRENCY,
+    currency: 'EUR',
     customerId,
   };
-  await clientBuilder
+  await apiRoot
+    .withProjectKey({ projectKey })
+    .me()
     .carts()
-    .post({ body: cartDraft })
+    .post({
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      body: cartDraft,
+    })
     .execute()
     .then((response) => {
       localStorage.setItem('registered_user_cart_id', response.body.id);
@@ -493,6 +557,9 @@ async function addToCart(
   quantity: number,
   cartVers: number
 ) {
+  const token = localStorage.getItem('token')
+    ? localStorage.getItem('token')
+    : localStorage.getItem('anonymous_token');
   let cartId: string | null = '';
   let cartVersion: string | null = '';
   if (localStorage.getItem('registered_user_cart_id')) {
@@ -508,12 +575,17 @@ async function addToCart(
   }
   if (!cartId || !cartVersion) {
     throw new Error('Cart ID or version is missing');
+    return;
   }
   const resp = await apiRoot
     .withProjectKey({ projectKey })
+    .me()
     .carts()
     .withId({ ID: cartId! })
     .post({
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
       body: {
         version: cartVers,
         actions: [
@@ -540,14 +612,32 @@ async function addToCart(
   }
 }
 
-async function getCartByCartId(cartId: string) {
-  const resp = await apiRoot
-    .withProjectKey({ projectKey })
-    .carts()
-    .withId({ ID: cartId })
-    .get()
-    .execute();
-  return resp;
+async function refreshAnonymousToken(): Promise<void> {
+  const CTP_CLIENT_ID = import.meta.env.VITE_CTP_CLIENT_ID;
+  const CTP_CLIENT_SECRET = import.meta.env.VITE_CTP_CLIENT_SECRET;
+  const CTP_AUTH_URL = import.meta.env.VITE_CTP_AUTH_URL;
+  const CTP_PROJECT_KEY = import.meta.env.VITE_CTP_PROJECT_KEY;
+  const anonRefreshToken = localStorage.getItem('anonymous_refresh_token');
+
+  const response = await fetch(
+    `${CTP_AUTH_URL}/oauth/${CTP_PROJECT_KEY}/customers/token`,
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        Authorization: `Basic ${btoa(`${CTP_CLIENT_ID}:${CTP_CLIENT_SECRET}`)}`,
+      },
+      body: `grant_type=refresh_token&refresh_token=${anonRefreshToken}`,
+    }
+  );
+
+  const data = await response.json();
+  const tokenTimeInMs = data.expires_in * MS_IN_SEC;
+  localStorage.setItem('anonymous_token', data.access_token);
+  localStorage.setItem(
+    'anonymous_token_time',
+    String(Date.now() + tokenTimeInMs)
+  );
 }
 
 export {
@@ -571,9 +661,11 @@ export {
   getProduct,
   removeAddress,
   getCategories,
+  getCartById,
   createAnonymousCart,
   createCart,
   getCartByUserId,
   addToCart,
-  getCartByCartId,
+  refreshAnonymousToken,
+  getAnonymousCartById,
 };

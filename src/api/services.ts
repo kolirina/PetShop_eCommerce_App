@@ -1,4 +1,4 @@
-import { MAX_CHAR_CODE, MIN_CHAR_CODE } from '../constants';
+import { MAX_CHAR_CODE, MIN_CHAR_CODE, MS_IN_SEC } from '../constants';
 import { AddressToChange, UserInfo } from '../types';
 import { LineItem } from '../types/cart';
 import {
@@ -16,9 +16,9 @@ import {
   setFirstName,
   setLastName,
   setShippingAddress,
-  getCartByCartId,
   addToCart,
   createCart,
+  getAnonymousCartById,
 } from './SDK';
 
 async function getToken(email: string, password: string): Promise<string> {
@@ -48,9 +48,10 @@ async function createAnonymousUser() {
   const CTP_AUTH_URL = import.meta.env.VITE_CTP_AUTH_URL;
   const CTP_CLIENT_ID = import.meta.env.VITE_CTP_CLIENT_ID;
   const CTP_CLIENT_SECRET = import.meta.env.VITE_CTP_CLIENT_SECRET;
+  const CTP_CLIENT_PROJECT_KEY = import.meta.env.VITE_CTP_PROJECT_KEY;
 
   const response = await fetch(
-    `${CTP_AUTH_URL}/oauth/token?grant_type=client_credentials`,
+    `${CTP_AUTH_URL}/oauth/${CTP_CLIENT_PROJECT_KEY}/anonymous/token?grant_type=client_credentials`,
     {
       method: 'POST',
       headers: {
@@ -65,7 +66,10 @@ async function createAnonymousUser() {
   }
 
   const data = await response.json();
+  const expiryTime = data.expires_in * MS_IN_SEC;
   localStorage.setItem('anonymous_token', data.access_token);
+  localStorage.setItem('anonymous_token_time', String(Date.now() + expiryTime));
+  localStorage.setItem('anonymous_refresh_token', data.refresh_token);
   return data.access_token;
 }
 
@@ -74,7 +78,7 @@ async function addItemsFromAnonymousCart() {
   if (!anonymousCartId) {
     return;
   }
-  const anonymousCart = await getCartByCartId(anonymousCartId);
+  const anonymousCart = await getAnonymousCartById(anonymousCartId);
   const items = anonymousCart.body.lineItems;
 
   async function addItemsRecursively(lineItems: LineItem[], index: number = 0) {
@@ -127,15 +131,13 @@ const signUpUser = async (
     const { id } = response.body.customer;
     localStorage.setItem('id', id);
 
-    if (localStorage.getItem('anonymous_cart_id')) {
-      await createCart(id);
-      addItemsFromAnonymousCart();
-    }
-
     try {
       const token = await getToken(userInfo.email, userInfo.password);
       localStorage.setItem('token', token);
-
+      if (localStorage.getItem('anonymous_cart_id')) {
+        await createCart(id);
+        addItemsFromAnonymousCart();
+      }
       return { id, token };
     } catch (tokenError) {
       throw new Error('Failed to retrieve authentication token.');

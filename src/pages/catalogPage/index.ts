@@ -1,3 +1,4 @@
+import { LineItem } from '@commercetools/platform-sdk';
 import Router from '../../router';
 import Page from '../Page';
 import SortBy from '../../types/sortBy';
@@ -21,7 +22,7 @@ import {
   createAnonymousCart,
   createCart,
   addToCart,
-  getCartByCartId,
+  getCartById,
 } from '../../api/SDK';
 import priceFormatter from '../../utils/priceFormatter';
 import Pages from '../../router/pageNames';
@@ -301,13 +302,15 @@ class CatalogPage extends Page {
     ) {
       cartId = localStorage.getItem('anonymous_cart_id')!;
     }
-    const cart = await getCartByCartId(cartId);
-    const productsInCart = cart.body.lineItems;
-    this.productsInCartIds = [];
-    if (productsInCart) {
-      productsInCart.forEach((product) =>
-        this.productsInCartIds.push(product.productId)
-      );
+    if (cartId) {
+      const cart = await getCartById(cartId);
+      const productsInCart = cart.body.lineItems;
+      this.productsInCartIds = [];
+      if (productsInCart) {
+        productsInCart.forEach((product: LineItem) =>
+          this.productsInCartIds.push(product.productId)
+        );
+      }
     }
 
     filteredProducts.forEach((product: FilteredProduct) => {
