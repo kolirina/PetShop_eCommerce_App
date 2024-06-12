@@ -5,7 +5,7 @@ function checkAnonymousToken() {
   const tokenTime = localStorage.getItem('anonymous_token_time');
   if (tokenTime) {
     const timeLeft = Number(tokenTime) - Date.now();
-    if (timeLeft < TEN_MINS_IN_MS) {
+    if (timeLeft < TEN_MINS_IN_MS && timeLeft > 0) {
       refreshAnonymousToken();
     }
     if (timeLeft <= 0) {

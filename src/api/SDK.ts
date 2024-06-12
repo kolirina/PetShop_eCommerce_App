@@ -12,6 +12,7 @@ import {
   MS_IN_SEC,
 } from '../constants';
 import SortBy from '../types/sortBy';
+import getLocalToken from '../utils/getLocalToken';
 
 async function getUser(email: string, password: string) {
   const resp = await apiRoot
@@ -688,6 +689,40 @@ async function deleteProductFromCart(
   return data;
 }
 
+async function changeProductQuantity(
+  cartId: string,
+  productId: string,
+  cartVersion: number,
+  quantity: number
+): Promise<Cart> {
+  const token = localStorage.getItem('token')
+    ? localStorage.getItem('token')
+    : localStorage.getItem('anonymous_token');
+  const response = await apiRoot
+    .withProjectKey({ projectKey })
+    .me()
+    .carts()
+    .withId({ ID: cartId })
+    .post({
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      body: {
+        version: cartVersion,
+        actions: [
+          {
+            action: 'changeLineItemQuantity',
+            lineItemId: productId,
+            quantity,
+          },
+        ],
+      },
+    })
+    .execute();
+  const data = response.body;
+  return data;
+}
+
 export {
   getUser,
   registerUser,
@@ -715,6 +750,7 @@ export {
   getCartByUserId,
   addToCart,
   refreshAnonymousToken,
-  getAnonymousCartById,
   deleteProductFromCart,
+  getAnonymousCartById,
+  changeProductQuantity,
 };
