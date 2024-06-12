@@ -1,4 +1,8 @@
-import { ClientResponse, CustomerUpdate } from '@commercetools/platform-sdk';
+import {
+  Cart,
+  ClientResponse,
+  CustomerUpdate,
+} from '@commercetools/platform-sdk';
 import { apiRoot, projectKey } from './ApiRoot';
 import { AddressToChange, UserAddress, UserInfo } from '../types';
 import { ByProjectKeyMeCartsPost, CartInfo } from '../types/cart';
@@ -644,7 +648,7 @@ async function deleteProductFromCart(
   cartId: string,
   productId: string,
   cartVersion: number
-) {
+): Promise<Cart> {
   const token = localStorage.getItem('token')
     ? localStorage.getItem('token')
     : localStorage.getItem('anonymous_token');
@@ -663,6 +667,40 @@ async function deleteProductFromCart(
           {
             action: 'removeLineItem',
             lineItemId: productId,
+          },
+        ],
+      },
+    })
+    .execute();
+  const data = response.body;
+  return data;
+}
+
+async function changeProductQuantity(
+  cartId: string,
+  productId: string,
+  cartVersion: number,
+  quantity: number
+): Promise<Cart> {
+  const token = localStorage.getItem('token')
+    ? localStorage.getItem('token')
+    : localStorage.getItem('anonymous_token');
+  const response = await apiRoot
+    .withProjectKey({ projectKey })
+    .me()
+    .carts()
+    .withId({ ID: cartId })
+    .post({
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      body: {
+        version: cartVersion,
+        actions: [
+          {
+            action: 'changeLineItemQuantity',
+            lineItemId: productId,
+            quantity,
           },
         ],
       },
@@ -701,4 +739,5 @@ export {
   refreshAnonymousToken,
   deleteProductFromCart,
   getAnonymousCartById,
+  changeProductQuantity,
 };

@@ -1,4 +1,4 @@
-import { LineItem } from '@commercetools/platform-sdk';
+import { Cart, LineItem } from '@commercetools/platform-sdk';
 import {
   createBtn,
   createDiv,
@@ -11,7 +11,7 @@ import { FIRST_PIC } from './constants';
 import noImage from '../../assets/no-image.png';
 import { lang } from '../../constants';
 import priceFormatter from '../../utils/priceFormatter';
-import { deleteProductFromCart } from '../../api/SDK';
+import { changeProductQuantity, deleteProductFromCart } from '../../api/SDK';
 import styles from './basketPage.module.css';
 
 class Product {
@@ -50,7 +50,7 @@ class Product {
   constructor(item: LineItem) {
     this.productInfo = item;
     this.productAmount = item.quantity;
-    this.productPrice = item.price.value.centAmount;
+    this.productPrice = item.totalPrice.centAmount;
 
     this.productWrapper = createDiv(styles.productWrapper);
 
@@ -105,22 +105,21 @@ class Product {
       '+',
       this.productAmountWrapper
     );
+    this.productAmountInput.disabled = true;
 
     this.productPriceText = createH3(
       styles.productPriceText,
       priceFormatter(this.productPrice),
       this.amountAndPriceWrapper
     );
+    if (item.price.discounted) {
+      this.productPriceText.classList.add(styles.discountedPrice);
+    }
 
     this.productDeleteBtn = createBtn(
       styles.productDeleteBtn,
       'Remove ',
       this.amountAndPriceWrapper
-    );
-
-    this.productAmountDecBtn.addEventListener(
-      'click',
-      this.minusOne.bind(this)
     );
   }
 
@@ -132,7 +131,7 @@ class Product {
     return noImage;
   }
 
-  private getBrandName() {
+  private getBrandName(): string {
     const brand = this.productInfo.variant.attributes;
     if (brand) {
       return brand.find((el) => el.name === 'brand')?.value;
@@ -140,16 +139,19 @@ class Product {
     return '';
   }
 
-  private minusOne() {
-    this.productAmountInput.value = String(
-      Number(this.productAmountInput.value) - 1
-    );
-    if (this.productAmountInput.value === '1') {
-      this.productAmountInput.disabled = true;
-    }
-  }
+  // private minusOne(): void {
+  //   this.productAmountInput.value = String(
+  //     Number(this.productAmountInput.value) - 1
+  //   );
+  //   if (this.productAmountInput.value === '1') {
+  //     this.productAmountInput.disabled = true;
+  //   }
+  // }
 
-  public async deleteProduct(cartId: string, cartVersion: number) {
+  public async deleteProduct(
+    cartId: string,
+    cartVersion: number
+  ): Promise<Cart> {
     const response = deleteProductFromCart(
       cartId,
       this.productInfo.id,
@@ -161,6 +163,48 @@ class Product {
       }
     }
     return response;
+  }
+
+  public async changeQuantity(
+    cartId: string,
+    cartVersion: number,
+    target: HTMLElement
+  ): Promise<Cart> {
+    let quantity = Number(this.productAmountInput.value);
+    if (target === this.productAmountDecBtn) {
+      quantity -= 1;
+    }
+    if (target === this.productAmountIncBtn) {
+      quantity += 1;
+    }
+    const response = await changeProductQuantity(
+      cartId,
+      this.productInfo.id,
+      cartVersion,
+      quantity
+    ).then((result) => {
+      const changedProduct = result.lineItems.find(
+        (el) => el.id === this.productInfo.id
+      );
+      if (changedProduct) {
+        this.productInfo = changedProduct;
+      }
+      this.updatePriceAndQuantity();
+      return result;
+    });
+    return response;
+  }
+
+  private updatePriceAndQuantity(): void {
+    this.productPrice = this.productInfo.totalPrice.centAmount;
+    this.productPriceText.textContent = priceFormatter(this.productPrice);
+    this.productAmount = this.productInfo.quantity;
+    this.productAmountInput.value = String(this.productAmount);
+    if (this.productAmount === 1) {
+      this.productAmountDecBtn.disabled = true;
+    } else {
+      this.productAmountDecBtn.disabled = false;
+    }
   }
 
   public getProduct(): HTMLDivElement {

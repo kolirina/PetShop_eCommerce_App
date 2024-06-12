@@ -82,6 +82,9 @@
   display: flex;
   height: 25px;
 }
+.discountedPrice {
+  color: green;
+}
 .product-amount-btn {
   display: flex;
   justify-content: center;
@@ -118,12 +121,12 @@
   height: 25px;
   margin: 0 7px 0 7px;
   text-align: center;
-  border: 1px solid var(--accent-color);
-  border-radius: 3px;
+  border: none;
+  background-color: transparent;
 }
-.product-amount-input:focus {
+/* .product-amount-input:focus {
   outline: 1px solid var(--accent-color);
-}
+} */
 .product-price-text {
   margin: 0 0 0 15px;
   line-height: 26px;

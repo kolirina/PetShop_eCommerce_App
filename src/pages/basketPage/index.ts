@@ -68,7 +68,14 @@ class BasketPage extends Page {
           item.productDeleteBtn.addEventListener('click', () =>
             this.deleteHandler(item)
           );
+          item.productAmountDecBtn.addEventListener('click', (e) =>
+            this.quantityHandler(item, e)
+          );
+          item.productAmountIncBtn.addEventListener('click', (e) =>
+            this.quantityHandler(item, e)
+          );
         });
+
         if (this.cartInfo && this.cartInfo.lineItems.length > 0) {
           this.goToCatalogBtn.remove();
           this.noProductsMessage.remove();
@@ -81,7 +88,7 @@ class BasketPage extends Page {
     }
   }
 
-  private async deleteHandler(item: Product) {
+  private async deleteHandler(item: Product): Promise<void> {
     if (this.cartInfo) {
       const deleteResult = await item.deleteProduct.bind(
         item,
@@ -95,7 +102,23 @@ class BasketPage extends Page {
     }
   }
 
-  private updateFields() {
+  private async quantityHandler(item: Product, e: Event): Promise<void> {
+    const target = e.target as HTMLElement;
+    if (this.cartInfo) {
+      const amountResult = await item.changeQuantity.bind(
+        item,
+        this.cartInfo.id,
+        this.cartInfo.version,
+        target
+      )();
+      if (amountResult) {
+        this.cartInfo = amountResult;
+        this.updateFields();
+      }
+    }
+  }
+
+  private updateFields(): void {
     if (this.cartInfo) {
       const cartStatus = localStorage.getItem('anonymous_cart_id')
         ? 'anonymous_cart'
