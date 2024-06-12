@@ -227,32 +227,43 @@ class CatalogPage extends Page {
       'SHOW MORE',
       this.productsPlusLoadMore
     );
+
     this.loadMoreButton.addEventListener('click', async () => {
       this.pageNumber += 1;
       this.isLoadMoreDisplayed();
-      if (
-        this.minPrice === 0 &&
-        this.maxPrice === 0 &&
-        this.chosenBrands.length === 0 &&
-        this.searchWord === '' &&
-        this.categoryId === ''
-      ) {
-        const products = await fetchProductsForPagination(
-          this.sortBy,
-          this.pageNumber
-        );
+
+      const spinner = createDiv('spinner', this.productsContainer);
+      spinner.style.display = 'block';
+
+      try {
+        let products;
+        if (
+          this.minPrice === 0 &&
+          this.maxPrice === 0 &&
+          this.chosenBrands.length === 0 &&
+          this.searchWord === '' &&
+          this.categoryId === ''
+        ) {
+          products = await fetchProductsForPagination(
+            this.sortBy,
+            this.pageNumber
+          );
+        } else {
+          products = await fetchFilteredForPagination(
+            this.minPrice,
+            this.maxPrice,
+            this.chosenBrands,
+            this.searchWord,
+            this.sortBy,
+            this.categoryId,
+            this.pageNumber
+          );
+        }
         this.getInfoFilteredProducts(products);
-      } else {
-        const products = await fetchFilteredForPagination(
-          this.minPrice,
-          this.maxPrice,
-          this.chosenBrands,
-          this.searchWord,
-          this.sortBy,
-          this.categoryId,
-          this.pageNumber
-        );
-        this.getInfoFilteredProducts(products);
+      } catch (error) {
+        throw new Error('Error fetching products');
+      } finally {
+        spinner.style.display = 'none';
       }
     });
 
