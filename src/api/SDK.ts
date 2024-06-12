@@ -1,4 +1,8 @@
-import { ClientResponse, CustomerUpdate } from '@commercetools/platform-sdk';
+import {
+  Cart,
+  ClientResponse,
+  CustomerUpdate,
+} from '@commercetools/platform-sdk';
 import { apiRoot, projectKey } from './ApiRoot';
 import { AddressToChange, UserAddress, UserInfo } from '../types';
 import { ByProjectKeyMeCartsPost, CartInfo } from '../types/cart';
@@ -575,7 +579,6 @@ async function addToCart(
   }
   if (!cartId || !cartVersion) {
     throw new Error('Cart ID or version is missing');
-    return;
   }
   const resp = await apiRoot
     .withProjectKey({ projectKey })
@@ -610,6 +613,8 @@ async function addToCart(
       JSON.stringify(resp.body.version)
     );
   }
+  const data = resp.body;
+  return data;
 }
 
 async function refreshAnonymousToken(): Promise<void> {
@@ -640,6 +645,49 @@ async function refreshAnonymousToken(): Promise<void> {
   );
 }
 
+async function deleteProductFromCart(
+  cartId: string,
+  productId: string,
+  cartVersion: number
+): Promise<Cart> {
+  const token = localStorage.getItem('token')
+    ? localStorage.getItem('token')
+    : localStorage.getItem('anonymous_token');
+  const response = await apiRoot
+    .withProjectKey({ projectKey })
+    .me()
+    .carts()
+    .withId({ ID: cartId })
+    .post({
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      body: {
+        version: cartVersion,
+        actions: [
+          {
+            action: 'removeLineItem',
+            lineItemId: productId,
+          },
+        ],
+      },
+    })
+    .execute();
+  if (cartId === localStorage.getItem('anonymous_cart_id')) {
+    localStorage.setItem(
+      'anonymous_cart_version',
+      JSON.stringify(response.body.version)
+    );
+  } else {
+    localStorage.setItem(
+      'registered_user_cart_version',
+      JSON.stringify(response.body.version)
+    );
+  }
+  const data = response.body;
+  return data;
+}
+
 export {
   getUser,
   registerUser,
@@ -668,4 +716,5 @@ export {
   addToCart,
   refreshAnonymousToken,
   getAnonymousCartById,
+  deleteProductFromCart,
 };
