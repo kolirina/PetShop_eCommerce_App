@@ -16,7 +16,9 @@ import {
 } from '../../utils/elementCreator';
 import {
   fetchProducts,
-  fetchFilteredByPriceAndBrandAndSearch,
+  fetchProductsForPagination,
+  fetchFiltered,
+  fetchFilteredForPagination,
   getSearchResult,
   getCategories,
   createAnonymousCart,
@@ -24,6 +26,7 @@ import {
   addToCart,
   getCartById,
 } from '../../api/SDK';
+import checkAnonymousToken from '../../utils/checkAnonymousToken';
 import priceFormatter from '../../utils/priceFormatter';
 import Pages from '../../router/pageNames';
 import './catalogPageStyles.css';
@@ -47,7 +50,11 @@ class CatalogPage extends Page {
 
   public productsContainerPlusAside: HTMLDivElement;
 
+  public productsPlusLoadMore: HTMLDivElement;
+
   public productsContainer: HTMLDivElement;
+
+  public loadMoreButton: HTMLButtonElement;
 
   public aside: HTMLElement;
 
@@ -82,6 +89,8 @@ class CatalogPage extends Page {
   public sortBy: SortBy = SortBy.PRICE_ASC;
 
   public productsInCartIds: string[] = [];
+
+  public pageNumber: number = 0;
 
   constructor(router: Router, parentElement: HTMLElement) {
     super(router, parentElement);
@@ -177,7 +186,9 @@ class CatalogPage extends Page {
     sortBySelect.addEventListener('change', async () => {
       this.sortBy = sortBySelect.value as SortBy;
       this.productsContainer.innerHTML = '';
-      const filteredProducts = await fetchFilteredByPriceAndBrandAndSearch(
+      this.pageNumber = 0;
+      this.loadMoreButton.classList.remove('hidden');
+      const filteredProducts = await fetchFiltered(
         this.minPrice,
         this.maxPrice,
         this.chosenBrands,
@@ -185,16 +196,65 @@ class CatalogPage extends Page {
         this.sortBy,
         this.categoryId
       );
-      this.getInfoFilteredProducts(filteredProducts);
+      const filteredProductForPagination = await fetchFilteredForPagination(
+        this.minPrice,
+        this.maxPrice,
+        this.chosenBrands,
+        this.searchWord,
+        this.sortBy,
+        this.categoryId,
+        this.pageNumber
+      );
+      this.getInfoFilteredProducts(filteredProductForPagination);
       this.filterByBrandDiv.innerHTML = '';
       this.getBrandsOfFilteredProducts(filteredProducts);
+      if (filteredProductForPagination.length > filteredProducts.length - 1) {
+        this.loadMoreButton.classList.add('hidden');
+      }
     });
 
     this.aside = createAside('aside', this.productsContainerPlusAside);
-    this.productsContainer = createDiv(
-      'productsContainer',
+    this.productsPlusLoadMore = createDiv(
+      'productsPlusLoadMore',
       this.productsContainerPlusAside
     );
+    this.productsContainer = createDiv(
+      'productsContainer',
+      this.productsPlusLoadMore
+    );
+    this.loadMoreButton = createBtn(
+      'catalogButton',
+      'SHOW MORE',
+      this.productsPlusLoadMore
+    );
+    this.loadMoreButton.addEventListener('click', async () => {
+      this.pageNumber += 1;
+      this.isLoadMoreDisplayed();
+      if (
+        this.minPrice === 0 &&
+        this.maxPrice === 0 &&
+        this.chosenBrands.length === 0 &&
+        this.searchWord === '' &&
+        this.categoryId === ''
+      ) {
+        const products = await fetchProductsForPagination(
+          this.sortBy,
+          this.pageNumber
+        );
+        this.getInfoFilteredProducts(products);
+      } else {
+        const products = await fetchFilteredForPagination(
+          this.minPrice,
+          this.maxPrice,
+          this.chosenBrands,
+          this.searchWord,
+          this.sortBy,
+          this.categoryId,
+          this.pageNumber
+        );
+        this.getInfoFilteredProducts(products);
+      }
+    });
 
     this.createAsideContent(this.aside);
 
@@ -237,6 +297,9 @@ class CatalogPage extends Page {
         this.showFiltersButton.textContent = 'Show Filters';
       }
       this.productsContainer.innerHTML = '';
+      this.pageNumber = 0;
+      this.loadMoreButton.classList.remove('hidden');
+
       this.productsDisplayed = [];
       this.minPrice = Number(this.minPriceInput.value) * 100;
       this.maxPrice = Number(this.maxPriceInput.value) * 100;
@@ -248,7 +311,7 @@ class CatalogPage extends Page {
       }
       let filteredProducts: FilteredProduct[] = [];
 
-      filteredProducts = await fetchFilteredByPriceAndBrandAndSearch(
+      filteredProducts = await fetchFiltered(
         this.minPrice,
         this.maxPrice,
         this.chosenBrands,
@@ -256,16 +319,27 @@ class CatalogPage extends Page {
         this.sortBy,
         this.categoryId
       );
+
+      const filteredProductForPagination = await fetchFilteredForPagination(
+        this.minPrice,
+        this.maxPrice,
+        this.chosenBrands,
+        this.searchWord,
+        this.sortBy,
+        this.categoryId,
+        this.pageNumber
+      );
+      this.getInfoFilteredProducts(filteredProductForPagination);
       this.filterByBrandDiv.innerHTML = '';
-      this.getInfoFilteredProducts(filteredProducts);
       this.getBrandsOfFilteredProducts(filteredProducts);
       this.minPriceInput.classList.add('chosen');
       this.maxPriceInput.classList.add('chosen');
     });
     this.filterByBrandDiv = createDiv('filterByBrandDiv', this.aside);
-
+    this.fetchProductsForPagination();
     this.fetchProducts();
     this.getCategories();
+    checkAnonymousToken();
   }
 
   public createAsideContent(asideElement: HTMLElement): void {
@@ -281,12 +355,21 @@ class CatalogPage extends Page {
 
   async fetchProducts(): Promise<void> {
     const productsData = await fetchProducts(this.sortBy);
-    this.getInfoFilteredProducts(productsData);
     this.getBrandsOfFilteredProducts(productsData);
     this.breadcrumbsContainer.innerHTML = 'HOME';
   }
 
+  async fetchProductsForPagination(): Promise<void> {
+    const productsData = await fetchProductsForPagination(
+      this.sortBy,
+      this.pageNumber
+    );
+    this.getInfoFilteredProducts(productsData);
+    this.breadcrumbsContainer.innerHTML = 'HOME';
+  }
+
   public async getInfoFilteredProducts(filteredProducts: FilteredProducts) {
+    this.isLoadMoreDisplayed();
     if (filteredProducts.length === 0) {
       this.productsContainer.innerHTML =
         'It seems that no product matches your request. Please try again.';
@@ -415,6 +498,8 @@ class CatalogPage extends Page {
 
       checkbox.addEventListener('click', async () => {
         this.productsContainer.innerHTML = '';
+        this.pageNumber = 0;
+        this.loadMoreButton.classList.remove('hidden');
         if (!this.chosenBrands.includes(brand.brand)) {
           this.chosenBrands.push(brand.brand);
         } else {
@@ -424,7 +509,7 @@ class CatalogPage extends Page {
           }
         }
         if (this.chosenBrands.length === 0) {
-          const filteredProducts = await fetchFilteredByPriceAndBrandAndSearch(
+          const filteredProducts = await fetchFiltered(
             this.minPrice,
             this.maxPrice,
             this.chosenBrands,
@@ -432,9 +517,18 @@ class CatalogPage extends Page {
             this.sortBy,
             this.categoryId
           );
+          const filteredProductForPagination = await fetchFilteredForPagination(
+            this.minPrice,
+            this.maxPrice,
+            this.chosenBrands,
+            this.searchWord,
+            this.sortBy,
+            this.categoryId,
+            this.pageNumber
+          );
+          this.getInfoFilteredProducts(filteredProductForPagination);
           this.getInfoFilteredProducts(filteredProducts);
           this.filterByBrandDiv.innerHTML = '';
-          this.getBrandsOfFilteredProducts(filteredProducts);
         }
         if (
           !this.minPrice &&
@@ -446,15 +540,16 @@ class CatalogPage extends Page {
         }
 
         try {
-          const filteredProducts = await fetchFilteredByPriceAndBrandAndSearch(
+          const filteredProductForPagination = await fetchFilteredForPagination(
             this.minPrice,
             this.maxPrice,
             this.chosenBrands,
             this.searchWord,
             this.sortBy,
-            this.categoryId
+            this.categoryId,
+            this.pageNumber
           );
-          this.getInfoFilteredProducts(filteredProducts);
+          this.getInfoFilteredProducts(filteredProductForPagination);
         } catch (error) {
           throw new Error('Error fetching filtered products');
         }
@@ -526,6 +621,14 @@ class CatalogPage extends Page {
         await createAnonymousCart();
       }
       if (
+        localStorage.getItem('anonymous_token') &&
+        !localStorage.getItem('anonymous_cart_id') &&
+        !localStorage.getItem('token') &&
+        !localStorage.getItem('id')
+      ) {
+        await createAnonymousCart();
+      }
+      if (
         !localStorage.getItem('registered_user_cart_id') &&
         localStorage.getItem('id')
       ) {
@@ -547,14 +650,19 @@ class CatalogPage extends Page {
   public async buildBreadcrumb(category: Category) {
     this.breadcrumbsContainer.innerHTML = '';
     this.productsContainer.innerHTML = '';
+    this.pageNumber = 0;
+    this.loadMoreButton.classList.remove('hidden');
     const categories = await getCategories();
     const homeBreadcrumb = document.createElement('span');
     homeBreadcrumb.classList.add('breadcrumb');
     homeBreadcrumb.textContent = 'HOME';
     this.breadcrumbsContainer.appendChild(homeBreadcrumb);
     homeBreadcrumb.addEventListener('click', async () => {
+      this.productsContainer.innerHTML = '';
+      this.pageNumber = 0;
+      this.loadMoreButton.classList.remove('hidden');
       this.categoryId = '';
-      const filteredProducts = await fetchFilteredByPriceAndBrandAndSearch(
+      const filteredProducts = await fetchFiltered(
         this.minPrice,
         this.maxPrice,
         this.chosenBrands,
@@ -562,12 +670,22 @@ class CatalogPage extends Page {
         this.sortBy,
         this.categoryId
       );
-      this.breadcrumbsContainer.innerHTML = 'HOME';
-      this.productsContainer.innerHTML = '';
+      const filteredProductForPagination = await fetchFilteredForPagination(
+        this.minPrice,
+        this.maxPrice,
+        this.chosenBrands,
+        this.searchWord,
+        this.sortBy,
+        this.categoryId,
+        this.pageNumber
+      );
+
       this.filterByBrandDiv.innerHTML = '';
-      this.getInfoFilteredProducts(filteredProducts);
+      this.breadcrumbsContainer.innerHTML = 'HOME';
+      this.filterByBrandDiv.innerHTML = '';
       this.getBrandsOfFilteredProducts(filteredProducts);
       this.getCategories();
+      this.getInfoFilteredProducts(filteredProductForPagination);
     });
 
     const buildBreadcrumbRecursive = (cat: Category) => {
@@ -594,7 +712,7 @@ class CatalogPage extends Page {
       breadcrumb.addEventListener('click', async () => {
         this.categoryId = cat.id;
 
-        const filteredProducts = await fetchFilteredByPriceAndBrandAndSearch(
+        const filteredProducts = await fetchFiltered(
           this.minPrice,
           this.maxPrice,
           this.chosenBrands,
@@ -602,11 +720,22 @@ class CatalogPage extends Page {
           this.sortBy,
           this.categoryId
         );
+
+        const filteredProductForPagination = await fetchFilteredForPagination(
+          this.minPrice,
+          this.maxPrice,
+          this.chosenBrands,
+          this.searchWord,
+          this.sortBy,
+          this.categoryId,
+          this.pageNumber
+        );
+
         this.buildBreadcrumb(cat);
-        this.getInfoFilteredProducts(filteredProducts);
         this.filterByBrandDiv.innerHTML = '';
         this.getBrandsOfFilteredProducts(filteredProducts);
         this.getCategories();
+        this.getInfoFilteredProducts(filteredProductForPagination);
       });
     };
 
@@ -657,8 +786,10 @@ class CatalogPage extends Page {
           this.breadcrumbsContainer.innerHTML = 'HOME';
           categoryElem.classList.remove('chosenCategory');
           this.productsContainer.innerHTML = '';
+          this.pageNumber = 0;
+          this.loadMoreButton.classList.remove('hidden');
           this.categoryId = '';
-          const filteredProducts = await fetchFilteredByPriceAndBrandAndSearch(
+          const filteredProducts = await fetchFiltered(
             this.minPrice,
             this.maxPrice,
             this.chosenBrands,
@@ -666,18 +797,30 @@ class CatalogPage extends Page {
             this.sortBy,
             this.categoryId
           );
-          this.getInfoFilteredProducts(filteredProducts);
+          const filteredProductForPagination = await fetchFilteredForPagination(
+            this.minPrice,
+            this.maxPrice,
+            this.chosenBrands,
+            this.searchWord,
+            this.sortBy,
+            this.categoryId,
+            this.pageNumber
+          );
+          this.getInfoFilteredProducts(filteredProductForPagination);
           this.filterByBrandDiv.innerHTML = '';
           this.getBrandsOfFilteredProducts(filteredProducts);
         } else {
           event.stopPropagation();
           this.productsContainer.innerHTML = '';
+          this.pageNumber = 0;
+          this.loadMoreButton.classList.remove('hidden');
           document.querySelectorAll('.chosenCategory').forEach((el) => {
             el.classList.remove('chosenCategory');
           });
           categoryElem.classList.add('chosenCategory');
           this.categoryId = category.id;
-          const filteredProducts = await fetchFilteredByPriceAndBrandAndSearch(
+
+          const filteredProducts = await fetchFiltered(
             this.minPrice,
             this.maxPrice,
             this.chosenBrands,
@@ -685,10 +828,21 @@ class CatalogPage extends Page {
             this.sortBy,
             this.categoryId
           );
+          const filteredProductForPagination = await fetchFilteredForPagination(
+            this.minPrice,
+            this.maxPrice,
+            this.chosenBrands,
+            this.searchWord,
+            this.sortBy,
+            this.categoryId,
+            this.pageNumber
+          );
           this.buildBreadcrumb(category);
-          this.getInfoFilteredProducts(filteredProducts);
           this.filterByBrandDiv.innerHTML = '';
+
           this.getBrandsOfFilteredProducts(filteredProducts);
+          this.getCategories();
+          this.getInfoFilteredProducts(filteredProductForPagination);
         }
       });
 
@@ -749,9 +903,25 @@ class CatalogPage extends Page {
     });
   }
 
+  public async isLoadMoreDisplayed() {
+    const productsOnNextPage = await fetchFilteredForPagination(
+      this.minPrice,
+      this.maxPrice,
+      this.chosenBrands,
+      this.searchWord,
+      this.sortBy,
+      this.categoryId,
+      this.pageNumber + 1
+    );
+    if (productsOnNextPage.length === 0) {
+      this.loadMoreButton.classList.add('hidden');
+    }
+  }
+
   public reset() {
     this.productsContainer.innerHTML = '';
     this.fetchProducts();
+    this.fetchProductsForPagination();
     this.minPriceInput.value = '';
     this.maxPriceInput.value = '';
     this.minPriceInput.classList.remove('chosen');
@@ -766,6 +936,8 @@ class CatalogPage extends Page {
       el.classList.remove('chosenCategory');
     });
     this.categoryId = '';
+    this.pageNumber = 0;
+    this.loadMoreButton.classList.remove('hidden');
   }
 }
 

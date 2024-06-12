@@ -20,6 +20,7 @@
   justify-content: flex-start;
   align-items: flex-start;
   width: 100%;
+  margin-bottom: 30px;
   padding: 15px;
   box-sizing: border-box;
 }
@@ -45,13 +46,22 @@ aside {
   color: var(--accent-color);
 }
 
+.productsPlusLoadMore {
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+  gap: 30px;
+  align-items: center;
+  width: calc(100% - 240px);
+}
+
 .productsContainer {
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
+  width: 100%;
   gap: 20px;
   justify-content: center;
-  width: calc(100% - 240px);
   color: rgba(3, 14, 6, 0.2);
 }
 
@@ -331,7 +341,7 @@ input[type='number'] {
 
     z-index: 2;
   }
-  .productsContainer {
+  .productsPlusLoadMore {
     width: 100%;
   }
 }
