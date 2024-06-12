@@ -103,6 +103,9 @@ const loginUser = async (email: string, password: string): Promise<string> => {
   const response = await getUser(email, password);
   const token = await getToken(email, password);
   localStorage.setItem('token', token);
+  localStorage.removeItem('anonymous_token');
+  localStorage.removeItem('anonymous_token_time');
+  localStorage.removeItem('anonymous_refresh_token');
 
   if (response.statusCode === 400) {
     throw new Error('Invalid email or password');
