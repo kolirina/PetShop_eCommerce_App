@@ -651,9 +651,7 @@ async function deleteProductFromCart(
   productId: string,
   cartVersion: number
 ): Promise<Cart> {
-  const token = localStorage.getItem('token')
-    ? localStorage.getItem('token')
-    : localStorage.getItem('anonymous_token');
+  const token = getLocalToken();
   const response = await apiRoot
     .withProjectKey({ projectKey })
     .me()

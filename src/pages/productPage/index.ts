@@ -133,16 +133,8 @@ class ProductPage extends Page {
         discountPriceDiv.textContent = `Now ${priceFormatter(discountPrice)}`;
       }
 
-      const addButton = createBtn(
-        styles.addButton,
-        'Add to cart',
-        infoContainer
-      );
-      const removeButton = createBtn(
-        styles.removeButton,
-        'Remove from cart',
-        infoContainer
-      );
+      const addButton = createBtn(styles.addButton, 'Add to cart');
+      const removeButton = createBtn(styles.removeButton, 'Remove from cart');
 
       let cartId: string = '';
       let cartVersion: string = '';
@@ -217,6 +209,8 @@ class ProductPage extends Page {
         removeButton.disabled = true;
         removeButton.textContent = 'Not yet in cart';
       }
+
+      infoContainer.append(addButton, removeButton);
 
       const detailedInfo = createDiv(styles.detailedInfo, this.container);
       product.masterVariant.attributes?.forEach((attribute) => {
