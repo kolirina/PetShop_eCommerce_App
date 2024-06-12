@@ -208,9 +208,6 @@ class CatalogPage extends Page {
       this.getInfoFilteredProducts(filteredProductForPagination);
       this.filterByBrandDiv.innerHTML = '';
       this.getBrandsOfFilteredProducts(filteredProducts);
-      if (filteredProductForPagination.length > filteredProducts.length - 1) {
-        this.loadMoreButton.classList.add('hidden');
-      }
     });
 
     this.aside = createAside('aside', this.productsContainerPlusAside);
@@ -931,6 +928,7 @@ class CatalogPage extends Page {
 
   public reset() {
     this.productsContainer.innerHTML = '';
+    this.pageNumber = 0;
     this.fetchProducts();
     this.fetchProductsForPagination();
     this.minPriceInput.value = '';
@@ -947,7 +945,6 @@ class CatalogPage extends Page {
       el.classList.remove('chosenCategory');
     });
     this.categoryId = '';
-    this.pageNumber = 0;
     this.loadMoreButton.classList.remove('hidden');
   }
 }
