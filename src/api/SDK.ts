@@ -12,6 +12,7 @@ import {
   MS_IN_SEC,
 } from '../constants';
 import SortBy from '../types/sortBy';
+import getLocalToken from '../utils/getLocalToken';
 
 async function getUser(email: string, password: string) {
   const resp = await apiRoot
@@ -649,9 +650,7 @@ async function deleteProductFromCart(
   productId: string,
   cartVersion: number
 ): Promise<Cart> {
-  const token = localStorage.getItem('token')
-    ? localStorage.getItem('token')
-    : localStorage.getItem('anonymous_token');
+  const token = getLocalToken();
   const response = await apiRoot
     .withProjectKey({ projectKey })
     .me()
