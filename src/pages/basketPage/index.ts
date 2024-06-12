@@ -59,31 +59,27 @@ class BasketPage extends Page {
       ? localStorage.getItem('registered_user_cart_id')
       : localStorage.getItem('anonymous_cart_id');
     if (cartLocalStorage) {
-      try {
-        const result = await getCartById(cartLocalStorage);
-        this.cartInfo = await result.body;
-        result.body.lineItems.forEach((el: LineItem) => {
-          const item = new Product(el);
-          this.productsWrapper.append(item.getProduct());
-          item.productDeleteBtn.addEventListener('click', () =>
-            this.deleteHandler(item)
-          );
-          item.productAmountDecBtn.addEventListener('click', (e) =>
-            this.quantityHandler(item, e)
-          );
-          item.productAmountIncBtn.addEventListener('click', (e) =>
-            this.quantityHandler(item, e)
-          );
-        });
+      const result = await getCartById(cartLocalStorage);
+      this.cartInfo = await result.body;
+      result.body.lineItems.forEach((el: LineItem) => {
+        const item = new Product(el);
+        this.productsWrapper.append(item.getProduct());
+        item.productDeleteBtn.addEventListener('click', () =>
+          this.deleteHandler(item)
+        );
+        item.productAmountDecBtn.addEventListener('click', (e) =>
+          this.quantityHandler(item, e)
+        );
+        item.productAmountIncBtn.addEventListener('click', (e) =>
+          this.quantityHandler(item, e)
+        );
+      });
 
-        if (this.cartInfo && this.cartInfo.lineItems.length > 0) {
-          this.goToCatalogBtn.remove();
-          this.noProductsMessage.remove();
-          this.totalPrice.textContent = `${TOTAL_PRICE_TEXT}${priceFormatter(this.cartInfo.totalPrice.centAmount)}`;
-          this.productsWrapper.append(this.totalPrice);
-        }
-      } catch (err) {
-        // console.error((err as Error).message);
+      if (this.cartInfo && this.cartInfo.lineItems.length > 0) {
+        this.goToCatalogBtn.remove();
+        this.noProductsMessage.remove();
+        this.totalPrice.textContent = `${TOTAL_PRICE_TEXT}${priceFormatter(this.cartInfo.totalPrice.centAmount)}`;
+        this.productsWrapper.append(this.totalPrice);
       }
     }
   }

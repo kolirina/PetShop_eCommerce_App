@@ -139,15 +139,6 @@ class Product {
     return '';
   }
 
-  // private minusOne(): void {
-  //   this.productAmountInput.value = String(
-  //     Number(this.productAmountInput.value) - 1
-  //   );
-  //   if (this.productAmountInput.value === '1') {
-  //     this.productAmountInput.disabled = true;
-  //   }
-  // }
-
   public async deleteProduct(
     cartId: string,
     cartVersion: number
