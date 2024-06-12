@@ -11,13 +11,13 @@
 }
 
 .member-card {
-  border: 1px solid var(--accent-color);
-  border-radius: 5px;
-  padding: 15px;
   width: 33%;
   max-width: 372px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  padding: 15px;
   text-align: left;
+  border: 1px solid var(--accent-color);
+  border-radius: 5px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
 .member-photo {
@@ -26,12 +26,12 @@
 }
 
 .member-name {
-  font-size: 1.2em;
   margin-top: 10px;
+  font-size: 1.2em;
 }
 
 .member-role {
-  color: #666;
+  color: gray;
 }
 
 .member-bio {
@@ -66,20 +66,20 @@
   padding: 30px;
   margin: 0;
   font-size: 36px;
-  text-align: left;
   font-weight: bold;
+  text-align: left;
 }
 
 .logo-container {
   width: 25%;
+  padding: 0 30px 30px;
   border: 1px solid var(--accent-color);
   border-radius: 5px;
-  padding: 0 30px 30px;
 }
 
 .logo-text {
-  text-align: left;
   font-weight: bold;
+  text-align: left;
 }
 
 .logo {
