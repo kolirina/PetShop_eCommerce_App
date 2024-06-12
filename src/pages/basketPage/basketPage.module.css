@@ -14,7 +14,8 @@
   display: flex;
   flex-direction: column;
   justify-content: center;
-  width: 80%;
+  width: 100%;
+  max-width: 1000px;
   margin: 0 auto;
 }
 .no-products {
@@ -55,6 +56,7 @@
 .img-and-text-wrapper {
   display: flex;
   max-width: 350px;
+  margin-right: 20px;
 }
 .product-image {
   height: 80px;
@@ -74,7 +76,7 @@
 .amount-and-price-wrapper {
   display: flex;
   justify-content: space-between;
-  width: 270px;
+  min-width: 330px;
 }
 .product-amount-wrapper {
   display: flex;
@@ -151,8 +153,13 @@
 @media (max-width: 768px) {
   .product-wrapper {
     flex-direction: column;
+    width: 330px;
+    margin: 0 auto;
   }
   .amount-and-price-wrapper {
     margin-top: 15px;
+  }
+  .basket-products-wrapper {
+    justify-content: center;
   }
 }
