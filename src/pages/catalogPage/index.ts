@@ -5,6 +5,7 @@ import SortBy from '../../types/sortBy';
 import Category from '../../types/category';
 import { FilteredProduct, FilteredProducts } from '../../types/filterProducts';
 import { lang } from '../../constants';
+import isLoggedIn from '../../utils/checkFunctions';
 import { createAnonymousUser } from '../../api/services';
 import {
   createDiv,
@@ -621,8 +622,7 @@ class CatalogPage extends Page {
       if (
         localStorage.getItem('anonymous_token') &&
         !localStorage.getItem('anonymous_cart_id') &&
-        !localStorage.getItem('token') &&
-        !localStorage.getItem('id')
+        !isLoggedIn()
       ) {
         await createAnonymousCart();
       }
