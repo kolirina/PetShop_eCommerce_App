@@ -20,6 +20,7 @@
   justify-content: flex-start;
   align-items: flex-start;
   width: 100%;
+  margin-bottom: 30px;
   padding: 15px;
   box-sizing: border-box;
 }
@@ -45,13 +46,22 @@ aside {
   color: var(--accent-color);
 }
 
+.productsPlusLoadMore {
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+  gap: 30px;
+  align-items: center;
+  width: calc(100% - 240px);
+}
+
 .productsContainer {
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
+  width: 100%;
   gap: 20px;
   justify-content: center;
-  width: calc(100% - 240px);
   color: rgba(3, 14, 6, 0.2);
 }
 
@@ -317,6 +327,28 @@ input[type='number'] {
   box-sizing: border-box;
 }
 
+.spinner {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  width: 120px;
+  height: 120px;
+  margin: -60px 0 0 -60px;
+  border: 16px solid #f3f3f3;
+  border-top: 16px solid #3498db;
+  border-radius: 50%;
+  animation: spin 2s linear infinite;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
 @media screen and (max-width: 760px) {
   .showFiltersButton {
     display: block;
@@ -331,7 +363,7 @@ input[type='number'] {
 
     z-index: 2;
   }
-  .productsContainer {
+  .productsPlusLoadMore {
     width: 100%;
   }
 }

@@ -9,6 +9,7 @@ import { ByProjectKeyMeCartsPost, CartInfo } from '../types/cart';
 import {
   lang,
   MAX_NUMBER_OF_PRODUCTS_DISPLAYED,
+  MAX_NUMBER_OF_PRODUCTS,
   MS_IN_SEC,
 } from '../constants';
 import SortBy from '../types/sortBy';
@@ -264,7 +265,23 @@ async function fetchProducts(sortBy: SortBy) {
     .search()
     .get({
       queryArgs: {
+        limit: MAX_NUMBER_OF_PRODUCTS,
+        sort: [`${sortBy}`],
+      },
+    })
+    .execute();
+  return resp.body.results;
+}
+
+async function fetchProductsForPagination(sortBy: SortBy, pageNumber: number) {
+  const resp = await apiRoot
+    .withProjectKey({ projectKey })
+    .productProjections()
+    .search()
+    .get({
+      queryArgs: {
         limit: MAX_NUMBER_OF_PRODUCTS_DISPLAYED,
+        offset: MAX_NUMBER_OF_PRODUCTS_DISPLAYED * pageNumber,
         sort: [`${sortBy}`],
       },
     })
@@ -343,7 +360,7 @@ async function changePassword(curPwd: string, newPwd: string, userId: string) {
     .execute();
 }
 
-async function fetchFilteredByPriceAndBrandAndSearch(
+async function fetchFiltered(
   minPrice: number,
   maxPrice: number,
   brands: string[],
@@ -372,7 +389,7 @@ async function fetchFilteredByPriceAndBrandAndSearch(
         queryArgs: {
           'filter.query': filterQueries,
           [`text.${lang}`]: `"${searchWord}"`,
-          limit: MAX_NUMBER_OF_PRODUCTS_DISPLAYED,
+          limit: MAX_NUMBER_OF_PRODUCTS,
           fuzzy: true,
           staged: true,
           sort: `${sortBy}`,
@@ -389,6 +406,62 @@ async function fetchFilteredByPriceAndBrandAndSearch(
       queryArgs: {
         'filter.query': filterQueries,
         limit: MAX_NUMBER_OF_PRODUCTS_DISPLAYED,
+        sort: `${sortBy}`,
+      },
+    })
+    .execute();
+  return resp.body.results;
+}
+
+async function fetchFilteredForPagination(
+  minPrice: number,
+  maxPrice: number,
+  brands: string[],
+  searchWord: string,
+  sortBy: SortBy,
+  categoryId: string,
+  pageNumber: number
+) {
+  const filterQueries = [];
+  if (maxPrice && minPrice) {
+    filterQueries.push(
+      `variants.price.centAmount:range(${minPrice} to ${maxPrice})`
+    );
+  }
+  if (!(brands.length === 0)) {
+    filterQueries.push(`variants.attributes.brand:"${brands.join('", "')}"`);
+  }
+  if (categoryId) {
+    filterQueries.push(`categories.id:subtree("${categoryId}")`);
+  }
+  if (searchWord) {
+    const resp = await apiRoot
+      .withProjectKey({ projectKey })
+      .productProjections()
+      .search()
+      .get({
+        queryArgs: {
+          'filter.query': filterQueries,
+          [`text.${lang}`]: `"${searchWord}"`,
+          limit: MAX_NUMBER_OF_PRODUCTS_DISPLAYED,
+          offset: MAX_NUMBER_OF_PRODUCTS_DISPLAYED * pageNumber,
+          fuzzy: true,
+          staged: true,
+          sort: `${sortBy}`,
+        },
+      })
+      .execute();
+    return resp.body.results;
+  }
+  const resp = await apiRoot
+    .withProjectKey({ projectKey })
+    .productProjections()
+    .search()
+    .get({
+      queryArgs: {
+        'filter.query': filterQueries,
+        limit: MAX_NUMBER_OF_PRODUCTS_DISPLAYED,
+        offset: MAX_NUMBER_OF_PRODUCTS_DISPLAYED * pageNumber,
         sort: `${sortBy}`,
       },
     })
@@ -726,7 +799,7 @@ export {
   changeEmail,
   changePassword,
   getSearchResult,
-  fetchFilteredByPriceAndBrandAndSearch,
+  fetchFiltered,
   getProduct,
   removeAddress,
   getCategories,
@@ -739,4 +812,6 @@ export {
   deleteProductFromCart,
   getAnonymousCartById,
   changeProductQuantity,
+  fetchFilteredForPagination,
+  fetchProductsForPagination,
 };
