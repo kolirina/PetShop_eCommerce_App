@@ -99,7 +99,7 @@ class BasketPage extends Page {
       if (deleteResult) {
         this.cartInfo = deleteResult;
         this.updateFields();
-        this.header.updateHeader();
+        this.header.updateCartCounter();
       }
     }
   }
@@ -116,7 +116,7 @@ class BasketPage extends Page {
       if (amountResult) {
         this.cartInfo = amountResult;
         this.updateFields();
-        this.header.updateHeader();
+        this.header.updateCartCounter();
       }
     }
   }

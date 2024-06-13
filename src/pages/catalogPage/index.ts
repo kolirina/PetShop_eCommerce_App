@@ -548,7 +548,7 @@ class CatalogPage extends Page {
         cartVersion = localStorage.getItem('anonymous_cart_version')!;
       }
       await addToCart(id, 1, JSON.parse(cartVersion));
-      this.header.updateHeader();
+      this.header.updateCartCounter();
     });
   }
 

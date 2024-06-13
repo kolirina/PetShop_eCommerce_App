@@ -178,7 +178,7 @@ class ProductPage extends Page {
         }
         updateCartData();
         const resp = await addToCart(this.id, 1, JSON.parse(cartVersion));
-        this.header.updateHeader();
+        this.header.updateCartCounter();
         this.lineId =
           resp.lineItems.find(
             (cartProduct: LineItem) => cartProduct.productId === this.id
@@ -191,7 +191,7 @@ class ProductPage extends Page {
       removeButton.addEventListener('click', async () => {
         updateCartData();
         await deleteProductFromCart(cartId, this.lineId, Number(cartVersion));
-        this.header.updateHeader();
+        this.header.updateCartCounter();
         addButton.disabled = false;
         addButton.textContent = 'Add to cart';
         removeButton.disabled = true;
