@@ -103,7 +103,6 @@ const loginUser = async (email: string, password: string): Promise<string> => {
   const response = await getUser(email, password);
   const token = await getToken(email, password);
   localStorage.setItem('token', token);
-  localStorage.removeItem('anonymous_token');
   localStorage.removeItem('anonymous_token_time');
   localStorage.removeItem('anonymous_refresh_token');
 
@@ -140,6 +139,7 @@ const signUpUser = async (
       if (localStorage.getItem('anonymous_cart_id')) {
         await createCart(id);
         addItemsFromAnonymousCart();
+        localStorage.removeItem('anonymous_token');
       }
       return { id, token };
     } catch (tokenError) {

@@ -374,7 +374,7 @@ class CatalogPage extends Page {
         'It seems that no product matches your request. Please try again.';
     }
     this.productsDisplayed = filteredProducts;
-    let cartId = '';
+    let cartId;
     if (localStorage.getItem('registered_user_cart_id')) {
       cartId = localStorage.getItem('registered_user_cart_id')!;
     }
