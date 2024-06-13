@@ -141,7 +141,8 @@ class Product {
 
   public async deleteProduct(
     cartId: string,
-    cartVersion: number
+    cartVersion: number,
+    clear = false
   ): Promise<Cart> {
     const response = deleteProductFromCart(
       cartId,
@@ -149,7 +150,7 @@ class Product {
       cartVersion
     );
     if (await response) {
-      if (this.productWrapper && this.productWrapper.parentNode) {
+      if (this.productWrapper && this.productWrapper.parentNode && !clear) {
         this.productWrapper.parentNode.removeChild(this.productWrapper);
       }
     }

@@ -157,22 +157,27 @@ class BasketPage extends Page {
     if (this.cartInfo) {
       let cartVersion = this.cartInfo.version;
       const cartId = this.cartInfo.id;
-      await this.productsArr.reduce(async (promise, product) => {
-        await promise;
-        const result = await product.deleteProduct.bind(
-          product,
-          cartId,
-          cartVersion
-        )();
-        cartVersion = result.version;
-        this.cartInfo = result;
-        cartVersion = result.version;
+      await this.productsArr
+        .reduce(async (promise, product) => {
+          await promise;
+          const result = await product.deleteProduct.bind(
+            product,
+            cartId,
+            cartVersion,
+            true
+          )();
+          cartVersion = result.version;
+          this.cartInfo = result;
+          cartVersion = result.version;
 
-        const cartStatus = localStorage.getItem('anonymous_cart_id')
-          ? 'anonymous_cart'
-          : 'registered_user_cart';
-        localStorage.setItem(`${cartStatus}_version`, String(result.version));
-      }, Promise.resolve());
+          const cartStatus = localStorage.getItem('anonymous_cart_id')
+            ? 'anonymous_cart'
+            : 'registered_user_cart';
+          localStorage.setItem(`${cartStatus}_version`, String(result.version));
+        }, Promise.resolve())
+        .then(() => {
+          this.productsWrapper.innerHTML = '';
+        });
       this.checkProductQuantityInCart();
     }
   }
