@@ -22,8 +22,7 @@ router.addRoutes({
     new MainPage(router, templatePage.getMainElement()).render(),
   [Pages.CATALOG]: () => new CatalogPage(router, templatePage).render(),
   [Pages.PRODUCT]: () => new ProductPage(router, templatePage).render(),
-  [Pages.BASKET]: () =>
-    new BasketPage(router, templatePage.getMainElement()).render(),
+  [Pages.BASKET]: () => new BasketPage(router, templatePage).render(),
   [Pages.ABOUT_US]: () =>
     new AboutPage(router, templatePage.getMainElement()).render(),
   [Pages.LOGIN]: () => new LoginPage(router, templatePage).render(),
