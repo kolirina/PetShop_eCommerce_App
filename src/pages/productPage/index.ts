@@ -25,16 +25,21 @@ import { lang } from '../../constants';
 import styles from './productPage.module.css';
 import { LineItem } from '../../types/cart';
 import { createAnonymousUser } from '../../api/services';
+import TemplatePage from '../templatePage';
+import Header from '../../components/header';
 
 class ProductPage extends Page {
+  header: Header;
+
   id: string;
 
   lineId: string;
 
   currentIndex: number = 0;
 
-  constructor(router: Router, parentElement: HTMLElement) {
-    super(router, parentElement);
+  constructor(router: Router, templatePage: TemplatePage) {
+    super(router, templatePage.getMainElement());
+    this.header = templatePage.getHeader();
     this.container.classList.add(styles.productPage);
     const match = window.location.pathname.match(/^\/product\/([a-z0-9-]+)$/);
     this.id = match ? match[1] : 'Error';
@@ -173,6 +178,7 @@ class ProductPage extends Page {
         }
         updateCartData();
         const resp = await addToCart(this.id, 1, JSON.parse(cartVersion));
+        this.header.updateHeader();
         this.lineId =
           resp.lineItems.find(
             (cartProduct: LineItem) => cartProduct.productId === this.id
@@ -185,6 +191,7 @@ class ProductPage extends Page {
       removeButton.addEventListener('click', async () => {
         updateCartData();
         await deleteProductFromCart(cartId, this.lineId, Number(cartVersion));
+        this.header.updateHeader();
         addButton.disabled = false;
         addButton.textContent = 'Add to cart';
         removeButton.disabled = true;

@@ -20,10 +20,8 @@ templatePage.render();
 router.addRoutes({
   [Pages.MAIN]: () =>
     new MainPage(router, templatePage.getMainElement()).render(),
-  [Pages.CATALOG]: () =>
-    new CatalogPage(router, templatePage.getMainElement()).render(),
-  [Pages.PRODUCT]: () =>
-    new ProductPage(router, templatePage.getMainElement()).render(),
+  [Pages.CATALOG]: () => new CatalogPage(router, templatePage).render(),
+  [Pages.PRODUCT]: () => new ProductPage(router, templatePage).render(),
   [Pages.BASKET]: () =>
     new BasketPage(router, templatePage.getMainElement()).render(),
   [Pages.ABOUT_US]: () =>
