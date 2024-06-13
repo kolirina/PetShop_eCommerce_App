@@ -10,10 +10,11 @@ import {
   createParagraph,
 } from '../../utils/elementCreator';
 import Page from '../Page';
-import styles from './basketPage.module.css';
 import Product from './productBuilder';
 import priceFormatter from '../../utils/priceFormatter';
 import { TOTAL_PRICE_TEXT } from './constants';
+import styles from './basketPage.module.css';
+import pageStyle from '../templatePage/templatePage.module.css';
 
 class BasketPage extends Page {
   public productsWrapper: HTMLDivElement;
@@ -93,7 +94,10 @@ class BasketPage extends Page {
 
     this.clearCartBtn = createBtn(styles.clearCartBtn, 'Clear cart');
 
-    this.clearCartBtn.addEventListener('click', this.clearCart.bind(this));
+    this.clearCartBtn.addEventListener(
+      'click',
+      this.paintConfirmation.bind(this)
+    );
 
     this.goToCatalogBtn.addEventListener('click', () => {
       router.navigateTo(Pages.CATALOG);
@@ -179,6 +183,7 @@ class BasketPage extends Page {
           this.productsWrapper.innerHTML = '';
         });
       this.checkProductQuantityInCart();
+      document.querySelector(`.${styles.background}`)?.remove();
     }
   }
 
@@ -195,6 +200,39 @@ class BasketPage extends Page {
         this.cartInfo = amountResult;
         this.updateFields();
       }
+    }
+  }
+
+  private paintConfirmation() {
+    const body = document.querySelector(`.${pageStyle.page}`);
+    if (body) {
+      const background = createDiv(styles.background, body as HTMLElement);
+      const confirmationWrapper = createDiv(
+        styles.confirmationWrapper,
+        background
+      );
+      createParagraph(
+        styles.confirmationText,
+        'All items will be deleted from cart. Continue?',
+        confirmationWrapper
+      );
+
+      const confirmationButtonWrapper = createDiv(
+        styles.confirmationButtonWrapper,
+        confirmationWrapper
+      );
+      const confirmBtn = createBtn(
+        styles.confirmBtn,
+        'Yes',
+        confirmationButtonWrapper
+      );
+      const declineBtn = createBtn(
+        styles.confirmBtn,
+        'No',
+        confirmationButtonWrapper
+      );
+      confirmBtn.addEventListener('click', this.clearCart.bind(this));
+      declineBtn.addEventListener('click', () => background.remove());
     }
   }
 
