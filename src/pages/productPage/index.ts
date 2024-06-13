@@ -1,5 +1,12 @@
 import { Image } from '@commercetools/platform-sdk';
-import { getProduct } from '../../api/SDK';
+import {
+  addToCart,
+  createAnonymousCart,
+  createCart,
+  deleteProductFromCart,
+  getCartById,
+  getProduct,
+} from '../../api/SDK';
 import Router from '../../router';
 import {
   createBtn,
@@ -16,17 +23,28 @@ import priceFormatter from '../../utils/priceFormatter';
 import { isDescription, isSpecification } from './constants';
 import { lang } from '../../constants';
 import styles from './productPage.module.css';
+import { LineItem } from '../../types/cart';
+import { createAnonymousUser } from '../../api/services';
+import TemplatePage from '../templatePage';
+import Header from '../../components/header';
+import isLoggedIn from '../../utils/checkFunctions';
 
 class ProductPage extends Page {
+  header: Header;
+
   id: string;
+
+  lineId: string;
 
   currentIndex: number = 0;
 
-  constructor(router: Router, parentElement: HTMLElement) {
-    super(router, parentElement);
+  constructor(router: Router, templatePage: TemplatePage) {
+    super(router, templatePage.getMainElement());
+    this.header = templatePage.getHeader();
     this.container.classList.add(styles.productPage);
     const match = window.location.pathname.match(/^\/product\/([a-z0-9-]+)$/);
     this.id = match ? match[1] : 'Error';
+    this.lineId = '';
     this.displayProductInfo();
   }
 
@@ -120,6 +138,83 @@ class ProductPage extends Page {
           product.masterVariant.prices[0].discounted.value.centAmount;
         discountPriceDiv.textContent = `Now ${priceFormatter(discountPrice)}`;
       }
+
+      const addButton = createBtn(styles.addButton, 'Add to cart');
+      const removeButton = createBtn(styles.removeButton, 'Remove from cart');
+
+      let cartId: string = '';
+      let cartVersion: string = '';
+      const updateCartData = () => {
+        if (localStorage.getItem('registered_user_cart_id')) {
+          cartId = localStorage.getItem('registered_user_cart_id')!;
+          cartVersion = localStorage.getItem('registered_user_cart_version')!;
+        }
+        if (
+          !localStorage.getItem('registered_user_cart_id') &&
+          localStorage.getItem('anonymous_cart_id')
+        ) {
+          cartId = localStorage.getItem('anonymous_cart_id')!;
+          cartVersion = localStorage.getItem('anonymous_cart_version')!;
+        }
+      };
+      updateCartData();
+
+      addButton.addEventListener('click', async () => {
+        if (!isLoggedIn() && !localStorage.getItem('anonymous_token')) {
+          await createAnonymousUser();
+          await createAnonymousCart();
+        }
+        if (
+          !localStorage.getItem('registered_user_cart_id') &&
+          localStorage.getItem('id')
+        ) {
+          const customerId = localStorage.getItem('id');
+          if (customerId) {
+            await createCart(customerId);
+          }
+        }
+        updateCartData();
+        const resp = await addToCart(this.id, 1, JSON.parse(cartVersion));
+        this.header.updateCartCounter();
+        this.lineId =
+          resp.lineItems.find(
+            (cartProduct: LineItem) => cartProduct.productId === this.id
+          )?.id ?? '';
+        addButton.disabled = true;
+        addButton.textContent = 'Already in cart';
+        removeButton.disabled = false;
+        removeButton.textContent = 'Remove from cart';
+      });
+      removeButton.addEventListener('click', async () => {
+        updateCartData();
+        await deleteProductFromCart(cartId, this.lineId, Number(cartVersion));
+        this.header.updateCartCounter();
+        addButton.disabled = false;
+        addButton.textContent = 'Add to cart';
+        removeButton.disabled = true;
+        removeButton.textContent = 'Not yet in cart';
+      });
+
+      if (cartId) {
+        const cart = await getCartById(cartId);
+        const productsInCart = cart.body.lineItems;
+        const thisProduct: LineItem | undefined = productsInCart.find(
+          (cartProduct: LineItem) => cartProduct.productId === this.id
+        );
+        if (thisProduct) {
+          this.lineId = thisProduct.id;
+          addButton.disabled = true;
+          addButton.textContent = 'Already in cart';
+        } else {
+          removeButton.disabled = true;
+          removeButton.textContent = 'Not yet in cart';
+        }
+      } else {
+        removeButton.disabled = true;
+        removeButton.textContent = 'Not yet in cart';
+      }
+
+      infoContainer.append(addButton, removeButton);
 
       const detailedInfo = createDiv(styles.detailedInfo, this.container);
       product.masterVariant.attributes?.forEach((attribute) => {

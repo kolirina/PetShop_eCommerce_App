@@ -112,6 +112,39 @@
   text-decoration: line-through;
 }
 
+.add-button,
+.remove-button {
+  width: 180px;
+  margin: 0 20px 20px 0;
+  padding: 10px 20px;
+  font-size: 16px;
+  font-weight: bold;
+  text-align: center;
+  text-decoration: none;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  outline: none;
+}
+
+.add-button:disabled,
+.remove-button:disabled {
+  background-color: var(--disabled-bg-color);
+  color: gray;
+  cursor: default;
+  transform: none;
+}
+
+.add-button {
+  color: white;
+  background-color: #28a745;
+}
+
+.remove-button {
+  color: white;
+  background-color: #dc3545;
+}
+
 .detailed-info {
   max-width: 1240px;
   padding: 20px;
