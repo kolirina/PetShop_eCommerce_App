@@ -12,6 +12,7 @@ import {
   MS_IN_SEC,
 } from '../constants';
 import SortBy from '../types/sortBy';
+import getLocalToken from '../utils/getLocalToken';
 
 async function getUser(email: string, password: string) {
   const resp = await apiRoot
@@ -455,9 +456,7 @@ async function getCategories() {
 }
 
 async function getCartById(cartId: string): Promise<ClientResponse> {
-  const token = localStorage.getItem('token')
-    ? localStorage.getItem('token')
-    : localStorage.getItem('anonymous_token');
+  const token = getLocalToken();
 
   try {
     const resp = await apiRoot
@@ -561,9 +560,8 @@ async function addToCart(
   quantity: number,
   cartVers: number
 ) {
-  const token = localStorage.getItem('token')
-    ? localStorage.getItem('token')
-    : localStorage.getItem('anonymous_token');
+  const token = getLocalToken();
+
   let cartId: string | null = '';
   let cartVersion: string | null = '';
   if (localStorage.getItem('registered_user_cart_id')) {
@@ -649,9 +647,8 @@ async function deleteProductFromCart(
   productId: string,
   cartVersion: number
 ): Promise<Cart> {
-  const token = localStorage.getItem('token')
-    ? localStorage.getItem('token')
-    : localStorage.getItem('anonymous_token');
+  const token = getLocalToken();
+
   const response = await apiRoot
     .withProjectKey({ projectKey })
     .me()
@@ -682,9 +679,7 @@ async function changeProductQuantity(
   cartVersion: number,
   quantity: number
 ): Promise<Cart> {
-  const token = localStorage.getItem('token')
-    ? localStorage.getItem('token')
-    : localStorage.getItem('anonymous_token');
+  const token = getLocalToken();
   const response = await apiRoot
     .withProjectKey({ projectKey })
     .me()

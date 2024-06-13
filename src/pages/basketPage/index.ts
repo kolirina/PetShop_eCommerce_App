@@ -6,6 +6,7 @@ import {
   createBtn,
   createDiv,
   createH3,
+  createInput,
   createParagraph,
 } from '../../utils/elementCreator';
 import Page from '../Page';
@@ -25,6 +26,20 @@ class BasketPage extends Page {
 
   public totalPrice: HTMLHeadingElement;
 
+  public promoAndTotalWrapper: HTMLDivElement;
+
+  public promoWrapper: HTMLDivElement;
+
+  public promoHeading: HTMLHeadingElement;
+
+  public promoInput: HTMLInputElement;
+
+  public promoApplyBtn: HTMLButtonElement;
+
+  public clearCartBtn: HTMLButtonElement;
+
+  private productsArr: Product[];
+
   constructor(router: Router, parentElement: HTMLElement) {
     super(router, parentElement);
     this.container.classList.add(styles.container);
@@ -32,6 +47,7 @@ class BasketPage extends Page {
       styles.basketProductsWrapper,
       this.container
     );
+    this.productsArr = [];
 
     this.noProductsMessage = createParagraph(
       styles.noProducts,
@@ -44,14 +60,44 @@ class BasketPage extends Page {
       'Go to the Catalog',
       this.productsWrapper
     );
+    this.promoAndTotalWrapper = createDiv(styles.promoAndTotalWrapper);
+
+    this.promoWrapper = createDiv(
+      styles.promoWrapper,
+      this.promoAndTotalWrapper
+    );
+    this.promoHeading = createH3(
+      styles.promoHeading,
+      'Enter promo code: ',
+      this.promoWrapper
+    );
+    this.promoInput = createInput({
+      className: styles.promoInput,
+      type: 'text',
+      placeholder: 'Code',
+      parentElement: this.promoWrapper,
+    });
+    this.promoApplyBtn = createBtn(
+      styles.promoApplyBtn,
+      'Apply',
+      this.promoWrapper
+    );
+
+    this.totalPrice = createH3(
+      styles.totalPrice,
+      'Total price: ',
+      this.promoAndTotalWrapper
+    );
+
+    this.fillCart();
+
+    this.clearCartBtn = createBtn(styles.clearCartBtn, 'Clear cart');
+
+    this.clearCartBtn.addEventListener('click', this.clearCart.bind(this));
 
     this.goToCatalogBtn.addEventListener('click', () => {
       router.navigateTo(Pages.CATALOG);
     });
-
-    this.totalPrice = createH3(styles.totalPrice, 'Total price: ');
-
-    this.fillCart();
   }
 
   private async fillCart(): Promise<void> {
@@ -73,14 +119,23 @@ class BasketPage extends Page {
         item.productAmountIncBtn.addEventListener('click', (e) =>
           this.quantityHandler(item, e)
         );
+        this.productsArr.push(item);
       });
+      this.productsWrapper.append(this.clearCartBtn);
+      this.checkProductQuantityInCart();
+    }
+  }
 
-      if (this.cartInfo && this.cartInfo.lineItems.length > 0) {
-        this.goToCatalogBtn.remove();
-        this.noProductsMessage.remove();
-        this.totalPrice.textContent = `${TOTAL_PRICE_TEXT}${priceFormatter(this.cartInfo.totalPrice.centAmount)}`;
-        this.productsWrapper.append(this.totalPrice);
-      }
+  private checkProductQuantityInCart(): void {
+    if (this.cartInfo && this.cartInfo.lineItems.length > 0) {
+      this.noProductsMessage.remove();
+      this.goToCatalogBtn.remove();
+      this.totalPrice.textContent = `${TOTAL_PRICE_TEXT}${priceFormatter(this.cartInfo.totalPrice.centAmount)}`;
+      this.productsWrapper.append(this.promoAndTotalWrapper);
+    } else {
+      this.productsWrapper.innerHTML = '';
+      this.productsWrapper.append(this.noProductsMessage);
+      this.productsWrapper.append(this.goToCatalogBtn);
     }
   }
 
@@ -95,6 +150,30 @@ class BasketPage extends Page {
         this.cartInfo = deleteResult;
         this.updateFields();
       }
+    }
+  }
+
+  private async clearCart() {
+    if (this.cartInfo) {
+      let cartVersion = this.cartInfo.version;
+      const cartId = this.cartInfo.id;
+      await this.productsArr.reduce(async (promise, product) => {
+        await promise;
+        const result = await product.deleteProduct.bind(
+          product,
+          cartId,
+          cartVersion
+        )();
+        cartVersion = result.version;
+        this.cartInfo = result;
+        cartVersion = result.version;
+
+        const cartStatus = localStorage.getItem('anonymous_cart_id')
+          ? 'anonymous_cart'
+          : 'registered_user_cart';
+        localStorage.setItem(`${cartStatus}_version`, String(result.version));
+      }, Promise.resolve());
+      this.checkProductQuantityInCart();
     }
   }
 
@@ -124,11 +203,7 @@ class BasketPage extends Page {
         String(this.cartInfo.version)
       );
       this.totalPrice.textContent = `${TOTAL_PRICE_TEXT}${priceFormatter(this.cartInfo.totalPrice.centAmount)}`;
-      if (this.cartInfo.lineItems.length === 0) {
-        this.totalPrice.remove();
-        this.productsWrapper.append(this.noProductsMessage);
-        this.productsWrapper.append(this.goToCatalogBtn);
-      }
+      this.checkProductQuantityInCart();
     }
   }
 }

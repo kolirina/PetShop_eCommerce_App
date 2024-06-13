@@ -124,13 +124,11 @@
   border: none;
   background-color: transparent;
 }
-/* .product-amount-input:focus {
-  outline: 1px solid var(--accent-color);
-} */
 .product-price-text {
   margin: 0 0 0 15px;
   line-height: 26px;
 }
+.clear-cart-btn,
 .product-delete-btn {
   margin-left: 15px;
   height: 25px;
@@ -142,17 +140,42 @@
   cursor: pointer;
   transition: 0.2s ease-in-out;
 }
+.clear-cart-btn {
+  margin: 0 0 0 auto;
+  width: 90px;
+}
+.clear-cart-btn:hover,
 .product-delete-btn:hover {
   color: var(--main-bg-color);
   background-color: var(--invalid-input-color);
   border: 1px solid var(--accent-color);
 }
-.totalPrice {
-  margin: 5px 0 0 0;
-  padding-top: 10px;
-  text-align: end;
+.promo-and-total-wrapper {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 15px;
+  padding: 15px;
+  align-items: center;
   border-top: 1px solid var(--accent-color);
 }
+.promo-wrapper {
+  display: flex;
+  color: var(--accent-color);
+}
+.promo-heading,
+.totalPrice {
+  margin: 0;
+}
+.promo-input {
+  height: 30px;
+}
+.promo-apply-btn {
+  height: 30px;
+  width: 70px;
+}
+/* .totalPrice {
+  margin: 0;
+} */
 @media (max-width: 768px) {
   .product-wrapper {
     flex-direction: column;
