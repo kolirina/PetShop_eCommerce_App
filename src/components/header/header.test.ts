@@ -5,9 +5,15 @@ import Pages from '../../router/pageNames';
 import Header from './index';
 import styles from './header.module.css';
 import isLoggedIn from '../../utils/checkFunctions';
+import { getCartById } from '../../api/SDK';
+import { LineItem } from '../../types/cart';
 
 vi.mock('../../utils/checkFunctions', () => ({
   default: vi.fn(),
+}));
+
+vi.mock('../../api/SDK', () => ({
+  getCartById: vi.fn(),
 }));
 
 describe('Header', () => {
@@ -31,6 +37,7 @@ describe('Header', () => {
 
     // Reset mock implementation before each test
     vi.mocked(isLoggedIn).mockReset();
+    vi.mocked(getCartById).mockReset();
   });
 
   it('should render the Header with correct elements', () => {
@@ -82,13 +89,13 @@ describe('Header', () => {
 
     const profileButton = header
       .getHeaderElement()
-      .querySelector(`.${styles.userControls} .${styles.button}:nth-child(4)`);
+      .querySelector(`.${styles.userControls} .${styles.button}:nth-child(3)`);
     expect(profileButton).not.toBeNull();
     expect(profileButton!.textContent).toBe('Profile');
 
     const logoutButton = header
       .getHeaderElement()
-      .querySelector(`.${styles.userControls} .${styles.button}:nth-child(5)`);
+      .querySelector(`.${styles.userControls} .${styles.button}:nth-child(4)`);
     expect(logoutButton).not.toBeNull();
     expect(logoutButton!.textContent).toBe('Logout');
   });
@@ -104,7 +111,7 @@ describe('Header', () => {
     const loginButton = header
       .getHeaderElement()
       .querySelector(
-        `.${styles.userControls} .${styles.button}:nth-child(4)`
+        `.${styles.userControls} .${styles.button}:nth-child(3)`
       ) as HTMLElement;
     loginButton.click();
 
@@ -122,7 +129,7 @@ describe('Header', () => {
     const registerButton = header
       .getHeaderElement()
       .querySelector(
-        `.${styles.userControls} .${styles.button}:nth-child(5)`
+        `.${styles.userControls} .${styles.button}:nth-child(4)`
       ) as HTMLElement;
     registerButton.click();
 
@@ -142,7 +149,7 @@ describe('Header', () => {
     const logoutButton = header
       .getHeaderElement()
       .querySelector(
-        `.${styles.userControls} .${styles.button}:nth-child(5)`
+        `.${styles.userControls} .${styles.button}:nth-child(4)`
       ) as HTMLElement;
     logoutButton.click();
 
@@ -167,5 +174,48 @@ describe('Header', () => {
 
     burgerButton.click();
     expect(burgerMenu!.classList.contains(styles.burgerMenuOpen)).toBe(false);
+  });
+
+  it('should display the correct cart count when items are present', async () => {
+    const mockCart = {
+      body: {
+        lineItems: [{ quantity: 2 }, { quantity: 3 }] as LineItem[],
+      },
+    };
+
+    vi.mocked(getCartById).mockResolvedValue(mockCart);
+    localStorage.setItem('registered_user_cart_id', 'cart123');
+
+    const header = new Header(router);
+    container.appendChild(header.getHeaderElement());
+
+    await header.updateHeader();
+
+    const cartCountElement = header
+      .getHeaderElement()
+      .querySelector(`.${styles.cartCount}`);
+    expect(cartCountElement).not.toBeNull();
+    expect(cartCountElement!.textContent).toBe('5');
+  });
+
+  it('should not display the cart count when there are no items in the cart', async () => {
+    const mockCart = {
+      body: {
+        lineItems: [],
+      },
+    };
+
+    vi.mocked(getCartById).mockResolvedValue(mockCart);
+    localStorage.setItem('registered_user_cart_id', 'cart123');
+
+    const header = new Header(router);
+    container.appendChild(header.getHeaderElement());
+
+    await header.updateHeader();
+
+    const cartCountElement = header
+      .getHeaderElement()
+      .querySelector(`.${styles.cartCount}`);
+    expect(cartCountElement).toBeNull();
   });
 });
