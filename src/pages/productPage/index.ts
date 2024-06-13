@@ -27,6 +27,7 @@ import { LineItem } from '../../types/cart';
 import { createAnonymousUser } from '../../api/services';
 import TemplatePage from '../templatePage';
 import Header from '../../components/header';
+import isLoggedIn from '../../utils/checkFunctions';
 
 class ProductPage extends Page {
   header: Header;
@@ -159,11 +160,7 @@ class ProductPage extends Page {
       updateCartData();
 
       addButton.addEventListener('click', async () => {
-        if (
-          !localStorage.getItem('token') &&
-          !localStorage.getItem('id') &&
-          !localStorage.getItem('anonymous_token')
-        ) {
+        if (!isLoggedIn() && !localStorage.getItem('anonymous_token')) {
           await createAnonymousUser();
           await createAnonymousCart();
         }
