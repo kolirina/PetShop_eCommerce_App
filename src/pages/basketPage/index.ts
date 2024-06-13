@@ -48,6 +48,7 @@ class BasketPage extends Page {
       styles.basketProductsWrapper,
       this.container
     );
+    
     this.productsArr = [];
 
     this.noProductsMessage = createParagraph(
@@ -61,6 +62,7 @@ class BasketPage extends Page {
       'Go to the Catalog',
       this.productsWrapper
     );
+    
     this.promoAndTotalWrapper = createDiv(styles.promoAndTotalWrapper);
 
     this.promoWrapper = createDiv(
@@ -156,6 +158,7 @@ class BasketPage extends Page {
       }
     }
   }
+
 
   private async clearCart() {
     if (this.cartInfo) {
