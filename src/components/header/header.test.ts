@@ -30,12 +30,11 @@ describe('Header', () => {
     global.localStorage = dom.window.localStorage;
 
     router = new Router();
-    router.navigateTo = vi.fn(); // Mock navigateTo method
+    router.navigateTo = vi.fn();
 
     container = document.createElement('div');
     document.body.appendChild(container);
 
-    // Reset mock implementation before each test
     vi.mocked(isLoggedIn).mockReset();
     vi.mocked(getCartById).mockReset();
   });
@@ -89,13 +88,13 @@ describe('Header', () => {
 
     const profileButton = header
       .getHeaderElement()
-      .querySelector(`.${styles.userControls} .${styles.button}:nth-child(3)`);
+      .querySelector(`.${styles.button}:nth-child(3)`);
     expect(profileButton).not.toBeNull();
     expect(profileButton!.textContent).toBe('Profile');
 
     const logoutButton = header
       .getHeaderElement()
-      .querySelector(`.${styles.userControls} .${styles.button}:nth-child(4)`);
+      .querySelector(`.${styles.button}:nth-child(4)`);
     expect(logoutButton).not.toBeNull();
     expect(logoutButton!.textContent).toBe('Logout');
   });
@@ -110,9 +109,7 @@ describe('Header', () => {
 
     const loginButton = header
       .getHeaderElement()
-      .querySelector(
-        `.${styles.userControls} .${styles.button}:nth-child(3)`
-      ) as HTMLElement;
+      .querySelector(`.${styles.button}:nth-child(3)`) as HTMLElement;
     loginButton.click();
 
     expect(router.navigateTo).toHaveBeenCalledWith(Pages.LOGIN);
@@ -128,9 +125,7 @@ describe('Header', () => {
 
     const registerButton = header
       .getHeaderElement()
-      .querySelector(
-        `.${styles.userControls} .${styles.button}:nth-child(4)`
-      ) as HTMLElement;
+      .querySelector(`.${styles.button}:nth-child(4)`) as HTMLElement;
     registerButton.click();
 
     expect(router.navigateTo).toHaveBeenCalledWith(Pages.REGISTRATION);
@@ -148,9 +143,7 @@ describe('Header', () => {
 
     const logoutButton = header
       .getHeaderElement()
-      .querySelector(
-        `.${styles.userControls} .${styles.button}:nth-child(4)`
-      ) as HTMLElement;
+      .querySelector(`.${styles.button}:nth-child(4)`) as HTMLElement;
     logoutButton.click();
 
     expect(localStorage.getItem('id')).toBeNull();
@@ -189,7 +182,7 @@ describe('Header', () => {
     const header = new Header(router);
     container.appendChild(header.getHeaderElement());
 
-    await header.updateHeader();
+    await header.updateCartCounter();
 
     const cartCountElement = header
       .getHeaderElement()
@@ -198,10 +191,10 @@ describe('Header', () => {
     expect(cartCountElement!.textContent).toBe('5');
   });
 
-  it('should not display the cart count when there are no items in the cart', async () => {
+  it('should display "0" when there are no items in the cart', async () => {
     const mockCart = {
       body: {
-        lineItems: [],
+        lineItems: [] as LineItem[],
       },
     };
 
@@ -211,11 +204,12 @@ describe('Header', () => {
     const header = new Header(router);
     container.appendChild(header.getHeaderElement());
 
-    await header.updateHeader();
+    await header.updateCartCounter();
 
     const cartCountElement = header
       .getHeaderElement()
       .querySelector(`.${styles.cartCount}`);
-    expect(cartCountElement).toBeNull();
+    expect(cartCountElement).not.toBeNull();
+    expect(cartCountElement!.textContent).toBe('0');
   });
 });
