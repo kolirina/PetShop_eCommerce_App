@@ -134,6 +134,10 @@
   overflow: hidden;
 }
 
+.hidden {
+  display: none;
+}
+
 .menu-item {
   width: 75%;
   margin: 0;

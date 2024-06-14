@@ -133,8 +133,13 @@ export default class Header {
         0
       );
       if (totalCount > 0) {
+        this.cartCountElement.classList.remove(styles.hidden);
         this.cartCountElement.textContent = totalCount;
+      } else {
+        this.cartCountElement.classList.add(styles.hidden);
       }
+    } else {
+      this.cartCountElement.classList.add(styles.hidden);
     }
   }
 

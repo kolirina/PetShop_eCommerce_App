@@ -191,6 +191,7 @@ class BasketPage extends Page {
           this.productsWrapper.innerHTML = '';
         });
       this.checkProductQuantityInCart();
+      this.header.updateCartCounter();
       document.querySelector(`.${styles.background}`)?.remove();
       this.productsArr = [];
     }
