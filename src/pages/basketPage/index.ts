@@ -193,6 +193,7 @@ class BasketPage extends Page {
       this.checkProductQuantityInCart();
       document.querySelector(`.${styles.background}`)?.remove();
       this.productsArr = [];
+      this.header.updateCartCounter();
     }
   }
 

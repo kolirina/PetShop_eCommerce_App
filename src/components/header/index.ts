@@ -132,9 +132,7 @@ export default class Header {
         (total: number, item: LineItem) => total + item.quantity,
         0
       );
-      if (totalCount > 0) {
-        this.cartCountElement.textContent = totalCount;
-      }
+      this.cartCountElement.textContent = totalCount;
     }
   }
 
