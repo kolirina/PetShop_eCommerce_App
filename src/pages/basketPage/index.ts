@@ -13,10 +13,14 @@ import Page from '../Page';
 import Product from './productBuilder';
 import priceFormatter from '../../utils/priceFormatter';
 import { TOTAL_PRICE_TEXT } from './constants';
+import TemplatePage from '../templatePage';
+import Header from '../../components/header';
 import styles from './basketPage.module.css';
 import pageStyle from '../templatePage/templatePage.module.css';
 
 class BasketPage extends Page {
+  public header: Header;
+
   public productsWrapper: HTMLDivElement;
 
   public noProductsMessage: HTMLParagraphElement;
@@ -41,8 +45,9 @@ class BasketPage extends Page {
 
   private productsArr: Product[];
 
-  constructor(router: Router, parentElement: HTMLElement) {
-    super(router, parentElement);
+  constructor(router: Router, templatePage: TemplatePage) {
+    super(router, templatePage.getMainElement());
+    this.header = templatePage.getHeader();
     this.container.classList.add(styles.container);
     this.productsWrapper = createDiv(
       styles.basketProductsWrapper,
@@ -156,6 +161,7 @@ class BasketPage extends Page {
       if (deleteResult) {
         this.cartInfo = deleteResult;
         this.updateFields();
+        this.header.updateCartCounter();
       }
     }
   }
@@ -202,6 +208,7 @@ class BasketPage extends Page {
       if (amountResult) {
         this.cartInfo = amountResult;
         this.updateFields();
+        this.header.updateCartCounter();
       }
     }
   }

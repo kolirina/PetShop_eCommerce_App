@@ -650,7 +650,6 @@ async function addToCart(
   }
   if (!cartId || !cartVersion) {
     throw new Error('Cart ID or version is missing');
-    return;
   }
   const resp = await apiRoot
     .withProjectKey({ projectKey })
@@ -685,6 +684,8 @@ async function addToCart(
       JSON.stringify(resp.body.version)
     );
   }
+  const data = resp.body;
+  return data;
 }
 
 async function refreshAnonymousToken(): Promise<void> {
@@ -741,6 +742,17 @@ async function deleteProductFromCart(
       },
     })
     .execute();
+  if (cartId === localStorage.getItem('anonymous_cart_id')) {
+    localStorage.setItem(
+      'anonymous_cart_version',
+      JSON.stringify(response.body.version)
+    );
+  } else {
+    localStorage.setItem(
+      'registered_user_cart_version',
+      JSON.stringify(response.body.version)
+    );
+  }
   const data = response.body;
   return data;
 }

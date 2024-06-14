@@ -30,9 +30,13 @@ import {
 import priceFormatter from '../../utils/priceFormatter';
 import Pages from '../../router/pageNames';
 import checkAnonymousToken from '../../utils/checkAnonymousToken';
+import TemplatePage from '../templatePage';
+import Header from '../../components/header';
 import './catalogPageStyles.css';
 
 class CatalogPage extends Page {
+  public header: Header;
+
   public banner: HTMLDivElement;
 
   public categoryBanner: HTMLDivElement;
@@ -93,8 +97,9 @@ class CatalogPage extends Page {
 
   public pageNumber: number = 0;
 
-  constructor(router: Router, parentElement: HTMLElement) {
-    super(router, parentElement);
+  constructor(router: Router, templatePage: TemplatePage) {
+    super(router, templatePage.getMainElement());
+    this.header = templatePage.getHeader();
     this.container = createDiv('catalogContainer', document.body);
     this.banner = createDiv('banner', this.container);
     this.categoryBanner = createDiv('categoryBanner', this.container);
@@ -642,6 +647,7 @@ class CatalogPage extends Page {
         cartVersion = localStorage.getItem('anonymous_cart_version')!;
       }
       await addToCart(id, 1, JSON.parse(cartVersion));
+      this.header.updateCartCounter();
     });
   }
 
