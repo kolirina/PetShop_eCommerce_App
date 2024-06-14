@@ -48,7 +48,7 @@ class BasketPage extends Page {
       styles.basketProductsWrapper,
       this.container
     );
-    
+
     this.productsArr = [];
 
     this.noProductsMessage = createParagraph(
@@ -62,7 +62,7 @@ class BasketPage extends Page {
       'Go to the Catalog',
       this.productsWrapper
     );
-    
+
     this.promoAndTotalWrapper = createDiv(styles.promoAndTotalWrapper);
 
     this.promoWrapper = createDiv(
@@ -147,6 +147,7 @@ class BasketPage extends Page {
 
   private async deleteHandler(item: Product): Promise<void> {
     if (this.cartInfo) {
+      this.productsArr = this.productsArr.filter((e) => e !== item);
       const deleteResult = await item.deleteProduct.bind(
         item,
         this.cartInfo.id,
@@ -158,7 +159,6 @@ class BasketPage extends Page {
       }
     }
   }
-
 
   private async clearCart() {
     if (this.cartInfo) {
@@ -175,7 +175,6 @@ class BasketPage extends Page {
           )();
           cartVersion = result.version;
           this.cartInfo = result;
-          cartVersion = result.version;
 
           const cartStatus = localStorage.getItem('anonymous_cart_id')
             ? 'anonymous_cart'
@@ -187,6 +186,7 @@ class BasketPage extends Page {
         });
       this.checkProductQuantityInCart();
       document.querySelector(`.${styles.background}`)?.remove();
+      this.productsArr = [];
     }
   }
 
@@ -234,8 +234,10 @@ class BasketPage extends Page {
         'No',
         confirmationButtonWrapper
       );
+      background.addEventListener('click', () => background.remove());
       confirmBtn.addEventListener('click', this.clearCart.bind(this));
       declineBtn.addEventListener('click', () => background.remove());
+      window.addEventListener('popstate', () => background.remove());
     }
   }
 

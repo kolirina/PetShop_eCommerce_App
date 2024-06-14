@@ -27,11 +27,10 @@ import {
   addToCart,
   getCartById,
 } from '../../api/SDK';
-import checkAnonymousToken from '../../utils/checkAnonymousToken';
 import priceFormatter from '../../utils/priceFormatter';
 import Pages from '../../router/pageNames';
-import './catalogPageStyles.css';
 import checkAnonymousToken from '../../utils/checkAnonymousToken';
+import './catalogPageStyles.css';
 
 class CatalogPage extends Page {
   public banner: HTMLDivElement;
