@@ -1,5 +1,10 @@
-import { Cart, LineItem } from '@commercetools/platform-sdk';
-import { getCartById } from '../../api/SDK';
+import {
+  Cart,
+  ClientResponse,
+  DiscountCode,
+  LineItem,
+} from '@commercetools/platform-sdk';
+import { applyCode, getCartById, getDiscountCodeById } from '../../api/SDK';
 import Router from '../../router';
 import Pages from '../../router/pageNames';
 import {
@@ -15,6 +20,9 @@ import priceFormatter from '../../utils/priceFormatter';
 import { TOTAL_PRICE_TEXT } from './constants';
 import TemplatePage from '../templatePage';
 import Header from '../../components/header';
+import checkAnonymousToken from '../../utils/checkAnonymousToken';
+import getCartStatus from '../../utils/checkCartStatus';
+import { lang } from '../../constants';
 import styles from './basketPage.module.css';
 import pageStyle from '../templatePage/templatePage.module.css';
 
@@ -44,6 +52,10 @@ class BasketPage extends Page {
   public clearCartBtn: HTMLButtonElement;
 
   private productsArr: Product[];
+
+  public appliedCodesWrapper: HTMLDivElement;
+
+  public appliedCodesHeading: HTMLHeadingElement;
 
   constructor(router: Router, templatePage: TemplatePage) {
     super(router, templatePage.getMainElement());
@@ -97,6 +109,15 @@ class BasketPage extends Page {
       this.promoAndTotalWrapper
     );
 
+    this.appliedCodesWrapper = createDiv(styles.appliedCodesWrapper);
+    this.appliedCodesHeading = createH3(
+      styles.appliedCodesHeading,
+      'Applied promo codes:',
+      this.appliedCodesWrapper
+    );
+
+    checkAnonymousToken();
+
     this.fillCart();
 
     this.clearCartBtn = createBtn(styles.clearCartBtn, 'Clear cart');
@@ -132,8 +153,36 @@ class BasketPage extends Page {
         );
         this.productsArr.push(item);
       });
+      this.promoApplyBtn.addEventListener(
+        'click',
+        this.applyPromoCode.bind(this)
+      );
       this.productsWrapper.append(this.clearCartBtn);
       this.checkProductQuantityInCart();
+      this.fillAppliedCodes();
+    }
+  }
+
+  private async fillAppliedCodes() {
+    if (this.cartInfo) {
+      const { discountCodes } = this.cartInfo;
+      if (discountCodes.length > 0) {
+        const promises = discountCodes.map((el) =>
+          getDiscountCodeById(el.discountCode.id)
+        );
+        const codesInfo = await Promise.all(promises);
+        codesInfo.forEach((el: ClientResponse<DiscountCode> | string) => {
+          if (typeof el !== 'string' && el.body.name) {
+            const codeName = el.body.name[lang];
+            createParagraph(
+              styles.codeElement,
+              codeName,
+              this.appliedCodesWrapper
+            );
+          }
+        });
+        this.productsWrapper.append(this.appliedCodesWrapper);
+      }
     }
   }
 
@@ -182,9 +231,7 @@ class BasketPage extends Page {
           cartVersion = result.version;
           this.cartInfo = result;
 
-          const cartStatus = localStorage.getItem('anonymous_cart_id')
-            ? 'anonymous_cart'
-            : 'registered_user_cart';
+          const cartStatus = getCartStatus();
           localStorage.setItem(`${cartStatus}_version`, String(result.version));
         }, Promise.resolve())
         .then(() => {
@@ -249,11 +296,31 @@ class BasketPage extends Page {
     }
   }
 
+  private async applyPromoCode(): Promise<void> {
+    this.promoWrapper.querySelector(`.${styles.errorMsg}`)?.remove();
+    this.promoInput.classList.remove(styles.errorInput);
+    if (this.cartInfo) {
+      const response = await applyCode(
+        this.cartInfo.id,
+        this.promoInput.value.toUpperCase()
+      );
+      if (typeof response === 'string') {
+        const errorMsg = createDiv(styles.errorMsg, this.promoWrapper);
+        errorMsg.textContent = `* ${response}`;
+        this.promoInput.classList.add(styles.errorInput);
+        return;
+      }
+      this.promoInput.value = '';
+      this.cartInfo = response.body;
+      this.updateFields();
+      this.fillAppliedCodes();
+      // this.productsArr.fil((el) => el.)
+    }
+  }
+
   private updateFields(): void {
     if (this.cartInfo) {
-      const cartStatus = localStorage.getItem('anonymous_cart_id')
-        ? 'anonymous_cart'
-        : 'registered_user_cart';
+      const cartStatus = getCartStatus();
       localStorage.setItem(
         `${cartStatus}_version`,
         String(this.cartInfo.version)
