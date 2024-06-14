@@ -132,7 +132,6 @@ const signUpUser = async (
     const response = await registerUser(userInfo);
     const { id } = response.body.customer;
     localStorage.setItem('id', id);
-
     try {
       const token = await getToken(userInfo.email, userInfo.password);
       localStorage.setItem('token', token);

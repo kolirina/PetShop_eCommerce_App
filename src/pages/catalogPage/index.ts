@@ -27,9 +27,9 @@ import {
   addToCart,
   getCartById,
 } from '../../api/SDK';
-import checkAnonymousToken from '../../utils/checkAnonymousToken';
 import priceFormatter from '../../utils/priceFormatter';
 import Pages from '../../router/pageNames';
+import checkAnonymousToken from '../../utils/checkAnonymousToken';
 import TemplatePage from '../templatePage';
 import Header from '../../components/header';
 import './catalogPageStyles.css';
