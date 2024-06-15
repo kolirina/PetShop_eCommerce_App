@@ -158,13 +158,13 @@ class BasketPage extends Page {
         this.applyPromoCode.bind(this)
       );
       this.productsWrapper.append(this.clearCartBtn);
-      this.checkProductQuantityInCart();
       this.fillAppliedCodes();
+      this.checkProductQuantityInCart();
     }
   }
 
   private async fillAppliedCodes() {
-    if (this.cartInfo) {
+    if (this.cartInfo && this.cartInfo.lineItems.length > 0) {
       const { discountCodes } = this.cartInfo;
       if (discountCodes.length > 0) {
         const promises = discountCodes.map((el) =>
@@ -174,11 +174,19 @@ class BasketPage extends Page {
         codesInfo.forEach((el: ClientResponse<DiscountCode> | string) => {
           if (typeof el !== 'string' && el.body.name) {
             const codeName = el.body.name[lang];
-            createParagraph(
-              styles.codeElement,
-              codeName,
-              this.appliedCodesWrapper
+            const addedCodes = document.querySelectorAll(
+              `.${styles.codeElement}`
             );
+            const wasCodeAdded = Array.from(addedCodes).find(
+              (e) => e.textContent === codeName
+            );
+            if (!wasCodeAdded) {
+              createParagraph(
+                styles.codeElement,
+                codeName,
+                this.appliedCodesWrapper
+              );
+            }
           }
         });
         this.productsWrapper.append(this.appliedCodesWrapper);
@@ -192,6 +200,7 @@ class BasketPage extends Page {
       this.goToCatalogBtn.remove();
       this.totalPrice.textContent = `${TOTAL_PRICE_TEXT}${priceFormatter(this.cartInfo.totalPrice.centAmount)}`;
       this.productsWrapper.append(this.promoAndTotalWrapper);
+      this.productsWrapper.append(this.appliedCodesWrapper);
     } else {
       this.productsWrapper.innerHTML = '';
       this.productsWrapper.append(this.noProductsMessage);
@@ -314,7 +323,9 @@ class BasketPage extends Page {
       this.cartInfo = response.body;
       this.updateFields();
       this.fillAppliedCodes();
-      // this.productsArr.fil((el) => el.)
+      this.productsArr.forEach((el, index) => {
+        el.updateProduct(response.body.lineItems[index]);
+      });
     }
   }
 
