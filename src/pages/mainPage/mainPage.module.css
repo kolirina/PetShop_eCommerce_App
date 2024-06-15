@@ -76,14 +76,16 @@
   font-weight: bold;
 }
 
-.promoContainer {
+.promo-container {
   display: flex;
   margin-bottom: 40px;
-  flex-wrap: wrap;
   gap: 16px;
+  flex-wrap: nowrap;
+  overflow-x: auto;
 }
 
 .coupon {
+  flex: 0 0 auto;
   width: 250px;
   padding: 16px;
   background: var(--background-color);
