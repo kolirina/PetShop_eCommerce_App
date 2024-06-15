@@ -789,6 +789,15 @@ async function changeProductQuantity(
   return data;
 }
 
+async function getAllDiscountCodes() {
+  const response = await apiRoot
+    .withProjectKey({ projectKey })
+    .discountCodes()
+    .get()
+    .execute();
+  return response;
+}
+
 export {
   getUser,
   registerUser,
@@ -821,4 +830,5 @@ export {
   changeProductQuantity,
   fetchFilteredForPagination,
   fetchProductsForPagination,
+  getAllDiscountCodes,
 };
