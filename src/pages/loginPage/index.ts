@@ -95,7 +95,7 @@ export default class LoginPage extends Page {
 
     this.registerLink = createLocalLink(
       'registerLink',
-      'Create Account',
+      'Create an Account',
       Pages.REGISTRATION,
       () => router.navigateTo(Pages.REGISTRATION),
       this.loginForm

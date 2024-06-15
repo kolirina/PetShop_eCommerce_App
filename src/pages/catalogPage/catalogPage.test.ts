@@ -3,6 +3,7 @@ import { JSDOM } from 'jsdom';
 import CatalogPage from '.';
 import Router from '../../router';
 import TemplatePage from '../templatePage';
+import { FilteredProducts } from '../../types/filterProducts';
 
 describe('CatalogPage', () => {
   let catalogPage: CatalogPage;
@@ -167,5 +168,199 @@ describe('CatalogPage', () => {
     catalogPage.productsInCartIds.push(productId);
     addToCartButton!.click();
     expect(addToCartButton!.classList.contains('alreadyInCart')).toBeTruthy();
+  });
+
+  it('should display message when no products match the filter', async () => {
+    const filteredProducts: FilteredProducts = [];
+
+    await catalogPage.getInfoFilteredProducts(filteredProducts);
+
+    expect(catalogPage.productsContainer.innerHTML).toBe(
+      'It seems that no product matches your request. Please try again.'
+    );
+  });
+
+  it('should display products correctly', async () => {
+    const filteredProducts: FilteredProducts = [
+      {
+        id: '1',
+        name: { en: 'Product 1' },
+        masterVariant: {
+          id: 1,
+          images: [
+            {
+              url: 'image1.jpg',
+              dimensions: {
+                w: 100,
+                h: 100,
+              },
+            },
+          ],
+          prices: [
+            {
+              id: 'price1',
+              value: {
+                type: 'centPrecision',
+                currencyCode: 'EUR',
+                centAmount: 1000,
+                fractionDigits: 2,
+              },
+              discounted: {
+                value: {
+                  type: 'centPrecision',
+                  currencyCode: 'EUR',
+                  centAmount: 800,
+                  fractionDigits: 2,
+                },
+                discount: {
+                  typeId: 'discount',
+                  id: 'discountId',
+                },
+              },
+            },
+          ],
+        },
+        categories: [],
+        createdAt: '2024-01-01T00:00:00.000Z',
+        lastModifiedAt: '2024-01-01T00:00:00.000Z',
+        productType: {
+          typeId: 'productType',
+          id: 'productTypeId',
+        },
+        slug: { en: 'product-1' },
+        variants: [],
+        version: 1,
+      },
+      {
+        id: '2',
+        name: { en: 'Product 2' },
+        masterVariant: {
+          id: 2,
+          images: [
+            {
+              url: 'image2.jpg',
+              dimensions: {
+                w: 100,
+                h: 100,
+              },
+            },
+          ],
+          prices: [
+            {
+              id: 'price2',
+              value: {
+                type: 'centPrecision',
+                currencyCode: 'EUR',
+                centAmount: 2000,
+                fractionDigits: 2,
+              },
+            },
+          ],
+        },
+        categories: [],
+        createdAt: '2024-01-01T00:00:00.000Z',
+        lastModifiedAt: '2024-01-01T00:00:00.000Z',
+        productType: {
+          typeId: 'productType',
+          id: 'productTypeId',
+        },
+        slug: { en: 'product-2' },
+        variants: [],
+        version: 1,
+      },
+    ];
+
+    await catalogPage.getInfoFilteredProducts(filteredProducts);
+
+    expect(catalogPage.productsDisplayed).toEqual(filteredProducts);
+
+    const productCards =
+      catalogPage.productsContainer.querySelectorAll('.productCard');
+    expect(productCards.length).toBe(2);
+
+    const firstProductCard = productCards[0];
+    expect(
+      firstProductCard.querySelector('.productImage')!.getAttribute('src')
+    ).toBe('image1.jpg');
+    expect(
+      firstProductCard.querySelector('.productInfoBrief')!.textContent
+    ).toBe('Sorry, no description available.');
+    expect(firstProductCard.querySelector('.regularPrice')!.textContent).toBe(
+      '€10.00'
+    );
+    const secondProductCard = productCards[1];
+    expect(
+      secondProductCard.querySelector('.productImage')!.getAttribute('src')
+    ).toBe('image2.jpg');
+    expect(
+      secondProductCard.querySelector('.productInfoBrief')!.textContent
+    ).toBe('Sorry, no description available.');
+    expect(secondProductCard.querySelector('.regularPrice')!.textContent).toBe(
+      '€20.00'
+    );
+    expect(secondProductCard.querySelector('.discountedPrice')).toBeNull();
+  });
+
+  it('should create brand and count array correctly', () => {
+    const brands = [
+      'happy cat',
+      'happy dog',
+      'applaws',
+      'bozira',
+      'cairo',
+      'royal canin',
+      'happy cat',
+      'applaws',
+      'happy cat',
+    ];
+
+    const result = catalogPage.createBrandAndCountArray(brands);
+
+    expect(result).toEqual([
+      { brand: 'applaws', count: 2 },
+      { brand: 'bozira', count: 1 },
+      { brand: 'cairo', count: 1 },
+      { brand: 'happy cat', count: 3 },
+      { brand: 'happy dog', count: 1 },
+      { brand: 'royal canin', count: 1 },
+    ]);
+  });
+
+  it('should handle empty brands array', () => {
+    const brands: string[] = [];
+
+    const result = catalogPage.createBrandAndCountArray(brands);
+
+    expect(result).toEqual([]);
+  });
+
+  it('should handle array with one brand', () => {
+    const brands = ['happy cat'];
+
+    const result = catalogPage.createBrandAndCountArray(brands);
+
+    expect(result).toEqual([{ brand: 'happy cat', count: 1 }]);
+  });
+
+  it('should handle array with multiple different brands', () => {
+    const brands = [
+      'happy cat',
+      'happy dog',
+      'applaws',
+      'bozita',
+      'cairo',
+      'royal canin',
+    ];
+
+    const result = catalogPage.createBrandAndCountArray(brands);
+
+    expect(result).toEqual([
+      { brand: 'applaws', count: 1 },
+      { brand: 'bozita', count: 1 },
+      { brand: 'cairo', count: 1 },
+      { brand: 'happy cat', count: 1 },
+      { brand: 'happy dog', count: 1 },
+      { brand: 'royal canin', count: 1 },
+    ]);
   });
 });
