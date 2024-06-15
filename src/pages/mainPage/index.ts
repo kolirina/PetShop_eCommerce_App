@@ -10,6 +10,11 @@ import {
 } from '../../utils/elementCreator';
 import Page from '../Page';
 import styles from './mainPage.module.css';
+import loginBackground from '../../assets/login_bg.png';
+import registrationBackground from '../../assets/registration_bg.png';
+import profileBackground from '../../assets/profile_bg.png';
+import catalogBackground from '../../assets/catalog_bg.png';
+import isLoggedIn from '../../utils/checkFunctions';
 
 class MainPage extends Page {
   constructor(router: Router, parentElement: HTMLElement) {
@@ -58,34 +63,79 @@ class MainPage extends Page {
   }
 
   displayLinks() {
-    createLocalLink(
-      styles.link,
-      'Login',
-      Pages.LOGIN,
-      () => this.router.navigateTo(Pages.LOGIN),
-      this.container
-    );
-    createLocalLink(
-      styles.link,
-      'Register',
-      Pages.REGISTRATION,
-      () => this.router.navigateTo(Pages.REGISTRATION),
-      this.container
-    );
-    createLocalLink(
-      styles.link,
-      'Profile',
-      Pages.PROFILE,
-      () => this.router.navigateTo(Pages.PROFILE),
-      this.container
-    );
-    createLocalLink(
-      styles.link,
-      'Catalog',
-      Pages.CATALOG,
-      () => this.router.navigateTo(Pages.CATALOG),
-      this.container
-    );
+    const pages = [
+      {
+        name: 'Login',
+        page: Pages.LOGIN,
+        description: 'Login to your account',
+        image: loginBackground,
+      },
+      {
+        name: 'Register',
+        page: Pages.REGISTRATION,
+        description: 'Create a new account',
+        image: registrationBackground,
+      },
+      {
+        name: 'Profile',
+        page: Pages.PROFILE,
+        description: 'View your profile',
+        image: profileBackground,
+      },
+      {
+        name: 'Catalog',
+        page: Pages.CATALOG,
+        description: 'Browse our catalog',
+        image: catalogBackground,
+      },
+      {
+        name: 'About us',
+        page: Pages.ABOUT_US,
+        description: 'Info about our team',
+        image: '',
+      },
+    ];
+
+    const cardContainer = createDiv(styles.cardContainer, this.container);
+
+    pages.forEach(({ name, page, description, image }) => {
+      const card = createLocalLink(
+        styles.card,
+        '',
+        page,
+        () => {
+          if (
+            isLoggedIn() &&
+            (page === Pages.LOGIN || page === Pages.REGISTRATION)
+          ) {
+            MainPage.displayWarning('You are already signed in!');
+          } else if (!isLoggedIn() && page === Pages.PROFILE) {
+            MainPage.displayWarning('You are not signed in!');
+          } else {
+            this.router.navigateTo(page);
+          }
+        },
+        cardContainer
+      );
+      card.style.backgroundImage = `url(${image})`;
+
+      const cardContent = createDiv(styles.cardContent, card);
+      createParagraph(styles.cardTitle, name, cardContent);
+      createParagraph(styles.cardDescription, description, cardContent);
+    });
+  }
+
+  static displayWarning(text: string) {
+    document.body.classList.add(styles.noscroll);
+    const background = createDiv(styles.background, document.body);
+    const warningWrapper = createDiv(styles.warningWrapper, background);
+    createParagraph(styles.warningText, text, warningWrapper);
+    const removeWarning = () => {
+      background.remove();
+      document.body.classList.remove(styles.noscroll);
+    };
+    background.addEventListener('click', removeWarning);
+    window.addEventListener('popstate', removeWarning);
   }
 }
 
