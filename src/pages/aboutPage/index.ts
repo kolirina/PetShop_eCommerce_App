@@ -34,10 +34,11 @@ class AboutPage extends Page {
       {
         name: 'Irina Kolotilkina',
         role: 'Developer',
-        bio: `With a background in finance and linguistics, Irina started her journey into front-end development
-              at RS School Stage 1 in November 2023. Before beginning her studies at RS School, she worked for several
-              years as a financial analyst for a bank and then as a corporate and private English teacher. Despite some
-              ups and downs along the way, she has undeniably found her passion in this new field.`,
+        bio: `With a background in finance and linguistics, I started my journey into front-end development at
+              RS School Stage 1 in November 2023. Before beginning studies at RS School, I worked for several years
+              as a financial analyst for a bank and then as a corporate and private English teacher. Despite some
+              ups and downs along the way, I have undeniably found my passion in this new field. I truly enjoy the
+              challenges and mental exercise it provides. Looking forward to embarking on stage 3 of this amazing course.`,
         contributions: ['Login page', 'Catalog page'],
         github: 'https://github.com/kolirina',
         photo: photoIrina,
