@@ -789,6 +789,15 @@ async function changeProductQuantity(
   return data;
 }
 
+async function getAllDiscountCodes() {
+  const response = await apiRoot
+    .withProjectKey({ projectKey })
+    .discountCodes()
+    .get()
+    .execute();
+  return response;
+}
+
 async function applyCode(
   cartId: string,
   code: string
@@ -869,6 +878,7 @@ export {
   changeProductQuantity,
   fetchFilteredForPagination,
   fetchProductsForPagination,
+  getAllDiscountCodes,
   applyCode,
   getDiscountCodeById,
 };

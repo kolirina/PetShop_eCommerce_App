@@ -1,29 +1,154 @@
 .container {
   padding: 20px;
   width: 100%;
+  height: 100%;
 }
 
-.link {
-  display: block;
-  padding: 10px;
-  border: 2px solid transparent;
-  text-align: center;
-  color: var(--accent-color);
-  font-size: 24px;
-  font-weight: bold;
+.card-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.card {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  width: 350px;
+  height: 350px;
+  overflow: hidden;
+  color: black;
   text-decoration: none;
-  transition:
-    color 0.3s ease,
-    border-color 0.3s ease;
+  border-radius: 10px;
+  background-size: cover;
+  background-position: center;
+  transition: all 0.3s ease;
   cursor: pointer;
 }
 
-.link:hover {
-  text-decoration: underline;
-  border-color: var(--accent-color);
+.card:hover {
+  transform: scale(1.05);
 }
+
+.card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(3px);
+  transition: all 0.3s ease;
+}
+
+.card:hover::before {
+  backdrop-filter: blur(0px);
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.card-content {
+  position: relative;
+  z-index: 1;
+  padding: 10px;
+}
+
+.card-title {
+  margin: 0;
+  font-size: 1.5em;
+  font-weight: bold;
+}
+
+.card-description {
+  margin: 5px 0 0;
+  font-size: 1em;
+}
+
 .main {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+}
+
+.promo-head {
+  margin: 0 0 20px;
+  font-size: 36px;
+  font-weight: bold;
+}
+
+.promo-container {
+  display: flex;
+  margin-bottom: 40px;
+  gap: 16px;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+}
+
+.coupon {
+  flex: 0 0 auto;
+  width: 250px;
+  padding: 16px;
+  background: var(--background-color);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  border: 2px dashed var(--accent-color);
+  border-radius: 10px;
+}
+
+.name {
+  margin: 0 0 8px;
+  font-size: 1.2em;
+  font-weight: bold;
+}
+
+.description {
+  font-size: 0.9em;
+  margin: 0 0 8px;
+}
+
+.copy-container {
+  display: flex;
+  justify-content: space-between;
+}
+
+.code {
+  margin: 0;
+  font-size: 1em;
+  font-weight: bold;
+  color: red;
+}
+
+.copy-button {
+  font-size: 1em;
+  color: blue;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.noscroll {
+  overflow: hidden;
+}
+
+.background {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 3;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.8);
+}
+.warning-wrapper {
+  width: 290px;
+  padding: 20px;
+  background-color: var(--main-bg-color);
+  border: 1px solid var(--accent-color);
+  border-radius: 20px;
+}
+.warning-text {
+  text-align: center;
+  font-size: 20px;
 }
