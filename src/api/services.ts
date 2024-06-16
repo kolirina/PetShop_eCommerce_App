@@ -98,6 +98,8 @@ async function addItemsFromAnonymousCart() {
   localStorage.removeItem('anonymous_cart_id');
   localStorage.removeItem('anonymous_cart_version');
   localStorage.removeItem('anonymous_token');
+  localStorage.removeItem('anonymous_refresh_token');
+  localStorage.removeItem('anonymous_token_time');
 }
 
 const loginUser = async (email: string, password: string): Promise<string> => {
