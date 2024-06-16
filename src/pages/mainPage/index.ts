@@ -14,6 +14,7 @@ import loginBackground from '../../assets/login_bg.png';
 import registrationBackground from '../../assets/registration_bg.png';
 import profileBackground from '../../assets/profile_bg.png';
 import catalogBackground from '../../assets/catalog_bg.png';
+import aboutBackground from '../../assets/about_bg.png';
 import isLoggedIn from '../../utils/checkFunctions';
 
 class MainPage extends Page {
@@ -92,7 +93,7 @@ class MainPage extends Page {
         name: 'About us',
         page: Pages.ABOUT_US,
         description: 'Info about our team',
-        image: '',
+        image: aboutBackground,
       },
     ];
 
