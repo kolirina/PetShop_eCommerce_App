@@ -4,12 +4,30 @@
   height: 100%;
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  padding-left: calc(100% * 0.1);
-  background-image: url('@/assets/background_4.jpg');
+  justify-content: space-between;
+  gap: 10px;
+  position: relative;
+  overflow: hidden;
+}
+
+.container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: url('@/assets/background_5.jpg');
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
+  transform: scaleY(-1);
+  z-index: -1;
+}
+
+.container > * {
+  position: relative;
+  z-index: 0;
 }
 
 .link {
@@ -34,4 +52,179 @@
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+}
+
+.card-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.card {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  width: 150px;
+  height: 150px;
+  overflow: hidden;
+  color: var(--accent-color);
+  text-decoration: none;
+  border-radius: 10px;
+  background-size: cover;
+  background-position: center;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.card:hover {
+  transform: scale(1.05);
+}
+
+.card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(3px);
+  transition: all 0.3s ease;
+}
+
+.card:hover::before {
+  backdrop-filter: blur(0px);
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.card-content {
+  position: relative;
+  z-index: 1;
+  padding: 10px;
+}
+
+.card-title {
+  margin: 0;
+  font-size: 1.5em;
+  font-weight: bold;
+}
+
+.card-description {
+  margin: 5px 0 0;
+  font-size: 1em;
+}
+
+.promoTextWrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  max-width: 800px;
+  margin-left: -20px;
+  padding-top: 70px;
+  padding-bottom: 70px;
+  padding-left: 40px;
+  background-color: yellow;
+  border-radius: 0 100px 100px 0;
+}
+
+.promo-head {
+  margin-top: 0;
+  margin-bottom: 0;
+  color: rgba(22, 189, 201, 0.589);
+  font-size: 60px;
+  font-weight: bold;
+  font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande',
+    'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+}
+
+.promoHeadItalic {
+  margin-top: 0;
+  margin-bottom: 0;
+  color: var(--accent-color);
+  font-size: 60px;
+  font-weight: bold;
+  font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande',
+    'Lucida Sans', Arial, sans-serif;
+  font-style: italic;
+}
+
+.promo-container {
+  display: flex;
+  gap: 16px;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+}
+
+.coupon {
+  flex: 0 0 auto;
+  width: 250px;
+  padding: 16px;
+  background: var(--background-color);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  border: 2px dashed var(--accent-color);
+  border-radius: 10px;
+}
+
+.name {
+  margin: 0 0 8px;
+  font-size: 1.2em;
+  font-weight: bold;
+}
+
+.description {
+  font-size: 0.9em;
+  margin: 0 0 8px;
+}
+
+.copy-container {
+  display: flex;
+  justify-content: space-between;
+}
+
+.code {
+  margin: 0;
+  font-size: 1em;
+  font-weight: bold;
+  color: red;
+}
+
+.copy-button {
+  font-size: 1em;
+  color: blue;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.noscroll {
+  overflow: hidden;
+}
+
+.warning-wrapper {
+  width: 290px;
+  padding: 20px;
+  background-color: var(--main-bg-color);
+  border: 1px solid var(--accent-color);
+  border-radius: 20px;
+}
+.warning-text {
+  text-align: center;
+  font-size: 20px;
+}
+
+@media screen and (max-width: 815px) {
+  .promoTextWrapper {
+    max-width: 500px;
+    padding-top: 30px;
+    padding-bottom: 30px;
+    padding-left: 20px;
+    background-color: yellow;
+    border-top-right-radius: 50px;
+    border-bottom-right-radius: 50px;
+  }
+
+  .promo-head,
+  .promoHeadItalic {
+    font-size: 30px;
+  }
 }

@@ -17,8 +17,8 @@
   gap: 10px;
   margin: auto;
   padding: 15px;
-  background-color: rgb(251, 252, 251, 0.5);
-  border-radius: 8px;
+  background-color: var(--main-bg-color-semi-transparent);
+  border-radius: 15px;
 }
 
 .welcomeDiv,
@@ -32,7 +32,10 @@
 
 .emailInput {
   height: 28px;
+  padding: 2px;
   color: var(--text-color);
+  border: 1px solid var(--light-border-color);
+  border-radius: 4px;
 }
 
 .passwordPlusEyeDiv {
@@ -43,12 +46,13 @@
   width: 300px;
   height: 30px;
   border: 1px solid var(--light-border-color);
-  border-radius: 2px;
+  border-radius: 4px;
 }
 
 .passwordInput {
   width: 270px;
-  height: 28px;
+  height: 27px;
+  margin-left: 1px;
   color: var(--text-color);
   border: none;
 }
@@ -59,6 +63,7 @@
 }
 
 .eyeBtn {
+  margin-right: 2px;
   background-color: var(--main-bg-color);
   border: none;
   cursor: pointer;
@@ -77,7 +82,7 @@
   color: var(--accent-color);
   background-color: var(--main-bg-color);
   border: 1px solid var(--accent-color);
-  border-radius: 2px;
+  border-radius: 4px;
   cursor: pointer;
 }
 
@@ -97,7 +102,7 @@
 }
 
 .registerLink {
-  width: 100px;
+  width: 120px;
   color: rgb(33, 85, 26);
   font-size: small;
   text-decoration: underline;

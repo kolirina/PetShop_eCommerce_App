@@ -70,7 +70,7 @@
 }
 .addresses-wrapper .inputs-wrapper {
   padding: 15px;
-  background-color: rgb(251, 252, 251, 0.5);
+  background-color: var(--main-bg-color-semi-transparent);
   border: 1px solid var(--text-color);
   border-radius: 15px;
 }

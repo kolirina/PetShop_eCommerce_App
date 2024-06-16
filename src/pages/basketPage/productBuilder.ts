@@ -17,7 +17,7 @@ import styles from './basketPage.module.css';
 class Product {
   public productWrapper: HTMLDivElement;
 
-  private productInfo: LineItem;
+  public productInfo: LineItem;
 
   private productAmount: number;
 
@@ -43,7 +43,11 @@ class Product {
 
   public productAmountInput: HTMLInputElement;
 
+  public productPriceWrapper: HTMLDivElement;
+
   public productPriceText: HTMLHeadingElement;
+
+  public originalPrice: HTMLHeadingElement;
 
   public productDeleteBtn: HTMLButtonElement;
 
@@ -107,14 +111,17 @@ class Product {
     );
     this.productAmountInput.disabled = true;
 
+    this.productPriceWrapper = createDiv(
+      styles.productPriceWrapper,
+      this.amountAndPriceWrapper
+    );
+    this.originalPrice = createH3(styles.productOriginalPrice, '');
     this.productPriceText = createH3(
       styles.productPriceText,
       priceFormatter(this.productPrice),
-      this.amountAndPriceWrapper
+      this.productPriceWrapper
     );
-    if (item.price.discounted) {
-      this.productPriceText.classList.add(styles.discountedPrice);
-    }
+    this.addOriginalPrice();
 
     this.productDeleteBtn = createBtn(
       styles.productDeleteBtn,
@@ -137,6 +144,17 @@ class Product {
       return brand.find((el) => el.name === 'brand')?.value;
     }
     return '';
+  }
+
+  private addOriginalPrice() {
+    if (
+      this.productInfo.discountedPricePerQuantity.length > 0 ||
+      this.productInfo.price.discounted
+    ) {
+      this.productPriceText.classList.add(styles.discountedPrice);
+      this.originalPrice.textContent = `${priceFormatter(this.productInfo.price.value.centAmount)}`;
+      this.productPriceWrapper.prepend(this.originalPrice);
+    }
   }
 
   public async deleteProduct(
@@ -196,6 +214,20 @@ class Product {
       this.productAmountDecBtn.disabled = true;
     } else {
       this.productAmountDecBtn.disabled = false;
+    }
+  }
+
+  public updateProduct(product: LineItem) {
+    this.productInfo = product;
+    if (this.productInfo.discountedPricePerQuantity.length > 0) {
+      const originalPrice = this.productPriceWrapper.querySelector(
+        `.${styles.productOriginalPrice}`
+      );
+      if (!originalPrice) {
+        this.addOriginalPrice();
+      }
+      this.productPriceText.classList.add(styles.discounted);
+      this.productPriceText.textContent = `${priceFormatter(this.productInfo.totalPrice.centAmount)}`;
     }
   }
 

@@ -29,8 +29,4 @@ export default class TemplatePage extends Page {
   getMainElement() {
     return this.main;
   }
-
-  getPageContainer() {
-    return this.container;
-  }
 }
