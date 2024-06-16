@@ -798,6 +798,54 @@ async function getAllDiscountCodes() {
   return response;
 }
 
+async function applyCode(
+  cartId: string,
+  code: string
+): Promise<ClientResponse<Cart> | string> {
+  const token = getLocalToken();
+  const cart = getCartById(cartId);
+  try {
+    const response = await apiRoot
+      .withProjectKey({ projectKey })
+      .me()
+      .carts()
+      .withId({ ID: cartId })
+      .post({
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        body: {
+          version: (await cart).body.version,
+          actions: [
+            {
+              action: 'addDiscountCode',
+              code,
+            },
+          ],
+        },
+      })
+      .execute();
+    // const data = response;
+    return response;
+  } catch {
+    return 'The code is incorrect';
+  }
+}
+
+async function getDiscountCodeById(codeId: string) {
+  try {
+    const response = await apiRoot
+      .withProjectKey({ projectKey })
+      .discountCodes()
+      .withId({ ID: codeId })
+      .get()
+      .execute();
+    return response;
+  } catch {
+    return 'There is no such code';
+  }
+}
+
 export {
   getUser,
   registerUser,
@@ -831,4 +879,6 @@ export {
   fetchFilteredForPagination,
   fetchProductsForPagination,
   getAllDiscountCodes,
+  applyCode,
+  getDiscountCodeById,
 };

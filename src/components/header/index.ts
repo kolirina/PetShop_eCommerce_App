@@ -140,6 +140,7 @@ export default class Header {
       }
     } else {
       this.cartCountElement.classList.add(styles.hidden);
+      this.cartCountElement.textContent = totalCount;
     }
   }
 
