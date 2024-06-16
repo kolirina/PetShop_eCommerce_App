@@ -126,21 +126,22 @@ export default class Header {
     const cartId =
       localStorage.getItem('registered_user_cart_id') ||
       localStorage.getItem('anonymous_cart_id');
+    let totalCount = 0;
     if (cartId) {
       const cart = await getCartById(cartId);
-      const totalCount = cart.body.lineItems.reduce(
+      totalCount = cart.body.lineItems.reduce(
         (total: number, item: LineItem) => total + item.quantity,
         0
       );
       if (totalCount > 0) {
         this.cartCountElement.classList.remove(styles.hidden);
-        this.cartCountElement.textContent = totalCount;
+        this.cartCountElement.textContent = totalCount.toString();
       } else {
         this.cartCountElement.classList.add(styles.hidden);
       }
     } else {
       this.cartCountElement.classList.add(styles.hidden);
-      this.cartCountElement.textContent = totalCount;
+      this.cartCountElement.textContent = totalCount.toString();
     }
   }
 

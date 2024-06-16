@@ -27,11 +27,6 @@ class MainPage extends Page {
   async displayDiscountCoupons() {
     const response = await getAllDiscountCodes();
     if (response.statusCode === 200 && response.body.total) {
-      createParagraph(
-        styles.promoHead,
-        'Available discount codes:',
-        this.container
-      );
       const promoContainer = createDiv(styles.promoContainer, this.container);
       response.body.results.forEach((promocode) => {
         if (promocode.isActive) {
@@ -60,6 +55,18 @@ class MainPage extends Page {
         }
       });
     }
+    const promoTextWrapper = createDiv(styles.promoTextWrapper, this.container);
+    createParagraph(styles.promoHead, 'Treat your friend to', promoTextWrapper);
+    createParagraph(
+      styles.promoHeadItalic,
+      'something nice!',
+      promoTextWrapper
+    );
+    createParagraph(
+      styles.promoHead,
+      'Snacks, toys and more.',
+      promoTextWrapper
+    );
     this.displayLinks();
   }
 

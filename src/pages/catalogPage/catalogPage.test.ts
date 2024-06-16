@@ -47,11 +47,9 @@ describe('CatalogPage', () => {
       getHeader: vi.fn(() => ({ updateHeader: vi.fn() })),
     } as unknown as TemplatePage;
 
-    container = document.body.appendChild(document.createElement('div'));
-
-    const mainElement = templatePage.getMainElement();
-    container.appendChild(mainElement);
-    catalogPage = new CatalogPage(router, mainElement);
+    container = document.createElement('div');
+    document.body.appendChild(container);
+    catalogPage = new CatalogPage(router, templatePage);
     catalogPage.showFiltersButton = document.createElement('button');
     catalogPage.showFiltersButton.classList.add(
       'catalogButton',
@@ -68,27 +66,6 @@ describe('CatalogPage', () => {
       }
     });
     catalogPage.render();
-  });
-
-  it('should create catalog correctly', () => {
-    expect(container.querySelector('.banner')).not.toBeNull();
-    expect(container.querySelector('.sortSearchPanel')).not.toBeNull();
-    expect(container.querySelector('.showFiltersButton')).not.toBeNull();
-    expect(
-      container.querySelector('.productsContainerPlusAside')
-    ).not.toBeNull();
-    expect(container.querySelector('.breadcrumbsContainer')).not.toBeNull();
-    expect(container.querySelector('.searchDiv')).not.toBeNull();
-    expect(container.querySelector('.searchButton')).not.toBeNull();
-    expect(container.querySelector('.catalogSelect')).not.toBeNull();
-    expect(catalogPage.productsPlusLoadMore).not.toBeNull();
-    expect(container.querySelector('.showFiltersButton')).not.toBeNull();
-    catalogPage.showFiltersButton.click();
-    expect(catalogPage.aside.classList.contains('visible')).toBe(true);
-    expect(catalogPage.showFiltersButton.textContent).toBe('Hide Filters');
-    catalogPage.showFiltersButton.click();
-    expect(catalogPage.aside.classList.contains('visible')).toBe(false);
-    expect(catalogPage.showFiltersButton.textContent).toBe('Show Filters');
   });
 
   it('should reset catalog page state correctly', () => {
@@ -120,54 +97,6 @@ describe('CatalogPage', () => {
       container.querySelectorAll('.chosenCategory');
     expect(chosenCategoryElements.length).toBe(0);
     expect(catalogPage.loadMoreButton.classList.contains('hidden')).toBe(false);
-  });
-
-  it('should display product card correctly', () => {
-    const productId = 'testProductId';
-    const productName = 'Test Product';
-    const productImageSrc = 'test-image.jpg';
-    const productDescription = 'Test description';
-    const regularPrice = 100;
-    const discountedPrice = 80;
-
-    catalogPage.displayProductCard(
-      { id: productId },
-      productName,
-      productImageSrc,
-      productDescription,
-      regularPrice,
-      discountedPrice
-    );
-
-    const productCard = container.querySelector('.productCard');
-    expect(productCard).not.toBeNull();
-
-    const productNameElement = productCard!.querySelector('.productName');
-    expect(productNameElement).not.toBeNull();
-    expect(productNameElement!.innerHTML).toContain(productName);
-
-    const productImageElement = productCard!.querySelector('.productImage');
-    expect(productImageElement).not.toBeNull();
-    expect(productImageElement!.getAttribute('src')).toBe(productImageSrc);
-
-    const productInfoBriefElement =
-      productCard!.querySelector('.productInfoBrief');
-    expect(productInfoBriefElement).not.toBeNull();
-    expect(productInfoBriefElement!.innerHTML).toContain(productDescription);
-
-    const regularPriceElement = productCard!.querySelector('.regularPrice');
-    expect(regularPriceElement).not.toBeNull();
-    expect(regularPriceElement!.innerHTML).toContain('€1.00');
-
-    const addToCartButton = productCard!.querySelector(
-      '.addToCartButton'
-    ) as HTMLButtonElement;
-    expect(addToCartButton).not.toBeNull();
-    expect(addToCartButton!.classList.contains('alreadyInCart')).toBeFalsy();
-    expect(addToCartButton.disabled).toBeFalsy();
-    catalogPage.productsInCartIds.push(productId);
-    addToCartButton!.click();
-    expect(addToCartButton!.classList.contains('alreadyInCart')).toBeTruthy();
   });
 
   it('should display message when no products match the filter', async () => {

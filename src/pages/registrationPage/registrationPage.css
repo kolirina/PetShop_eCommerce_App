@@ -30,7 +30,7 @@
   flex-direction: column;
   justify-content: space-between;
   padding: 15px;
-  border: 1px solid lightgray;
+  background-color: var(--main-bg-color-semi-transparent);
   border-radius: 15px;
 }
 .user-info-wrapper {
