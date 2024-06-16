@@ -97,6 +97,7 @@ async function addItemsFromAnonymousCart() {
   await addItemsRecursively(items);
   localStorage.removeItem('anonymous_cart_id');
   localStorage.removeItem('anonymous_cart_version');
+  localStorage.removeItem('anonymous_token');
 }
 
 const loginUser = async (email: string, password: string): Promise<string> => {
