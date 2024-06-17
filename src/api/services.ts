@@ -122,7 +122,7 @@ const loginUser = async (email: string, password: string): Promise<string> => {
       JSON.stringify(response.body.cart!.version)
     );
     if (localStorage.getItem('anonymous_cart_id')) {
-      addItemsFromAnonymousCart();
+      await addItemsFromAnonymousCart();
     }
   }
   return id;
