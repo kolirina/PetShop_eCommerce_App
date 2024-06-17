@@ -140,7 +140,7 @@ const signUpUser = async (
       localStorage.setItem('token', token);
       if (localStorage.getItem('anonymous_cart_id')) {
         await createCart(id);
-        addItemsFromAnonymousCart();
+        await addItemsFromAnonymousCart();
         localStorage.removeItem('anonymous_token');
       }
       return { id, token };
