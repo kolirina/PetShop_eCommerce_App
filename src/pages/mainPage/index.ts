@@ -87,7 +87,7 @@ class MainPage extends Page {
       {
         name: 'Profile',
         page: Pages.PROFILE,
-        description: 'View your profile',
+        description: 'View and edit your profile',
         image: profileBackground,
       },
       {
