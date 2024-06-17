@@ -299,7 +299,11 @@ class BasketPage extends Page {
         'No',
         confirmationButtonWrapper
       );
-      background.addEventListener('click', () => background.remove());
+      background.addEventListener('click', (e) => {
+        if (e.target === background) {
+          background.remove();
+        }
+      });
       confirmBtn.addEventListener('click', this.clearCart.bind(this));
       declineBtn.addEventListener('click', () => background.remove());
       window.addEventListener('popstate', () => background.remove());
