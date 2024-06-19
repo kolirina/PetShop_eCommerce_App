@@ -116,6 +116,10 @@ class Product {
       this.amountAndPriceWrapper
     );
     this.originalPrice = createH3(styles.productOriginalPrice, '');
+    this.originalPrice.textContent = `${priceFormatter(this.productInfo.price.value.centAmount)}`;
+    if (this.productAmount > 1) {
+      this.productPriceWrapper.prepend(this.originalPrice);
+    }
     this.productPriceText = createH3(
       styles.productPriceText,
       priceFormatter(this.productPrice),
@@ -152,7 +156,7 @@ class Product {
       this.productInfo.price.discounted
     ) {
       this.productPriceText.classList.add(styles.discountedPrice);
-      this.originalPrice.textContent = `${priceFormatter(this.productInfo.price.value.centAmount)}`;
+      this.originalPrice.classList.add(styles.productOriginalPriceDiscounted);
       this.productPriceWrapper.prepend(this.originalPrice);
     }
   }
@@ -215,8 +219,10 @@ class Product {
     this.productAmountInput.value = String(this.productAmount);
     if (this.productAmount === 1) {
       this.productAmountDecBtn.disabled = true;
+      this.originalPrice.remove();
     } else {
       this.productAmountDecBtn.disabled = false;
+      this.productPriceWrapper.prepend(this.originalPrice);
     }
   }
 

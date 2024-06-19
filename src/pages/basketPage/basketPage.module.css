@@ -154,7 +154,7 @@ body {
   row-gap: 5px;
   margin: 0 0 0 15px;
 }
-.product-original-price {
+.product-original-price-discounted {
   text-decoration: line-through;
 }
 .product-price-text,
