@@ -160,8 +160,8 @@ class BasketPage extends Page {
       result.body.lineItems.forEach((el: LineItem) => {
         const item = new Product(el);
         this.productsWrapper.append(item.getProduct());
-        item.productDeleteBtn.addEventListener('click', () =>
-          this.deleteHandler(item)
+        item.productDeleteBtn.addEventListener('click', (evt) =>
+          this.deleteHandler(item, evt)
         );
         item.productAmountDecBtn.addEventListener('click', (e) =>
           this.quantityHandler(item, e)
@@ -259,8 +259,10 @@ class BasketPage extends Page {
     }
   }
 
-  private async deleteHandler(item: Product): Promise<void> {
+  private async deleteHandler(item: Product, evt: Event): Promise<void> {
     if (this.cartInfo) {
+      const target: HTMLButtonElement = evt.target as HTMLButtonElement;
+      target.disabled = true;
       this.productsArr = this.productsArr.filter((e) => e !== item);
       const deleteResult = await item.deleteProduct.bind(
         item,
@@ -269,6 +271,7 @@ class BasketPage extends Page {
       )();
       if (deleteResult && !(typeof deleteResult === 'string')) {
         this.cartInfo = deleteResult;
+        target.disabled = false;
         this.updateFields();
         this.header.updateCartCounter();
       }
