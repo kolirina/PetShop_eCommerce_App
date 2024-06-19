@@ -178,8 +178,10 @@ class Product {
   public async changeQuantity(
     cartId: string,
     cartVersion: number,
-    target: HTMLElement
+    target: HTMLButtonElement
   ): Promise<Cart> {
+    const targetBtn = target;
+    targetBtn.disabled = true;
     let quantity = Number(this.productAmountInput.value);
     if (target === this.productAmountDecBtn) {
       quantity -= 1;
@@ -193,6 +195,7 @@ class Product {
       cartVersion,
       quantity
     ).then((result) => {
+      targetBtn.disabled = false;
       const changedProduct = result.lineItems.find(
         (el) => el.id === this.productInfo.id
       );

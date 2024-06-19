@@ -255,7 +255,7 @@ class BasketPage extends Page {
   }
 
   private async quantityHandler(item: Product, e: Event): Promise<void> {
-    const target = e.target as HTMLElement;
+    const target = e.target as HTMLButtonElement;
     if (this.cartInfo) {
       const amountResult = await item.changeQuantity.bind(
         item,
