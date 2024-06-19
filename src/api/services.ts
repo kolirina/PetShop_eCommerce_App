@@ -97,6 +97,9 @@ async function addItemsFromAnonymousCart() {
   await addItemsRecursively(items);
   localStorage.removeItem('anonymous_cart_id');
   localStorage.removeItem('anonymous_cart_version');
+  localStorage.removeItem('anonymous_token');
+  localStorage.removeItem('anonymous_refresh_token');
+  localStorage.removeItem('anonymous_token_time');
 }
 
 const loginUser = async (email: string, password: string): Promise<string> => {
@@ -119,7 +122,7 @@ const loginUser = async (email: string, password: string): Promise<string> => {
       JSON.stringify(response.body.cart!.version)
     );
     if (localStorage.getItem('anonymous_cart_id')) {
-      addItemsFromAnonymousCart();
+      await addItemsFromAnonymousCart();
     }
   }
   return id;
@@ -137,7 +140,7 @@ const signUpUser = async (
       localStorage.setItem('token', token);
       if (localStorage.getItem('anonymous_cart_id')) {
         await createCart(id);
-        addItemsFromAnonymousCart();
+        await addItemsFromAnonymousCart();
         localStorage.removeItem('anonymous_token');
       }
       return { id, token };

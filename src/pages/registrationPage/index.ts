@@ -713,6 +713,14 @@ class RegistrationPage extends Page {
     ) {
       isDefaultShippingAddress = this.defaultShippingAddressInput.checked;
       isDefaultBillingAddress = this.defaultBillingAddressInput.checked;
+      this.billingAddressBlock.countryInput.value =
+        this.shippingAddressBlock.countryInput.value;
+      this.billingAddressBlock.postInput.value =
+        this.shippingAddressBlock.postInput.value;
+      this.billingAddressBlock.cityInput.value =
+        this.shippingAddressBlock.cityInput.value;
+      this.billingAddressBlock.streetInput.value =
+        this.shippingAddressBlock.streetInput.value;
     }
     const userObj: UserInfo = {
       email: this.emailInput.value,

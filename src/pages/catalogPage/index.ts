@@ -612,10 +612,6 @@ class CatalogPage extends Page {
     }
     addToCartButton.addEventListener('click', async (event) => {
       event.stopPropagation();
-      addToCartButton.classList.add('alreadyInCart');
-      addToCartButton.disabled = true;
-      addToCartButton.innerText = 'ALREADY IN CART';
-
       if (
         !localStorage.getItem('token') &&
         !localStorage.getItem('id') &&
@@ -647,6 +643,9 @@ class CatalogPage extends Page {
         cartVersion = localStorage.getItem('anonymous_cart_version')!;
       }
       await addToCart(id, 1, JSON.parse(cartVersion));
+      addToCartButton.classList.add('alreadyInCart');
+      addToCartButton.disabled = true;
+      addToCartButton.innerText = 'ALREADY IN CART';
       this.header.updateCartCounter();
     });
   }
