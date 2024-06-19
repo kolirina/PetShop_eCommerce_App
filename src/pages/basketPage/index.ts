@@ -37,7 +37,11 @@ class BasketPage extends Page {
 
   private cartInfo?: Cart;
 
+  public totalPriceWrapper: HTMLDivElement;
+
   public totalPrice: HTMLHeadingElement;
+
+  public originalTotalPrice: HTMLHeadingElement;
 
   public promoAndTotalWrapper: HTMLDivElement;
 
@@ -103,11 +107,16 @@ class BasketPage extends Page {
       this.promoWrapper
     );
 
+    this.totalPriceWrapper = createDiv(
+      styles.totalPriceWrapper,
+      this.promoAndTotalWrapper
+    );
     this.totalPrice = createH3(
       styles.totalPrice,
       'Total price: ',
-      this.promoAndTotalWrapper
+      this.totalPriceWrapper
     );
+    this.originalTotalPrice = createH3(styles.totalPrice, 'Old Total price: ');
 
     this.appliedCodesWrapper = createDiv(styles.appliedCodesWrapper);
     this.appliedCodesHeading = createH3(
@@ -194,11 +203,44 @@ class BasketPage extends Page {
     }
   }
 
+  private getOriginalTotalPrice(): string {
+    let originalTotalPrice = 0;
+    if (this.cartInfo) {
+      this.cartInfo.lineItems.forEach((el) => {
+        const price = el.price.value.centAmount * el.quantity;
+        originalTotalPrice += price;
+      });
+    }
+    return priceFormatter(originalTotalPrice);
+  }
+
+  private addRemoveOriginalTotalPrice(): void {
+    if (this.cartInfo) {
+      const areDiscountsPresent = this.cartInfo.lineItems.some(
+        (el) => el.discountedPricePerQuantity.length > 0 || el.price.discounted
+      );
+      if (areDiscountsPresent) {
+        this.originalTotalPrice.textContent = `Old ${TOTAL_PRICE_TEXT}${this.getOriginalTotalPrice()}`;
+        this.totalPrice.textContent = `New ${TOTAL_PRICE_TEXT}${priceFormatter(this.cartInfo.totalPrice.centAmount)}`;
+        this.totalPriceWrapper.prepend(this.originalTotalPrice);
+        this.originalTotalPrice.classList.add(
+          styles.productOriginalPriceDiscounted
+        );
+        this.totalPrice.classList.add(styles.discountedPrice);
+      } else {
+        this.totalPrice.textContent = `${TOTAL_PRICE_TEXT}${priceFormatter(this.cartInfo.totalPrice.centAmount)}`;
+        this.originalTotalPrice.remove();
+        this.totalPrice.classList.remove(styles.discountedPrice);
+      }
+    }
+  }
+
   private checkProductQuantityInCart(): void {
     if (this.cartInfo && this.cartInfo.lineItems.length > 0) {
       this.noProductsMessage.remove();
       this.goToCatalogBtn.remove();
       this.totalPrice.textContent = `${TOTAL_PRICE_TEXT}${priceFormatter(this.cartInfo.totalPrice.centAmount)}`;
+      this.addRemoveOriginalTotalPrice();
       this.productsWrapper.append(this.promoAndTotalWrapper);
       this.productsWrapper.append(this.appliedCodesWrapper);
     } else {
@@ -342,6 +384,7 @@ class BasketPage extends Page {
         String(this.cartInfo.version)
       );
       this.totalPrice.textContent = `${TOTAL_PRICE_TEXT}${priceFormatter(this.cartInfo.totalPrice.centAmount)}`;
+      this.addRemoveOriginalTotalPrice();
       this.checkProductQuantityInCart();
     }
   }
