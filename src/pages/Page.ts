@@ -1,4 +1,5 @@
 import Router from '../router';
+import checkAnonymousToken from '../utils/checkAnonymousToken';
 
 export default class Page {
   protected parentElement: HTMLElement;
@@ -14,6 +15,7 @@ export default class Page {
   }
 
   public render() {
+    checkAnonymousToken();
     this.parentElement.innerHTML = '';
     this.parentElement.appendChild(this.container);
   }
