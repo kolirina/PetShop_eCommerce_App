@@ -151,6 +151,9 @@
 }
 
 .coupon {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
   flex: 0 0 auto;
   width: 250px;
   padding: 16px;

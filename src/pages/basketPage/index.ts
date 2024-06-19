@@ -26,6 +26,15 @@ import { lang } from '../../constants';
 import styles from './basketPage.module.css';
 import pageStyle from '../templatePage/templatePage.module.css';
 
+function showError() {
+  const background = document.querySelector(`.${styles.background}`);
+  background?.remove();
+  const body = document.querySelector(`.${pageStyle.page}`);
+  const bg = createDiv(styles.background, body as HTMLElement);
+  bg.append(createH3(styles.deletionError, 'Can`t clear cart at the moment.'));
+  bg.addEventListener('click', () => bg.remove());
+}
+
 class BasketPage extends Page {
   public header: Header;
 
@@ -37,7 +46,11 @@ class BasketPage extends Page {
 
   private cartInfo?: Cart;
 
+  public totalPriceWrapper: HTMLDivElement;
+
   public totalPrice: HTMLHeadingElement;
+
+  public originalTotalPrice: HTMLHeadingElement;
 
   public promoAndTotalWrapper: HTMLDivElement;
 
@@ -103,11 +116,16 @@ class BasketPage extends Page {
       this.promoWrapper
     );
 
+    this.totalPriceWrapper = createDiv(
+      styles.totalPriceWrapper,
+      this.promoAndTotalWrapper
+    );
     this.totalPrice = createH3(
       styles.totalPrice,
       'Total price: ',
-      this.promoAndTotalWrapper
+      this.totalPriceWrapper
     );
+    this.originalTotalPrice = createH3(styles.totalPrice, 'Total price: ');
 
     this.appliedCodesWrapper = createDiv(styles.appliedCodesWrapper);
     this.appliedCodesHeading = createH3(
@@ -194,11 +212,44 @@ class BasketPage extends Page {
     }
   }
 
+  private getOriginalTotalPrice(): string {
+    let originalTotalPrice = 0;
+    if (this.cartInfo) {
+      this.cartInfo.lineItems.forEach((el) => {
+        const price = el.price.value.centAmount * el.quantity;
+        originalTotalPrice += price;
+      });
+    }
+    return priceFormatter(originalTotalPrice);
+  }
+
+  private addRemoveOriginalTotalPrice(): void {
+    if (this.cartInfo) {
+      const areDiscountsPresent = this.cartInfo.lineItems.some(
+        (el) => el.discountedPricePerQuantity.length > 0 || el.price.discounted
+      );
+      if (areDiscountsPresent) {
+        this.originalTotalPrice.textContent = `${TOTAL_PRICE_TEXT}${this.getOriginalTotalPrice()}`;
+        this.totalPrice.textContent = `${TOTAL_PRICE_TEXT}${priceFormatter(this.cartInfo.totalPrice.centAmount)}`;
+        this.totalPriceWrapper.prepend(this.originalTotalPrice);
+        this.originalTotalPrice.classList.add(
+          styles.productOriginalPriceDiscounted
+        );
+        this.totalPrice.classList.add(styles.discountedPrice);
+      } else {
+        this.totalPrice.textContent = `${TOTAL_PRICE_TEXT}${priceFormatter(this.cartInfo.totalPrice.centAmount)}`;
+        this.originalTotalPrice.remove();
+        this.totalPrice.classList.remove(styles.discountedPrice);
+      }
+    }
+  }
+
   private checkProductQuantityInCart(): void {
     if (this.cartInfo && this.cartInfo.lineItems.length > 0) {
       this.noProductsMessage.remove();
       this.goToCatalogBtn.remove();
       this.totalPrice.textContent = `${TOTAL_PRICE_TEXT}${priceFormatter(this.cartInfo.totalPrice.centAmount)}`;
+      this.addRemoveOriginalTotalPrice();
       this.productsWrapper.append(this.promoAndTotalWrapper);
       this.productsWrapper.append(this.appliedCodesWrapper);
     } else {
@@ -216,7 +267,7 @@ class BasketPage extends Page {
         this.cartInfo.id,
         this.cartInfo.version
       )();
-      if (deleteResult) {
+      if (deleteResult && !(typeof deleteResult === 'string')) {
         this.cartInfo = deleteResult;
         this.updateFields();
         this.header.updateCartCounter();
@@ -230,32 +281,43 @@ class BasketPage extends Page {
       const cartId = this.cartInfo.id;
       await this.productsArr
         .reduce(async (promise, product) => {
-          await promise;
-          const result = await product.deleteProduct.bind(
-            product,
-            cartId,
-            cartVersion,
-            true
-          )();
-          cartVersion = result.version;
-          this.cartInfo = result;
-
-          const cartStatus = getCartStatus();
-          localStorage.setItem(`${cartStatus}_version`, String(result.version));
+          try {
+            await promise;
+            const result = await product.deleteProduct.bind(
+              product,
+              cartId,
+              cartVersion,
+              true
+            )();
+            if (typeof result !== 'undefined') {
+              cartVersion = result.version;
+              this.cartInfo = result;
+              const cartStatus = getCartStatus();
+              localStorage.setItem(
+                `${cartStatus}_version`,
+                String(result.version)
+              );
+            }
+          } catch (err) {
+            throw new Error('Can`t clear the cart at the moment');
+          }
         }, Promise.resolve())
         .then(() => {
           this.productsWrapper.innerHTML = '';
+          this.checkProductQuantityInCart();
+          this.header.updateCartCounter();
+          document.querySelector(`.${styles.background}`)?.remove();
+          this.productsArr = [];
+          this.header.updateCartCounter();
+        })
+        .catch(() => {
+          showError();
         });
-      this.checkProductQuantityInCart();
-      this.header.updateCartCounter();
-      document.querySelector(`.${styles.background}`)?.remove();
-      this.productsArr = [];
-      this.header.updateCartCounter();
     }
   }
 
   private async quantityHandler(item: Product, e: Event): Promise<void> {
-    const target = e.target as HTMLElement;
+    const target = e.target as HTMLButtonElement;
     if (this.cartInfo) {
       const amountResult = await item.changeQuantity.bind(
         item,
@@ -342,6 +404,7 @@ class BasketPage extends Page {
         String(this.cartInfo.version)
       );
       this.totalPrice.textContent = `${TOTAL_PRICE_TEXT}${priceFormatter(this.cartInfo.totalPrice.centAmount)}`;
+      this.addRemoveOriginalTotalPrice();
       this.checkProductQuantityInCart();
     }
   }

@@ -12,7 +12,17 @@ import noImage from '../../assets/no-image.png';
 import { lang } from '../../constants';
 import priceFormatter from '../../utils/priceFormatter';
 import { changeProductQuantity, deleteProductFromCart } from '../../api/SDK';
+import pageStyle from '../templatePage/templatePage.module.css';
 import styles from './basketPage.module.css';
+
+function showError() {
+  const body = document.querySelector(`.${pageStyle.page}`);
+  const bg = createDiv(styles.background, body as HTMLElement);
+  bg.append(
+    createH3(styles.deletionError, 'Can`t delete product at the moment.')
+  );
+  bg.addEventListener('click', () => bg.remove());
+}
 
 class Product {
   public productWrapper: HTMLDivElement;
@@ -116,6 +126,10 @@ class Product {
       this.amountAndPriceWrapper
     );
     this.originalPrice = createH3(styles.productOriginalPrice, '');
+    this.originalPrice.textContent = `${priceFormatter(this.productInfo.price.value.centAmount)}`;
+    if (this.productAmount > 1) {
+      this.productPriceWrapper.prepend(this.originalPrice);
+    }
     this.productPriceText = createH3(
       styles.productPriceText,
       priceFormatter(this.productPrice),
@@ -152,7 +166,7 @@ class Product {
       this.productInfo.price.discounted
     ) {
       this.productPriceText.classList.add(styles.discountedPrice);
-      this.originalPrice.textContent = `${priceFormatter(this.productInfo.price.value.centAmount)}`;
+      this.originalPrice.classList.add(styles.productOriginalPriceDiscounted);
       this.productPriceWrapper.prepend(this.originalPrice);
     }
   }
@@ -161,25 +175,35 @@ class Product {
     cartId: string,
     cartVersion: number,
     clear = false
-  ): Promise<Cart> {
-    const response = deleteProductFromCart(
-      cartId,
-      this.productInfo.id,
-      cartVersion
-    );
-    if (await response) {
+  ): Promise<void | Cart> {
+    let data;
+    try {
+      const response = await deleteProductFromCart(
+        cartId,
+        this.productInfo.id,
+        cartVersion
+      );
       if (this.productWrapper && this.productWrapper.parentNode && !clear) {
         this.productWrapper.parentNode.removeChild(this.productWrapper);
       }
+      data = response;
+    } catch (err) {
+      if (!clear) {
+        showError();
+      } else {
+        throw new Error('Error');
+      }
     }
-    return response;
+    return data;
   }
 
   public async changeQuantity(
     cartId: string,
     cartVersion: number,
-    target: HTMLElement
+    target: HTMLButtonElement
   ): Promise<Cart> {
+    const targetBtn = target;
+    targetBtn.disabled = true;
     let quantity = Number(this.productAmountInput.value);
     if (target === this.productAmountDecBtn) {
       quantity -= 1;
@@ -193,6 +217,7 @@ class Product {
       cartVersion,
       quantity
     ).then((result) => {
+      targetBtn.disabled = false;
       const changedProduct = result.lineItems.find(
         (el) => el.id === this.productInfo.id
       );
@@ -212,8 +237,10 @@ class Product {
     this.productAmountInput.value = String(this.productAmount);
     if (this.productAmount === 1) {
       this.productAmountDecBtn.disabled = true;
+      this.originalPrice.remove();
     } else {
       this.productAmountDecBtn.disabled = false;
+      this.productPriceWrapper.prepend(this.originalPrice);
     }
   }
 
