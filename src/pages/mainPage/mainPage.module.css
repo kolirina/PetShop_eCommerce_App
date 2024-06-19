@@ -236,3 +236,9 @@
     font-size: 30px;
   }
 }
+
+@media screen and (max-width: 560px) {
+  .promo-container {
+    flex-direction: column;
+  }
+}
