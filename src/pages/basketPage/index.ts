@@ -125,7 +125,7 @@ class BasketPage extends Page {
       'Total price: ',
       this.totalPriceWrapper
     );
-    this.originalTotalPrice = createH3(styles.totalPrice, 'Old Total price: ');
+    this.originalTotalPrice = createH3(styles.totalPrice, 'Total price: ');
 
     this.appliedCodesWrapper = createDiv(styles.appliedCodesWrapper);
     this.appliedCodesHeading = createH3(
@@ -229,8 +229,8 @@ class BasketPage extends Page {
         (el) => el.discountedPricePerQuantity.length > 0 || el.price.discounted
       );
       if (areDiscountsPresent) {
-        this.originalTotalPrice.textContent = `Old ${TOTAL_PRICE_TEXT}${this.getOriginalTotalPrice()}`;
-        this.totalPrice.textContent = `New ${TOTAL_PRICE_TEXT}${priceFormatter(this.cartInfo.totalPrice.centAmount)}`;
+        this.originalTotalPrice.textContent = `${TOTAL_PRICE_TEXT}${this.getOriginalTotalPrice()}`;
+        this.totalPrice.textContent = `${TOTAL_PRICE_TEXT}${priceFormatter(this.cartInfo.totalPrice.centAmount)}`;
         this.totalPriceWrapper.prepend(this.originalTotalPrice);
         this.originalTotalPrice.classList.add(
           styles.productOriginalPriceDiscounted
