@@ -602,6 +602,7 @@ class CatalogPage extends Page {
       priceAndAddToCart
     );
     addToCartButton.classList.add('addToCartButton');
+
     productCard.addEventListener('click', () =>
       this.router.navigateTo(Pages.PRODUCT, { id })
     );
@@ -610,43 +611,52 @@ class CatalogPage extends Page {
       addToCartButton.disabled = true;
       addToCartButton.innerText = 'ALREADY IN CART';
     }
+
     addToCartButton.addEventListener('click', async (event) => {
       event.stopPropagation();
-      if (
-        !localStorage.getItem('token') &&
-        !localStorage.getItem('id') &&
-        !localStorage.getItem('anonymous_token')
-      ) {
-        await createAnonymousUser();
-        await createAnonymousCart();
-      }
-      if (
-        localStorage.getItem('anonymous_token') &&
-        !localStorage.getItem('anonymous_cart_id') &&
-        !isLoggedIn()
-      ) {
-        await createAnonymousCart();
-      }
-      if (
-        !localStorage.getItem('registered_user_cart_id') &&
-        localStorage.getItem('id')
-      ) {
-        const customerId = localStorage.getItem('id');
-        if (customerId) {
-          await createCart(customerId);
+      const spinner = createDiv('spinner', this.productsContainer);
+      spinner.style.display = 'block';
+      try {
+        if (
+          !localStorage.getItem('token') &&
+          !localStorage.getItem('id') &&
+          !localStorage.getItem('anonymous_token')
+        ) {
+          await createAnonymousUser();
+          await createAnonymousCart();
         }
+        if (
+          localStorage.getItem('anonymous_token') &&
+          !localStorage.getItem('anonymous_cart_id') &&
+          !isLoggedIn()
+        ) {
+          await createAnonymousCart();
+        }
+        if (
+          !localStorage.getItem('registered_user_cart_id') &&
+          localStorage.getItem('id')
+        ) {
+          const customerId = localStorage.getItem('id');
+          if (customerId) {
+            await createCart(customerId);
+          }
+        }
+        let cartVersion = '';
+        if (localStorage.getItem('registered_user_cart_version')) {
+          cartVersion = localStorage.getItem('registered_user_cart_version')!;
+        } else {
+          cartVersion = localStorage.getItem('anonymous_cart_version')!;
+        }
+        await addToCart(id, 1, JSON.parse(cartVersion));
+        addToCartButton.classList.add('alreadyInCart');
+        addToCartButton.disabled = true;
+        addToCartButton.innerText = 'ALREADY IN CART';
+        this.header.updateCartCounter();
+      } catch (error) {
+        throw new Error('Error fetching products');
+      } finally {
+        spinner.style.display = 'none';
       }
-      let cartVersion = '';
-      if (localStorage.getItem('registered_user_cart_version')) {
-        cartVersion = localStorage.getItem('registered_user_cart_version')!;
-      } else {
-        cartVersion = localStorage.getItem('anonymous_cart_version')!;
-      }
-      await addToCart(id, 1, JSON.parse(cartVersion));
-      addToCartButton.classList.add('alreadyInCart');
-      addToCartButton.disabled = true;
-      addToCartButton.innerText = 'ALREADY IN CART';
-      this.header.updateCartCounter();
     });
   }
 
