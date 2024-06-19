@@ -722,39 +722,43 @@ async function deleteProductFromCart(
   cartVersion: number
 ): Promise<Cart> {
   const token = getLocalToken();
-  const response = await apiRoot
-    .withProjectKey({ projectKey })
-    .me()
-    .carts()
-    .withId({ ID: cartId })
-    .post({
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-      body: {
-        version: cartVersion,
-        actions: [
-          {
-            action: 'removeLineItem',
-            lineItemId: productId,
-          },
-        ],
-      },
-    })
-    .execute();
-  if (cartId === localStorage.getItem('anonymous_cart_id')) {
-    localStorage.setItem(
-      'anonymous_cart_version',
-      JSON.stringify(response.body.version)
-    );
-  } else {
-    localStorage.setItem(
-      'registered_user_cart_version',
-      JSON.stringify(response.body.version)
-    );
+  try {
+    const response = await apiRoot
+      .withProjectKey({ projectKey })
+      .me()
+      .carts()
+      .withId({ ID: cartId })
+      .post({
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        body: {
+          version: cartVersion,
+          actions: [
+            {
+              action: 'removeLineItem',
+              lineItemId: productId,
+            },
+          ],
+        },
+      })
+      .execute();
+    if (cartId === localStorage.getItem('anonymous_cart_id')) {
+      localStorage.setItem(
+        'anonymous_cart_version',
+        JSON.stringify(response.body.version)
+      );
+    } else {
+      localStorage.setItem(
+        'registered_user_cart_version',
+        JSON.stringify(response.body.version)
+      );
+    }
+    const data = response.body;
+    return data;
+  } catch (err) {
+    throw new Error('Error');
   }
-  const data = response.body;
-  return data;
 }
 
 async function changeProductQuantity(

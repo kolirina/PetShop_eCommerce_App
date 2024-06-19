@@ -26,6 +26,15 @@ import { lang } from '../../constants';
 import styles from './basketPage.module.css';
 import pageStyle from '../templatePage/templatePage.module.css';
 
+function showError() {
+  const background = document.querySelector(`.${styles.background}`);
+  background?.remove();
+  const body = document.querySelector(`.${pageStyle.page}`);
+  const bg = createDiv(styles.background, body as HTMLElement);
+  bg.append(createH3(styles.deletionError, 'Can`t clear cart at the moment.'));
+  bg.addEventListener('click', () => bg.remove());
+}
+
 class BasketPage extends Page {
   public header: Header;
 
@@ -258,7 +267,7 @@ class BasketPage extends Page {
         this.cartInfo.id,
         this.cartInfo.version
       )();
-      if (deleteResult) {
+      if (deleteResult && !(typeof deleteResult === 'string')) {
         this.cartInfo = deleteResult;
         this.updateFields();
         this.header.updateCartCounter();
@@ -272,27 +281,38 @@ class BasketPage extends Page {
       const cartId = this.cartInfo.id;
       await this.productsArr
         .reduce(async (promise, product) => {
-          await promise;
-          const result = await product.deleteProduct.bind(
-            product,
-            cartId,
-            cartVersion,
-            true
-          )();
-          cartVersion = result.version;
-          this.cartInfo = result;
-
-          const cartStatus = getCartStatus();
-          localStorage.setItem(`${cartStatus}_version`, String(result.version));
+          try {
+            await promise;
+            const result = await product.deleteProduct.bind(
+              product,
+              cartId,
+              cartVersion,
+              true
+            )();
+            if (typeof result !== 'undefined') {
+              cartVersion = result.version;
+              this.cartInfo = result;
+              const cartStatus = getCartStatus();
+              localStorage.setItem(
+                `${cartStatus}_version`,
+                String(result.version)
+              );
+            }
+          } catch (err) {
+            throw new Error('Can`t clear the cart at the moment');
+          }
         }, Promise.resolve())
         .then(() => {
           this.productsWrapper.innerHTML = '';
+          this.checkProductQuantityInCart();
+          this.header.updateCartCounter();
+          document.querySelector(`.${styles.background}`)?.remove();
+          this.productsArr = [];
+          this.header.updateCartCounter();
+        })
+        .catch(() => {
+          showError();
         });
-      this.checkProductQuantityInCart();
-      this.header.updateCartCounter();
-      document.querySelector(`.${styles.background}`)?.remove();
-      this.productsArr = [];
-      this.header.updateCartCounter();
     }
   }
 

@@ -12,7 +12,17 @@ import noImage from '../../assets/no-image.png';
 import { lang } from '../../constants';
 import priceFormatter from '../../utils/priceFormatter';
 import { changeProductQuantity, deleteProductFromCart } from '../../api/SDK';
+import pageStyle from '../templatePage/templatePage.module.css';
 import styles from './basketPage.module.css';
+
+function showError() {
+  const body = document.querySelector(`.${pageStyle.page}`);
+  const bg = createDiv(styles.background, body as HTMLElement);
+  bg.append(
+    createH3(styles.deletionError, 'Can`t delete product at the moment.')
+  );
+  bg.addEventListener('click', () => bg.remove());
+}
 
 class Product {
   public productWrapper: HTMLDivElement;
@@ -165,18 +175,26 @@ class Product {
     cartId: string,
     cartVersion: number,
     clear = false
-  ): Promise<Cart> {
-    const response = deleteProductFromCart(
-      cartId,
-      this.productInfo.id,
-      cartVersion
-    );
-    if (await response) {
+  ): Promise<void | Cart> {
+    let data;
+    try {
+      const response = await deleteProductFromCart(
+        cartId,
+        this.productInfo.id,
+        cartVersion
+      );
       if (this.productWrapper && this.productWrapper.parentNode && !clear) {
         this.productWrapper.parentNode.removeChild(this.productWrapper);
       }
+      data = response;
+    } catch (err) {
+      if (!clear) {
+        showError();
+      } else {
+        throw new Error('Error');
+      }
     }
-    return response;
+    return data;
   }
 
   public async changeQuantity(
